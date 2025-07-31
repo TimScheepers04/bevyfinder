@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder - Discover Your Perfect Beverage</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Discover and learn about alcoholic beverages with BevyFinder - the ultimate beverage database with top beers, wines, cocktails, and Australian craft beers. Find ABV, ingredients, and standard drink information.">
+    <meta name="keywords" content="beer, wine, cocktails, beverages, alcohol, australian beer, craft beer, ABV, standard drinks, beverage database, dan murphy's">
+    <meta name="author" content="BevyFinder">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="BevyFinder - Discover Your Perfect Beverage">
+    <meta property="og:description" content="Explore the world's best beers, wines, and cocktails with detailed information about alcohol content and ingredients.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=630&fit=crop">
+    <meta property="og:site_name" content="BevyFinder">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BevyFinder - Discover Your Perfect Beverage">
+    <meta name="twitter:description" content="Explore the world's best beers, wines, and cocktails with detailed information about alcohol content and ingredients.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=630&fit=crop">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://images.unsplash.com">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "BevyFinder",
+        "description": "A comprehensive beverage discovery application with information about beers, wines, and cocktails",
+        "url": "https://your-domain.com",
+        "applicationCategory": "FoodAndDrinkApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+            <p>Enter a photo or name of your favorite alcoholic beverage</p>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="name">
+                        <i class="fas fa-edit"></i>
+                        Name Input
+                    </button>
+                    <button class="tab-btn" data-tab="photo">
+                        <i class="fas fa-camera"></i>
+                        Photo Upload
+                    </button>
+                </div>
+
+                <!-- Name Input Tab -->
+                <div class="tab-content active" id="name-tab">
+                    <div class="input-group">
+                        <label for="beverage-name">Beverage Name</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="beverage-name" 
+                                placeholder="e.g., Margarita, Guinness, Chardonnay..."
+                                autocomplete="off"
+                            >
+                            <button class="search-btn" id="search-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="suggestions" id="suggestions"></div>
+                    </div>
+                </div>
+
+                <!-- Photo Input Tab -->
+                <div class="tab-content" id="photo-tab">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Beverage Photo</h3>
+                            <p>Drag & drop an image here or click to browse</p>
+                            <input type="file" id="photo-input" accept="image/*" hidden>
+                            <button class="upload-btn" onclick="document.getElementById('photo-input').click()">
+                                Choose File
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-area" id="preview-area" style="display: none;">
+                        <img id="preview-image" src="" alt="Preview">
+                        <button class="remove-btn" id="remove-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="results-section" style="display: none;">
+                <h2>Beverage Information</h2>
+                <div class="beverage-card" id="beverage-card">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Made with <i class="fas fa-heart"></i> for beverage enthusiasts</p>
+            <p>By Tim Scheepers</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

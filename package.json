@@ -1,0 +1,49 @@
+{
+  "name": "bevyfinder-beverage-app",
+  "version": "1.0.0",
+  "description": "BevyFinder - Discover Your Perfect Beverage. A modern web application for exploring top-rated beers, wines, cocktails, and spirits from around the world.",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 3000 -o -c-1",
+    "dev": "http-server -p 3000 -o -c-1",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "echo 'Ready for deployment - see deploy.md for options'",
+    "deploy:github": "echo 'Push to GitHub and enable Pages'",
+    "deploy:netlify": "echo 'Drag folder to Netlify or connect Git repo'",
+    "deploy:vercel": "vercel --prod",
+    "test": "echo 'No tests configured'",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": [
+    "beverage",
+    "beer",
+    "wine",
+    "cocktails",
+    "alcohol",
+    "australian-beer",
+    "craft-beer",
+    "beverage-discovery",
+    "drink-database",
+    "cocktail-recipes",
+    "beer-guide",
+    "wine-guide"
+  ],
+  "author": "BevyFinder Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/bevyfinder-beverage-app.git"
+  },
+  "homepage": "https://yourusername.github.io/bevyfinder-beverage-app",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+} 
