@@ -133,6 +133,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast', 'Nitrogen'],
         description: 'A classic Irish dry stout with a creamy head and smooth finish. One 440ml can contains 1.0 standard drink.',
+        nutrition: {
+            calories: 125,
+            carbs: 10.5,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '440ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'Irish', 'Classic', 'Creamy']
     },
@@ -2288,6 +2296,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A classic Western Australian lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 12.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Western Australia', 'Classic']
     },
@@ -2310,6 +2326,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A light, refreshing lager perfect for hot weather. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.2,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Light', 'Refreshing']
     },
@@ -2334,6 +2358,14 @@ const beverageDatabase = {
         standardDrinks: '1.5',
         ingredients: ['Tequila (2 oz)', 'Lime juice (1 oz)', 'Triple sec (1 oz)', 'Salt rim'],
         description: 'A refreshing cocktail made with tequila, lime juice, and triple sec, typically served with salt on the rim. One standard margarita contains 1.5 standard drinks.',
+        nutrition: {
+            calories: 168,
+            carbs: 8.5,
+            protein: 0.2,
+            fat: 0,
+            sugar: 6.2,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Tequila', 'Citrus', 'Classic', 'Refreshing']
     },
@@ -3277,6 +3309,35 @@ function simulateImageRecognition() {
 function displayBeverageInfo(beverage, fromImage = false) {
     const sourceText = fromImage ? ' (Identified from image)' : '';
     
+    // Create nutrition section if available
+    const nutritionSection = beverage.nutrition ? `
+        <div class="nutrition-section">
+            <h4>Nutritional Information (per ${beverage.nutrition.servingSize})</h4>
+            <div class="nutrition-grid">
+                <div class="nutrition-item">
+                    <span class="nutrition-label">Calories</span>
+                    <span class="nutrition-value">${beverage.nutrition.calories}</span>
+                </div>
+                <div class="nutrition-item">
+                    <span class="nutrition-label">Carbs</span>
+                    <span class="nutrition-value">${beverage.nutrition.carbs}g</span>
+                </div>
+                <div class="nutrition-item">
+                    <span class="nutrition-label">Protein</span>
+                    <span class="nutrition-value">${beverage.nutrition.protein}g</span>
+                </div>
+                <div class="nutrition-item">
+                    <span class="nutrition-label">Fat</span>
+                    <span class="nutrition-value">${beverage.nutrition.fat}g</span>
+                </div>
+                <div class="nutrition-item">
+                    <span class="nutrition-label">Sugar</span>
+                    <span class="nutrition-value">${beverage.nutrition.sugar}g</span>
+                </div>
+            </div>
+        </div>
+    ` : '';
+    
     beverageCard.innerHTML = `
         <div class="beverage-info">
             <img src="${beverage.image}" alt="${beverage.name}" class="beverage-image">
@@ -3288,6 +3349,7 @@ function displayBeverageInfo(beverage, fromImage = false) {
                 ${beverage.standardDrinks ? `<p><strong>Standard Drinks:</strong> ${beverage.standardDrinks}</p>` : ''}
                 <p><strong>Ingredients:</strong> ${beverage.ingredients.join(', ')}</p>
                 <p><strong>Description:</strong> ${beverage.description}</p>
+                ${nutritionSection}
                 <div class="beverage-tags">
                     ${beverage.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                 </div>
