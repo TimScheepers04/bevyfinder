@@ -23,6 +23,14 @@ const beverageDatabase = {
         standardDrinks: '2.4',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Styrian Golding hops', 'Westmalle yeast'],
         description: 'Considered the world\'s best beer, this Trappist quadrupel from Belgium offers complex flavors of dark fruit, caramel, and spice. One 330ml bottle contains 2.4 standard drinks.',
+        nutrition: {
+            calories: 285,
+            carbs: 28.5,
+            protein: 2.8,
+            fat: 0,
+            sugar: 3.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Quadrupel', 'Belgian', 'Trappist', 'Premium']
     },
@@ -34,6 +42,14 @@ const beverageDatabase = {
         standardDrinks: '2.4',
         ingredients: ['Pale malt', 'Crystal malt', 'Amarillo hops', 'Simcoe hops', 'Centennial hops'],
         description: 'A highly sought-after triple IPA from Russian River Brewing. Intensely hoppy with citrus and pine notes. One 500ml serving contains 2.4 standard drinks.',
+        nutrition: {
+            calories: 290,
+            carbs: 29.2,
+            protein: 2.9,
+            fat: 0,
+            sugar: 2.8,
+            servingSize: '500ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'American', 'Hoppy', 'Limited']
     },
@@ -45,6 +61,14 @@ const beverageDatabase = {
         standardDrinks: '1.9',
         ingredients: ['Pale malt', 'Wheat malt', 'Amarillo hops', 'Simcoe hops', 'Centennial hops'],
         description: 'A legendary double IPA from The Alchemist. Hazy, juicy, and intensely aromatic. One 473ml can contains 1.9 standard drinks.',
+        nutrition: {
+            calories: 225,
+            carbs: 22.8,
+            protein: 2.2,
+            fat: 0,
+            sugar: 2.1,
+            servingSize: '473ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'American', 'Hazy', 'Cult']
     },
@@ -56,6 +80,14 @@ const beverageDatabase = {
         standardDrinks: '2.8',
         ingredients: ['Chocolate malt', 'Coffee', 'Chocolate', 'Bourbon barrel aged'],
         description: 'A bourbon barrel-aged imperial stout with coffee and chocolate notes. Rich and complex. One 355ml bottle contains 2.8 standard drinks.',
+        nutrition: {
+            calories: 335,
+            carbs: 33.8,
+            protein: 3.2,
+            fat: 0,
+            sugar: 4.2,
+            servingSize: '355ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'American', 'Barrel-aged', 'Coffee']
     },
@@ -152,6 +184,14 @@ const beverageDatabase = {
         standardDrinks: '2.0',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Saaz hops', 'Duvel yeast'],
         description: 'A classic Belgian strong golden ale with fruity esters and spicy hop character. One 330ml bottle contains 2.0 standard drinks.',
+        nutrition: {
+            calories: 240,
+            carbs: 24.2,
+            protein: 2.4,
+            fat: 0,
+            sugar: 2.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Golden Ale', 'Belgian', 'Strong', 'Classic']
     },
@@ -163,6 +203,14 @@ const beverageDatabase = {
         standardDrinks: '2.1',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Styrian Golding hops', 'Chimay yeast'],
         description: 'A Trappist strong dark ale with complex dark fruit and spice notes. One 330ml bottle contains 2.1 standard drinks.',
+        nutrition: {
+            calories: 255,
+            carbs: 25.8,
+            protein: 2.5,
+            fat: 0,
+            sugar: 3.1,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Dark Ale', 'Belgian', 'Trappist', 'Complex']
     },
@@ -319,6 +367,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A classic Australian lager with a crisp, clean taste. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 138,
+            carbs: 12.8,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Crisp']
     },
@@ -330,6 +386,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'Australia\'s most popular beer, known for its distinctive bitter taste. One 375ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 13.2,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Bitter', 'Australian', 'Popular', 'Classic']
     },
@@ -341,6 +405,14 @@ const beverageDatabase = {
         standardDrinks: '0.8',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A mid-strength lager from Queensland, perfect for extended drinking sessions. One 375ml bottle contains 0.8 standard drinks.',
+        nutrition: {
+            calories: 105,
+            carbs: 9.8,
+            protein: 0.9,
+            fat: 0,
+            sugar: 0.3,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Queensland']
     },
@@ -352,6 +424,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'Australia\'s premium lager with a smooth, full-bodied taste. One 375ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 148,
+            carbs: 13.5,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Smooth']
     },
@@ -363,6 +443,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A naturally cloudy pale ale with distinctive fruity characters. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 12.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Cloudy', 'Fruity']
     },
@@ -374,6 +462,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A traditional Australian sparkling ale with natural sediment. One 375ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 16.8,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Sparkling Ale', 'Australian', 'Traditional', 'Sediment']
     },
@@ -385,6 +481,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A hoppy American-style pale ale with citrus and floral notes. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Hoppy', 'Citrus']
     },
@@ -396,6 +500,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
         description: 'A tropical fruit-forward pale ale with Galaxy hops. One 330ml bottle contains 1.0 standard drink.',
+        nutrition: {
+            calories: 132,
+            carbs: 12.8,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Tropical', 'Galaxy Hops']
     },
@@ -407,6 +519,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A sessionable extra pale ale with tropical and citrus hop character. One 330ml can contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 138,
+            carbs: 13.2,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'XPA', 'Australian', 'Sessionable', 'Tropical']
     },
@@ -418,6 +538,14 @@ const beverageDatabase = {
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
         description: 'A bold IPA with intense tropical fruit and pine hop character. One 330ml can contains 1.5 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 18.2,
+            protein: 1.8,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -429,6 +557,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A sessionable pale ale with balanced malt and hop character. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Sessionable', 'Balanced']
     },
@@ -440,6 +576,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A hazy IPA with intense tropical fruit and citrus hop character. One 330ml can contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.2,
+            protein: 1.9,
+            fat: 0,
+            sugar: 1.0,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Hazy', 'Tropical']
     },
@@ -451,6 +595,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A juicy IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Juicy', 'Tropical']
     },
@@ -462,6 +614,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Oats', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A hazy New England-style IPA with tropical fruit notes. One 330ml can contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.5,
+            protein: 1.9,
+            fat: 0,
+            sugar: 1.0,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Hazy', 'Tropical']
     },
@@ -473,6 +633,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Columbus hops', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A bold IPA with intense hop character and high alcohol content. One 330ml bottle contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 200,
+            carbs: 20.2,
+            protein: 2.0,
+            fat: 0,
+            sugar: 1.1,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Bold', 'High ABV']
     },
@@ -484,6 +652,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Earl Grey tea', 'Citra hops', 'Water', 'Yeast'],
         description: 'An Earl Grey tea-infused IPA with citrus and bergamot notes. One 330ml bottle contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.5,
+            protein: 1.9,
+            fat: 0,
+            sugar: 1.0,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Tea-infused', 'Bergamot']
     },
@@ -541,6 +717,14 @@ const beverageDatabase = {
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A rich, dark stout with coffee and chocolate notes. One 375ml bottle contains 1.5 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 18.2,
+            protein: 1.8,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'Australian', 'Dark', 'Rich']
     },
@@ -563,6 +747,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A clean, crisp lager with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.2,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Clean', 'Crisp']
     },
@@ -607,6 +799,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A clean, natural lager with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 128,
+            carbs: 12.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Clean', 'Natural']
     },
@@ -629,6 +829,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A smooth, dark stout with coffee and chocolate notes. One 330ml can contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'Australian', 'Dark', 'Smooth']
     },
@@ -651,6 +859,14 @@ const beverageDatabase = {
         standardDrinks: '1.9',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
         description: 'A bold double IPA with intense hop character and high alcohol content. One 330ml can contains 1.9 standard drinks.',
+        nutrition: {
+            calories: 225,
+            carbs: 22.8,
+            protein: 2.2,
+            fat: 0,
+            sugar: 1.1,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Double IPA', 'Australian', 'Bold', 'High ABV']
     },
@@ -673,6 +889,14 @@ const beverageDatabase = {
         standardDrinks: '1.7',
         ingredients: ['Malted barley', 'Mango', 'Citra hops', 'Water', 'Yeast'],
         description: 'A mango-infused IPA with tropical fruit character. One 330ml can contains 1.7 standard drinks.',
+        nutrition: {
+            calories: 205,
+            carbs: 20.5,
+            protein: 2.0,
+            fat: 0,
+            sugar: 1.1,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Mango', 'Tropical']
     },
@@ -695,6 +919,14 @@ const beverageDatabase = {
         standardDrinks: '2.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
         description: 'A massive double IPA with intense hop character and high alcohol content. One 330ml bottle contains 2.0 standard drinks.',
+        nutrition: {
+            calories: 240,
+            carbs: 24.2,
+            protein: 2.4,
+            fat: 0,
+            sugar: 1.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Double IPA', 'New Zealand', 'Massive', 'High ABV']
     },
@@ -717,6 +949,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Roasted barley', 'Chocolate malt', 'Water', 'Yeast'],
         description: 'A rich porter with coffee and chocolate notes. One 330ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.8,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Porter', 'New Zealand', 'Rich', 'Dark']
     },
@@ -739,6 +979,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A bright, golden ale with subtle hop character. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Golden Ale', 'Australian', 'Bright', 'Golden']
     },
@@ -750,6 +998,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A sessionable IPA with tropical fruit hop character. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 13.2,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Session IPA', 'Australian', 'Sessionable', 'Tropical']
     },
@@ -761,6 +1017,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Northern Brewer hops', 'Water', 'Yeast'],
         description: 'A California common-style beer with caramel malt character. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'California Common', 'Australian', 'Caramel', 'Smooth']
     },
@@ -772,6 +1036,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'East Kent Golding hops', 'Water', 'Yeast'],
         description: 'An English-style pale ale with balanced malt and hop character. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'English Pale Ale', 'Australian', 'Balanced', 'Traditional']
     },
@@ -783,6 +1055,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A bright, golden ale with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Golden Ale', 'Australian', 'Bright', 'Golden']
     },
@@ -2304,7 +2584,7 @@ const beverageDatabase = {
             sugar: 0.5,
             servingSize: '375ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Western Australia', 'Classic']
     },
     'carlton-dry': {
@@ -2345,8 +2625,130 @@ const beverageDatabase = {
         standardDrinks: '0.8',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A mid-strength version of Great Northern with the same refreshing character. One 330ml bottle contains 0.8 standard drinks.',
+        nutrition: {
+            calories: 100,
+            carbs: 9.5,
+            protein: 0.8,
+            fat: 0,
+            sugar: 0.3,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Refreshing']
+    },
+    'varsity-lager': {
+        name: 'Varsity Lager',
+        type: 'Beer',
+        alcohol: 'Australian Lager',
+        abv: '4.5%',
+        standardDrinks: '1.1',
+        ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
+        description: 'A premium Australian lager with a crisp, clean taste and smooth finish. Perfect for any occasion. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 138,
+            carbs: 12.8,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Crisp', 'Clean']
+    },
+    'sommersby': {
+        name: 'Sommersby',
+        type: 'Cider',
+        alcohol: 'Apple Cider',
+        abv: '4.5%',
+        standardDrinks: '1.2',
+        ingredients: ['Apple juice', 'Water', 'Sugar', 'Yeast', 'Natural flavors'],
+        description: 'A refreshing apple cider with a crisp, fruity taste. Light and easy to drink. One 330ml can contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 15.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 12.8,
+            servingSize: '330ml'
+        },
+        image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
+        tags: ['Cider', 'Apple', 'Refreshing', 'Fruity', 'Light']
+    },
+    'minus196-premix': {
+        name: '-196 Premix',
+        type: 'RTD',
+        alcohol: 'Vodka',
+        abv: '6.0%',
+        standardDrinks: '1.4',
+        ingredients: ['Vodka', 'Natural flavors', 'Carbonated water', 'Sugar', 'Citric acid'],
+        description: 'A premium ready-to-drink vodka premix with natural flavors. Smooth and refreshing. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 16.5,
+            protein: 0,
+            fat: 0,
+            sugar: 14.2,
+            servingSize: '330ml'
+        },
+        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
+        tags: ['RTD', 'Vodka', 'Premix', 'Premium', 'Smooth']
+    },
+    'hard-solo': {
+        name: 'Hard Solo',
+        type: 'RTD',
+        alcohol: 'Vodka',
+        abv: '4.5%',
+        standardDrinks: '1.1',
+        ingredients: ['Vodka', 'Lemon flavoring', 'Carbonated water', 'Sugar', 'Natural flavors'],
+        description: 'A hard lemonade version of the classic Solo soft drink. Tangy and refreshing with a kick. One 330ml can contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 142,
+            carbs: 15.8,
+            protein: 0,
+            fat: 0,
+            sugar: 13.5,
+            servingSize: '330ml'
+        },
+        image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
+        tags: ['RTD', 'Vodka', 'Lemon', 'Tangy', 'Refreshing']
+    },
+    'bundaberg-rum-cola': {
+        name: 'Bundaberg Rum & Cola',
+        type: 'RTD',
+        alcohol: 'Rum',
+        abv: '5.5%',
+        standardDrinks: '1.3',
+        ingredients: ['Bundaberg Rum', 'Cola', 'Carbonated water', 'Sugar', 'Natural flavors'],
+        description: 'A classic rum and cola premix featuring Bundaberg Rum. Sweet and smooth with a distinctive rum flavor. One 330ml can contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 18.2,
+            protein: 0,
+            fat: 0,
+            sugar: 16.8,
+            servingSize: '330ml'
+        },
+        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
+        tags: ['RTD', 'Rum', 'Cola', 'Bundaberg', 'Classic']
+    },
+    'jack-daniels-cola': {
+        name: 'Jack Daniels & Cola',
+        type: 'RTD',
+        alcohol: 'Whiskey',
+        abv: '5.5%',
+        standardDrinks: '1.3',
+        ingredients: ['Jack Daniels Tennessee Whiskey', 'Cola', 'Carbonated water', 'Sugar', 'Natural flavors'],
+        description: 'A premium whiskey and cola premix featuring Jack Daniels. Smooth and classic with that distinctive Tennessee whiskey taste. One 330ml can contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 168,
+            carbs: 18.5,
+            protein: 0,
+            fat: 0,
+            sugar: 17.2,
+            servingSize: '330ml'
+        },
+        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
+        tags: ['RTD', 'Whiskey', 'Cola', 'Jack Daniels', 'Premium']
     },
 
     // Cocktails with enhanced information
@@ -2377,6 +2779,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['White rum (2 oz)', 'Lime juice (1 oz)', 'Mint leaves', 'Sugar (1 tsp)', 'Soda water'],
         description: 'A traditional Cuban highball cocktail with white rum, sugar, lime juice, soda water, and mint. One standard mojito contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 148,
+            carbs: 8.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.8,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Rum', 'Mint', 'Refreshing', 'Cuban']
     },
@@ -2388,6 +2798,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Bourbon whiskey (2 oz)', 'Angostura bitters (2-3 dashes)', 'Sugar cube', 'Orange peel'],
         description: 'A classic whiskey cocktail with bourbon, bitters, sugar, and orange peel. One standard old fashioned contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 0.4,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Classic', 'Bourbon', 'Sophisticated']
     },
@@ -2399,6 +2817,14 @@ const beverageDatabase = {
         standardDrinks: '1.5',
         ingredients: ['Gin (1 oz)', 'Campari (1 oz)', 'Sweet vermouth (1 oz)', 'Orange peel'],
         description: 'An Italian cocktail with equal parts gin, Campari, and sweet vermouth. One standard negroni contains 1.5 standard drinks.',
+        nutrition: {
+            calories: 128,
+            carbs: 0.2,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Italian', 'Bitter', 'Classic']
     },
@@ -2410,6 +2836,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Rye whiskey (2 oz)', 'Sweet vermouth (1 oz)', 'Angostura bitters (2-3 dashes)', 'Cherry garnish'],
         description: 'A classic whiskey cocktail with rye, sweet vermouth, and bitters. One standard manhattan contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 132,
+            carbs: 0.3,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Classic', 'Rye', 'Sophisticated']
     },
@@ -2423,6 +2857,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['White rum (2 oz)', 'Lime juice (1 oz)', 'Simple syrup (0.75 oz)'],
         description: 'A classic Cuban cocktail with rum, lime juice, and simple syrup. One standard daiquiri contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 7.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 6.8,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Rum', 'Classic', 'Cuban', 'Citrus']
     },
@@ -2434,6 +2876,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Gin (2.5 oz)', 'Dry vermouth (0.5 oz)', 'Lemon twist or olive garnish'],
         description: 'The quintessential cocktail with gin and dry vermouth. One standard martini contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 124,
+            carbs: 0.2,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Classic', 'Sophisticated', 'Iconic']
     },
@@ -2445,6 +2895,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Gin (2 oz)', 'Tonic water (4-6 oz)', 'Lime wedge'],
         description: 'A refreshing highball cocktail with gin and tonic water. One standard gin & tonic contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 142,
+            carbs: 7.8,
+            protein: 0,
+            fat: 0,
+            sugar: 7.1,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Refreshing', 'Highball', 'Classic']
     },
@@ -2456,6 +2914,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Bourbon whiskey (2 oz)', 'Lemon juice (1 oz)', 'Simple syrup (0.75 oz)', 'Egg white (optional)'],
         description: 'A classic sour cocktail with bourbon, lemon juice, and simple syrup. One standard whiskey sour contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 158,
+            carbs: 8.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.5,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Sour', 'Classic', 'Bourbon']
     },
@@ -2467,6 +2933,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Cognac (2 oz)', 'Cointreau (0.75 oz)', 'Lemon juice (0.75 oz)', 'Sugar rim'],
         description: 'A sophisticated cocktail with cognac, Cointreau, and lemon juice. One standard sidecar contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 8.5,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.8,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Cognac', 'Sophisticated', 'French', 'Citrus']
     },
@@ -2478,6 +2952,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Gin (2 oz)', 'Lime cordial (0.75 oz)', 'Lime wheel garnish'],
         description: 'A classic gin cocktail with lime cordial. One standard gimlet contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 8.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.5,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Classic', 'Lime', 'Refreshing']
     },
@@ -2489,6 +2971,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Rye whiskey (2 oz)', 'Peychaud\'s bitters (3 dashes)', 'Absinthe rinse', 'Sugar cube', 'Lemon peel'],
         description: 'A New Orleans classic with rye whiskey, absinthe, and bitters. One standard sazerac contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 138,
+            carbs: 0.3,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'New Orleans', 'Classic', 'Absinthe']
     },
@@ -2500,6 +2990,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Bourbon whiskey (1.5 oz)', 'Campari (1 oz)', 'Sweet vermouth (1 oz)', 'Orange peel'],
         description: 'A whiskey variation of the Negroni with bourbon instead of gin. One standard boulevardier contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 142,
+            carbs: 0.4,
+            protein: 0,
+            fat: 0,
+            sugar: 0,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Bourbon', 'Bitter', 'Sophisticated']
     },
@@ -2599,6 +3097,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['White rum (2 oz)', 'Pineapple juice (2 oz)', 'Cream of coconut (2 oz)', 'Pineapple wedge garnish'],
         description: 'The national drink of Puerto Rico with rum, pineapple, and coconut. One standard piña colada contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 245,
+            carbs: 18.5,
+            protein: 0.3,
+            fat: 0,
+            sugar: 16.2,
+            servingSize: '5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Rum', 'Tropical', 'Pineapple', 'Coconut']
     },
@@ -2610,6 +3116,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Aged rum (2 oz)', 'Orange curaçao (0.75 oz)', 'Orgeat (0.75 oz)', 'Lime juice (1 oz)', 'Simple syrup (0.25 oz)'],
         description: 'A classic tiki cocktail with aged rum and tropical flavors. One standard mai tai contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 198,
+            carbs: 12.5,
+            protein: 0.2,
+            fat: 0,
+            sugar: 11.8,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Rum', 'Tiki', 'Tropical', 'Classic']
     },
@@ -2621,6 +3135,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Multiple rums (3 oz total)', 'Falernum (0.5 oz)', 'Donn\'s mix (1 oz)', 'Grenadine (0.25 oz)', 'Angostura bitters (1 dash)'],
         description: 'A complex tiki cocktail with multiple rums and tropical ingredients. One standard zombie contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 285,
+            carbs: 18.2,
+            protein: 0.3,
+            fat: 0,
+            sugar: 16.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Rum', 'Tiki', 'Complex', 'Tropical']
     },
@@ -2643,6 +3165,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (2 oz)', 'Ginger beer (4 oz)', 'Lime juice (0.5 oz)', 'Lime wedge'],
         description: 'A refreshing highball with vodka and ginger beer. One standard moscow mule contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 156,
+            carbs: 8.5,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.2,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Highball', 'Ginger', 'Refreshing']
     },
@@ -2654,6 +3184,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Cachaça (2 oz)', 'Lime (1 whole)', 'Sugar (2 tsp)', 'Muddled lime and sugar'],
         description: 'Brazil\'s national cocktail with cachaça, lime, and sugar. One standard caipirinha contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 8.5,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.8,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Cachaça', 'Brazilian', 'Lime', 'Muddled']
     },
@@ -2665,6 +3203,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Tequila blanco (2 oz)', 'Grapefruit soda (4 oz)', 'Lime juice (0.5 oz)', 'Salt rim (optional)'],
         description: 'A refreshing Mexican cocktail with tequila and grapefruit. One standard paloma contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 12.8,
+            protein: 0.2,
+            fat: 0,
+            sugar: 11.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Tequila', 'Mexican', 'Grapefruit', 'Refreshing']
     },
@@ -2676,6 +3222,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Tequila reposado (2 oz)', 'Crème de cassis (0.5 oz)', 'Lime juice (0.75 oz)', 'Ginger beer (4 oz)'],
         description: 'A tequila cocktail with blackcurrant liqueur and ginger beer. One standard el diablo contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 10.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 8.8,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Tequila', 'Ginger', 'Blackcurrant', 'Refreshing']
     },
@@ -2687,6 +3241,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (2 oz)', 'Tomato juice (4 oz)', 'Lemon juice (0.5 oz)', 'Worcestershire sauce', 'Hot sauce', 'Celery salt'],
         description: 'A savory cocktail with vodka and tomato juice. One standard bloody mary contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 8.2,
+            protein: 1.8,
+            fat: 0,
+            sugar: 6.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Savory', 'Tomato', 'Brunch']
     },
@@ -2700,6 +3262,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Vodka (1.5 oz)', 'Cointreau (0.5 oz)', 'Cranberry juice (0.5 oz)', 'Lime juice (0.5 oz)', 'Orange peel garnish'],
         description: 'A sophisticated vodka cocktail with cranberry and citrus. One standard cosmopolitan contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 172,
+            carbs: 9.5,
+            protein: 0.2,
+            fat: 0,
+            sugar: 8.8,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Sophisticated', 'Cranberry', 'Citrus']
     },
@@ -2711,6 +3281,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Vodka (2 oz)', 'Coffee liqueur (0.5 oz)', 'Espresso (1 oz)', 'Simple syrup (0.5 oz)', 'Coffee beans garnish'],
         description: 'A coffee-flavored vodka cocktail with espresso. One standard espresso martini contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 8.8,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.2,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Coffee', 'Modern', 'Sophisticated']
     },
@@ -2722,6 +3300,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Vodka (2 oz)', 'Coffee liqueur (1 oz)', 'Heavy cream (1 oz)'],
         description: 'A creamy cocktail with vodka, coffee liqueur, and cream. One standard white russian contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 225,
+            carbs: 8.5,
+            protein: 0.8,
+            fat: 11.2,
+            sugar: 7.8,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Creamy', 'Coffee', 'Dessert']
     },
@@ -2733,6 +3319,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Vodka (2 oz)', 'Coffee liqueur (1 oz)'],
         description: 'A simple cocktail with vodka and coffee liqueur. One standard black russian contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 6.8,
+            protein: 0,
+            fat: 0,
+            sugar: 5.2,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Simple', 'Coffee', 'Strong']
     },
@@ -2744,6 +3338,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (2 oz)', 'Orange juice (4 oz)', 'Orange slice garnish'],
         description: 'A simple highball with vodka and orange juice. One standard screwdriver contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 12.5,
+            protein: 0.8,
+            fat: 0,
+            sugar: 10.2,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Simple', 'Orange', 'Highball']
     },
@@ -2755,6 +3357,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (2 oz)', 'Cranberry juice (2 oz)', 'Pineapple juice (2 oz)'],
         description: 'A refreshing cocktail with vodka, cranberry, and pineapple. One standard bay breeze contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 15.8,
+            protein: 0.5,
+            fat: 0,
+            sugar: 14.2,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Refreshing', 'Tropical', 'Fruity']
     },
@@ -2766,6 +3376,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (2 oz)', 'Cranberry juice (3 oz)', 'Grapefruit juice (1 oz)', 'Lime wedge'],
         description: 'A refreshing cocktail with vodka, cranberry, and grapefruit. One standard sea breeze contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 14.2,
+            protein: 0.4,
+            fat: 0,
+            sugar: 12.8,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Refreshing', 'Grapefruit', 'Citrus']
     },
@@ -2777,6 +3395,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Vodka (1 oz)', 'Triple sec (1 oz)', 'Lime juice (1 oz)', 'Lime wedge garnish'],
         description: 'A citrusy cocktail with vodka, triple sec, and lime. One standard kamikaze contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 8.5,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.8,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Citrus', 'Equal Parts', 'Strong']
     },
@@ -2788,6 +3414,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Vodka (2 oz)', 'Triple sec (0.5 oz)', 'Lemon juice (1 oz)', 'Simple syrup (0.5 oz)', 'Sugar rim'],
         description: 'A sweet and sour vodka cocktail with lemon. One standard lemon drop contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 9.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 8.5,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Sweet', 'Lemon', 'Sour']
     },

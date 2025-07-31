@@ -1,0 +1,142 @@
+// Comprehensive Nutritional Data for All Beverages
+// This script provides nutritional information for all beverages in the BevyFinder database
+
+const nutritionalData = {
+    // International Top Rated Beers
+    'westvleteren12': { calories: 285, carbs: 28.5, protein: 2.8, fat: 0, sugar: 3.2, servingSize: '330ml' },
+    'plinytheyounger': { calories: 290, carbs: 29.2, protein: 2.9, fat: 0, sugar: 2.8, servingSize: '500ml' },
+    'headytopper': { calories: 225, carbs: 22.8, protein: 2.2, fat: 0, sugar: 2.1, servingSize: '473ml' },
+    'kbs': { calories: 335, carbs: 33.8, protein: 3.2, fat: 0, sugar: 4.2, servingSize: '355ml' },
+    'cbs': { calories: 340, carbs: 34.2, protein: 3.3, fat: 0, sugar: 4.5, servingSize: '355ml' },
+    'darklord': { calories: 380, carbs: 38.5, protein: 3.8, fat: 0, sugar: 5.2, servingSize: '355ml' },
+    'hunahpu': { calories: 365, carbs: 36.8, protein: 3.6, fat: 0, sugar: 4.8, servingSize: '355ml' },
+    'parabola': { calories: 350, carbs: 35.2, protein: 3.4, fat: 0, sugar: 4.6, servingSize: '355ml' },
+    'theabyss': { calories: 360, carbs: 36.5, protein: 3.7, fat: 0, sugar: 4.9, servingSize: '355ml' },
+    'speedwaystout': { calories: 345, carbs: 34.8, protein: 3.3, fat: 0, sugar: 4.4, servingSize: '355ml' },
+    'duvel': { calories: 240, carbs: 24.2, protein: 2.4, fat: 0, sugar: 2.8, servingSize: '330ml' },
+    'chimay': { calories: 255, carbs: 25.8, protein: 2.5, fat: 0, sugar: 3.1, servingSize: '330ml' },
+    'rochefort10': { calories: 270, carbs: 27.2, protein: 2.7, fat: 0, sugar: 3.4, servingSize: '330ml' },
+    'orval': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 2.1, servingSize: '330ml' },
+    'latrappe': { calories: 275, carbs: 27.8, protein: 2.8, fat: 0, sugar: 3.6, servingSize: '330ml' },
+    'saisondupont': { calories: 195, carbs: 19.8, protein: 2.0, fat: 0, sugar: 2.3, servingSize: '330ml' },
+    'pilsnerurquell': { calories: 145, carbs: 14.2, protein: 1.4, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'weihenstephaner': { calories: 155, carbs: 15.5, protein: 1.6, fat: 0, sugar: 1.2, servingSize: '330ml' },
+    'maharaja': { calories: 280, carbs: 28.2, protein: 2.8, fat: 0, sugar: 3.1, servingSize: '355ml' },
+    '120minute': { calories: 320, carbs: 32.5, protein: 3.2, fat: 0, sugar: 3.8, servingSize: '355ml' },
+    'founderskbs': { calories: 335, carbs: 33.8, protein: 3.2, fat: 0, sugar: 4.2, servingSize: '355ml' },
+    'twohearted': { calories: 210, carbs: 21.2, protein: 2.1, fat: 0, sugar: 2.4, servingSize: '355ml' },
+    'sierranevada': { calories: 175, carbs: 17.5, protein: 1.7, fat: 0, sugar: 1.8, servingSize: '355ml' },
+    'samueladams': { calories: 160, carbs: 16.2, protein: 1.6, fat: 0, sugar: 1.5, servingSize: '355ml' },
+    'bluemoon': { calories: 170, carbs: 17.2, protein: 1.7, fat: 0, sugar: 2.1, servingSize: '355ml' },
+    'asahi': { calories: 140, carbs: 13.8, protein: 1.3, fat: 0, sugar: 0.6, servingSize: '330ml' },
+
+    // Australian Beers
+    'carlton-draught': { calories: 138, carbs: 12.8, protein: 1.2, fat: 0, sugar: 0.4, servingSize: '375ml' },
+    'victoria-bitter': { calories: 145, carbs: 13.2, protein: 1.3, fat: 0, sugar: 0.5, servingSize: '375ml' },
+    'x-gold': { calories: 105, carbs: 9.8, protein: 0.9, fat: 0, sugar: 0.3, servingSize: '375ml' },
+    'crown-lager': { calories: 148, carbs: 13.5, protein: 1.3, fat: 0, sugar: 0.6, servingSize: '375ml' },
+    'coopers-pale-ale': { calories: 135, carbs: 12.5, protein: 1.2, fat: 0, sugar: 0.5, servingSize: '375ml' },
+    'coopers-sparkling-ale': { calories: 175, carbs: 16.8, protein: 1.6, fat: 0, sugar: 0.8, servingSize: '375ml' },
+    'little-creatures-pale-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'stone-wood-pacific-ale': { calories: 132, carbs: 12.8, protein: 1.2, fat: 0, sugar: 0.4, servingSize: '330ml' },
+    'balter-xpa': { calories: 138, carbs: 13.2, protein: 1.3, fat: 0, sugar: 0.5, servingSize: '330ml' },
+    'balter-ipa': { calories: 185, carbs: 18.2, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'young-henrys-newtowner': { calories: 145, carbs: 14.2, protein: 1.4, fat: 0, sugar: 0.6, servingSize: '330ml' },
+    'modus-operandi-former-tenant': { calories: 175, carbs: 17.5, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'hop-nation-rattenhund': { calories: 165, carbs: 16.2, protein: 1.6, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'garage-project-hazy-daze': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'epic-armageddon': { calories: 195, carbs: 19.2, protein: 1.9, fat: 0, sugar: 1.0, servingSize: '330ml' },
+    'yeastie-boys-gunnamatta': { calories: 155, carbs: 15.5, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+
+    // Additional Australian Beers
+    'coopers-best-extra-stout': { calories: 185, carbs: 18.2, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '375ml' },
+    'stone-wood-green-coast-lager': { calories: 125, carbs: 12.2, protein: 1.2, fat: 0, sugar: 0.4, servingSize: '330ml' },
+    'young-henrys-natural-lager': { calories: 128, carbs: 12.5, protein: 1.2, fat: 0, sugar: 0.5, servingSize: '330ml' },
+    'modus-operandi-silent-knight': { calories: 195, carbs: 19.5, protein: 1.9, fat: 0, sugar: 1.0, servingSize: '330ml' },
+    'hop-nation-the-wolf': { calories: 175, carbs: 17.8, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'garage-project-death-from-above': { calories: 205, carbs: 20.5, protein: 2.0, fat: 0, sugar: 1.1, servingSize: '330ml' },
+    'epic-hop-zombie': { calories: 215, carbs: 21.8, protein: 2.1, fat: 0, sugar: 1.2, servingSize: '330ml' },
+    'yeastie-boys-pot-kettle-black': { calories: 165, carbs: 16.5, protein: 1.6, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'little-creatures-bright-ale': { calories: 145, carbs: 14.2, protein: 1.4, fat: 0, sugar: 0.6, servingSize: '330ml' },
+    'little-creatures-dog-days': { calories: 135, carbs: 13.2, protein: 1.3, fat: 0, sugar: 0.5, servingSize: '330ml' },
+    'mountain-goat-steam-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'mountain-goat-hightail-ale': { calories: 175, carbs: 17.5, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'mountain-goat-fancy-pants': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    '4-pines-pale-ale': { calories: 165, carbs: 16.2, protein: 1.6, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    '4-pines-kolsch': { calories: 145, carbs: 14.2, protein: 1.4, fat: 0, sugar: 0.6, servingSize: '330ml' },
+    '4-pines-hefeweizen': { calories: 155, carbs: 15.5, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'bridge-road-chevalier-saison': { calories: 175, carbs: 17.8, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'bridge-road-beechworth-pale-ale': { calories: 165, carbs: 16.2, protein: 1.6, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'bridge-road-robust-porter': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'foghorn-breakwater-pale-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'foghorn-redhead-red-ale': { calories: 165, carbs: 16.5, protein: 1.6, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'foghorn-black-sheep-stout': { calories: 175, carbs: 17.8, protein: 1.7, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'hawkers-pale-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'hawkers-ipa': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'hawkers-lager': { calories: 135, carbs: 13.2, protein: 1.3, fat: 0, sugar: 0.5, servingSize: '330ml' },
+    'akasha-brewing-hopsmith-ipa': { calories: 195, carbs: 19.5, protein: 1.9, fat: 0, sugar: 1.0, servingSize: '330ml' },
+    'akasha-brewing-freshwater-pale-ale': { calories: 165, carbs: 16.2, protein: 1.6, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'akasha-brewing-5-oclock-shadow': { calories: 175, carbs: 17.5, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'batch-brewing-west-coast-ipa': { calories: 185, carbs: 18.8, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'batch-brewing-saison': { calories: 175, carbs: 17.8, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'batch-brewing-pale-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'wayward-brewing-raspberry-berliner-weisse': { calories: 145, carbs: 15.5, protein: 1.4, fat: 0, sugar: 1.2, servingSize: '330ml' },
+    'wayward-brewing-charlie-ipa': { calories: 185, carbs: 18.5, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'wayward-brewing-sour-puss': { calories: 155, carbs: 16.2, protein: 1.5, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'nomad-brewing-long-trip-saison': { calories: 175, carbs: 17.8, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'nomad-brewing-smooth-criminal': { calories: 165, carbs: 16.5, protein: 1.6, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'nomad-brewing-freshie-salt-pepper-gose': { calories: 145, carbs: 15.2, protein: 1.4, fat: 0, sugar: 0.6, servingSize: '330ml' },
+    'bentspoke-crankshaft-ipa': { calories: 195, carbs: 19.5, protein: 1.9, fat: 0, sugar: 1.0, servingSize: '330ml' },
+    'bentspoke-barley-griffin': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'bentspoke-sprocket-red-ipa': { calories: 175, carbs: 17.5, protein: 1.7, fat: 0, sugar: 0.8, servingSize: '330ml' },
+    'capital-brewing-rock-hopper-ipa': { calories: 185, carbs: 18.8, protein: 1.8, fat: 0, sugar: 0.9, servingSize: '330ml' },
+    'capital-brewing-trail-pale-ale': { calories: 155, carbs: 15.2, protein: 1.5, fat: 0, sugar: 0.7, servingSize: '330ml' },
+    'capital-brewing-cosmic-crush-sour': { calories: 145, carbs: 15.5, protein: 1.4, fat: 0, sugar: 0.8, servingSize: '330ml' },
+
+    // Cocktails
+    'margarita': { calories: 168, carbs: 8.5, protein: 0.2, fat: 0, sugar: 6.2, servingSize: '4 oz' },
+    'martini': { calories: 124, carbs: 0.2, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+    'daiquiri': { calories: 145, carbs: 7.2, protein: 0.1, fat: 0, sugar: 6.8, servingSize: '3 oz' },
+    'manhattan': { calories: 132, carbs: 0.3, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+    'negroni': { calories: 128, carbs: 0.2, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+    'old-fashioned': { calories: 135, carbs: 0.4, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+    'moscow-mule': { calories: 156, carbs: 8.5, protein: 0.1, fat: 0, sugar: 7.2, servingSize: '4 oz' },
+    'gin-and-tonic': { calories: 142, carbs: 7.8, protein: 0, fat: 0, sugar: 7.1, servingSize: '4 oz' },
+    'whiskey-sour': { calories: 158, carbs: 8.2, protein: 0.1, fat: 0, sugar: 7.5, servingSize: '3 oz' },
+    'mint-julep': { calories: 165, carbs: 8.8, protein: 0.1, fat: 0, sugar: 8.2, servingSize: '4 oz' },
+    'cosmopolitan': { calories: 172, carbs: 9.5, protein: 0.2, fat: 0, sugar: 8.8, servingSize: '4 oz' },
+    'mojito': { calories: 148, carbs: 8.2, protein: 0.1, fat: 0, sugar: 7.8, servingSize: '4 oz' },
+    'pina-colada': { calories: 245, carbs: 18.5, protein: 0.3, fat: 0, sugar: 16.2, servingSize: '5 oz' },
+    'sex-on-the-beach': { calories: 185, carbs: 12.8, protein: 0.2, fat: 0, sugar: 11.5, servingSize: '4 oz' },
+    'long-island-iced-tea': { calories: 235, carbs: 8.5, protein: 0.1, fat: 0, sugar: 7.2, servingSize: '5 oz' },
+    'mai-tai': { calories: 198, carbs: 12.5, protein: 0.2, fat: 0, sugar: 11.8, servingSize: '4 oz' },
+    'zombie': { calories: 285, carbs: 18.2, protein: 0.3, fat: 0, sugar: 16.5, servingSize: '6 oz' },
+    'hurricane': { calories: 225, carbs: 15.8, protein: 0.2, fat: 0, sugar: 14.2, servingSize: '5 oz' },
+    'sazerac': { calories: 138, carbs: 0.3, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+    'boulevardier': { calories: 142, carbs: 0.4, protein: 0, fat: 0, sugar: 0, servingSize: '3 oz' },
+
+    // Recently Added Beverages
+    'varsity-lager': { calories: 138, carbs: 12.8, protein: 1.3, fat: 0, sugar: 0.6, servingSize: '375ml' },
+    'sommersby': { calories: 145, carbs: 15.2, protein: 0.1, fat: 0, sugar: 12.8, servingSize: '330ml' },
+    '-196-premix': { calories: 155, carbs: 16.5, protein: 0, fat: 0, sugar: 14.2, servingSize: '330ml' },
+    'hard-solo': { calories: 142, carbs: 15.8, protein: 0, fat: 0, sugar: 13.5, servingSize: '330ml' },
+    'bundaberg-rum-cola': { calories: 165, carbs: 17.2, protein: 0, fat: 0, sugar: 15.8, servingSize: '330ml' },
+    'jack-daniels-cola': { calories: 168, carbs: 17.5, protein: 0, fat: 0, sugar: 16.2, servingSize: '330ml' }
+};
+
+// Function to add nutritional data to beverage entries
+function addNutritionalData(beverageKey, nutrition) {
+    return `        nutrition: {
+            calories: ${nutrition.calories},
+            carbs: ${nutrition.carbs},
+            protein: ${nutrition.protein},
+            fat: ${nutrition.fat},
+            sugar: ${nutrition.sugar},
+            servingSize: '${nutrition.servingSize}'
+        },`;
+}
+
+// Export for use in main script
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { nutritionalData, addNutritionalData };
+} 
