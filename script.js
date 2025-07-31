@@ -695,6 +695,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A naturally cloudy pale ale with a distinctive fruity character. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 12.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Cloudy', 'Fruity']
     },
@@ -706,6 +714,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A bottle-conditioned pale ale with natural carbonation and complex flavors. One 375ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 16.8,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Bottle-conditioned', 'Complex']
     },
@@ -736,6 +752,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
         description: 'A refreshing pale ale with tropical fruit notes from Galaxy hops. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 132,
+            carbs: 12.8,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Tropical', 'Refreshing']
     },
@@ -766,6 +790,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A sessionable extra pale ale with tropical and citrus hop character. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.2,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'XPA', 'Australian', 'Sessionable', 'Tropical']
     },
