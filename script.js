@@ -3100,6 +3100,15 @@ beverageNameInput.addEventListener('input', (e) => {
     }, 300);
 });
 
+beverageNameInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (query.length >= 2) {
+        showSuggestions(query);
+    } else {
+        hideSuggestions();
+    }
+});
+
 beverageNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         searchBeverage();
@@ -3109,19 +3118,22 @@ beverageNameInput.addEventListener('keydown', (e) => {
 searchBtn.addEventListener('click', searchBeverage);
 
 function showSuggestions(query) {
-    const matches = Object.keys(beverageDatabase).filter(beverage => 
-        beverage.includes(query) || beverageDatabase[beverage].name.toLowerCase().includes(query)
-    );
+    const matches = Object.keys(beverageDatabase).filter(beverage => {
+        const data = beverageDatabase[beverage];
+        return beverage.includes(query) || 
+               data.name.toLowerCase().includes(query) ||
+               data.type.toLowerCase().includes(query);
+    });
     
     if (matches.length === 0) {
         hideSuggestions();
         return;
     }
     
-    suggestions.innerHTML = matches.slice(0, 5).map(beverage => {
+    suggestions.innerHTML = matches.slice(0, 8).map(beverage => {
         const data = beverageDatabase[beverage];
         return `<div class="suggestion-item" onclick="selectSuggestion('${beverage}')">
-            <strong>${data.name}</strong> - ${data.type}
+            <strong>${data.name}</strong> - ${data.type} (${data.abv || 'N/A'})
         </div>`;
     }).join('');
     
@@ -3147,15 +3159,30 @@ function searchBeverage() {
         return;
     }
     
-    // Find matching beverage
-    const beverageKey = Object.keys(beverageDatabase).find(key => 
-        key === query || beverageDatabase[key].name.toLowerCase() === query
-    );
+    // Find matching beverage - more flexible search
+    const beverageKey = Object.keys(beverageDatabase).find(key => {
+        const beverage = beverageDatabase[key];
+        return key === query || 
+               beverage.name.toLowerCase() === query ||
+               beverage.name.toLowerCase().includes(query) ||
+               key.includes(query);
+    });
     
     if (beverageKey) {
         displayBeverageInfo(beverageDatabase[beverageKey]);
     } else {
-        showError('Beverage not found. Try searching for Australian beers like "Victoria Bitter", "Coopers Pale Ale", "Stone & Wood Pacific Ale", "Balter XPA", or cocktails like "Margarita", "Martini", "Daiquiri"');
+        // Show suggestions for similar beverages
+        const similarBeverages = Object.keys(beverageDatabase).filter(key => {
+            const beverage = beverageDatabase[key];
+            return beverage.name.toLowerCase().includes(query) || key.includes(query);
+        }).slice(0, 3);
+        
+        if (similarBeverages.length > 0) {
+            const suggestions = similarBeverages.map(key => beverageDatabase[key].name).join(', ');
+            showError(`Beverage not found. Did you mean: ${suggestions}?`);
+        } else {
+            showError('Beverage not found. Try searching for Australian beers like "Swan Draught", "Victoria Bitter", "Coopers Pale Ale", or cocktails like "Margarita", "Martini"');
+        }
     }
 }
 
