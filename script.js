@@ -405,6 +405,20 @@ function hideAllPages() {
     mainApp.style.display = 'none';
     favoritesPage.style.display = 'none';
     historyPage.style.display = 'none';
+    
+    // Hide dynamically created profile page
+    const profilePage = document.getElementById('profile-page');
+    if (profilePage) {
+        profilePage.style.display = 'none';
+    }
+    
+    // Hide auth page
+    const authPage = document.getElementById('auth-page');
+    if (authPage) {
+        authPage.style.display = 'none';
+    }
+    
+    console.log('All pages hidden');
 }
 
 // History System
@@ -601,6 +615,21 @@ function debugTabState() {
     tabContents.forEach(content => {
         console.log(`Content: ${content.id}, Active: ${content.classList.contains('active')}, Display: ${content.style.display}`);
     });
+}
+
+// Debug function to check page visibility
+function debugPageVisibility() {
+    console.log('=== Page Visibility Debug ===');
+    console.log('Welcome page:', welcomePage.style.display);
+    console.log('Main app:', mainApp.style.display);
+    console.log('Favorites page:', favoritesPage.style.display);
+    console.log('History page:', historyPage.style.display);
+    
+    const profilePage = document.getElementById('profile-page');
+    console.log('Profile page:', profilePage ? profilePage.style.display : 'Not found');
+    
+    const authPage = document.getElementById('auth-page');
+    console.log('Auth page:', authPage ? authPage.style.display : 'Not found');
 }
 
     // Enhanced drink database with top 100 beers, Australian beers, and alcohol percentages
