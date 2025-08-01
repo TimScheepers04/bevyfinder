@@ -381,6 +381,16 @@ function goToHome() {
     clearResults();
 }
 
+function goToWelcomePage() {
+    hideAllPages();
+    welcomePage.style.display = 'block';
+    
+    // Track analytics
+    if (typeof analytics !== 'undefined') {
+        analytics.trackPageView('welcome');
+    }
+}
+
 function hideAllPages() {
     welcomePage.style.display = 'none';
     mainApp.style.display = 'none';
@@ -6301,7 +6311,7 @@ function createProfilePage() {
     
     profilePage.innerHTML = `
         <header class="header">
-            <h1><i class="fas fa-user"></i> My Profile</h1>
+            <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
             <p>Manage your account and preferences</p>
         </header>
 
