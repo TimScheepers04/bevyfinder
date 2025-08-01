@@ -83,7 +83,10 @@ function handleSidebarButtonClick(buttonId) {
     switch(buttonId) {
         case 'sidebar-btn-1': // Home
             console.log('Home button clicked');
-            goToHome();
+            // Always go to search page, regardless of auth status
+            hideAllPages();
+            mainApp.style.display = 'block';
+            clearResults();
             break;
         case 'sidebar-btn-profile': // Profile
             console.log('Profile button clicked');
@@ -376,9 +379,15 @@ function viewFavorite(beverageKey) {
 }
 
 function goToHome() {
+    // Go to search page (main app)
     hideAllPages();
     mainApp.style.display = 'block';
     clearResults();
+    
+    // Track analytics
+    if (typeof analytics !== 'undefined') {
+        analytics.trackPageView('search');
+    }
 }
 
 function goToWelcomePage() {
