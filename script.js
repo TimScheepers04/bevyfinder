@@ -479,7 +479,7 @@ function switchToSearch() {
     clearPhotoUpload();
 }
 
-// Enhanced beverage database with top 100 beers, Australian beers, and alcohol percentages
+    // Enhanced drink database with top 100 beers, Australian beers, and alcohol percentages
 const beverageDatabase = {
     // Top Rated Beers (1-25)
     'westvleteren12': {
@@ -4809,7 +4809,7 @@ const beverageDatabase = {
         abv: '40-50%',
         standardDrinks: '1.4',
         ingredients: ['Grain mash', 'Water', 'Yeast', 'Oak barrel aged'],
-        description: 'A distilled alcoholic beverage made from fermented grain mash, typically aged in wooden casks. One 44ml shot contains 1.4 standard drinks.',
+        description: 'A distilled alcoholic drink made from fermented grain mash, typically aged in wooden casks. One 44ml shot contains 1.4 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Spirit', 'Aged', 'Classic', 'Premium', 'Versatile']
     },
@@ -4953,7 +4953,7 @@ function searchBeverage() {
     hideSuggestions();
     
     if (!query) {
-        showError('Please enter a beverage name');
+        showError('Please enter a drink name');
         return;
     }
     

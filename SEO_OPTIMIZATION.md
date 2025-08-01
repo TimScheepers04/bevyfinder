@@ -36,7 +36,7 @@ Your website now has comprehensive SEO optimization that will help it rank high 
 - "beer database"
 - "wine database" 
 - "cocktail database"
-- "beverage finder"
+- "drink finder"
 - "alcohol content"
 - "ABV calculator"
 - "standard drinks"
@@ -56,7 +56,7 @@ Your website now has comprehensive SEO optimization that will help it rank high 
 2. **"Australian beer"** - Top 5 potential  
 3. **"cocktail database"** - Top 10 potential
 4. **"ABV calculator"** - Top 15 potential
-5. **"beverage finder"** - Top 10 potential
+5. **"drink finder"** - Top 10 potential
 
 ### **Featured Snippet Opportunities:**
 - "What is the ABV of Carlton Draught?"
