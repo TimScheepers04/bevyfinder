@@ -316,12 +316,28 @@ body {
     font-size: 1rem;
     transition: all 0.3s ease;
     background: white;
+    color: #333;
+    font-weight: 400;
+    -webkit-text-fill-color: #333;
 }
 
 .input-wrapper input:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    color: #333;
+}
+
+.input-wrapper input::placeholder {
+    color: #999;
+    opacity: 1;
+    -webkit-text-fill-color: #999;
+}
+
+/* Ensure input text is always visible */
+.input-wrapper input[type="text"] {
+    color: #333 !important;
+    -webkit-text-fill-color: #333 !important;
 }
 
 .search-btn {
