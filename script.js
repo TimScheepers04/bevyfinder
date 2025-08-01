@@ -2671,21 +2671,21 @@ const beverageDatabase = {
     'varsity-lager': {
         name: 'Varsity Lager',
         type: 'Beer',
-        alcohol: 'Australian Lager',
-        abv: '4.5%',
-        standardDrinks: '1.1',
-        ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A premium Australian lager with a crisp, clean taste and smooth finish. Perfect for any occasion. One 375ml bottle contains 1.1 standard drinks.',
+        alcohol: 'Low-Carb Lager',
+        abv: '4.2%',
+        standardDrinks: '1.0',
+        ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast', 'Enzymes for low-carb'],
+        description: 'A low-carb Australian lager with a crisp, clean taste and smooth finish. Perfect for those watching their carb intake. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
-            calories: 138,
-            carbs: 12.8,
-            protein: 1.3,
+            calories: 95,
+            carbs: 2.8,
+            protein: 0.8,
             fat: 0,
-            sugar: 0.6,
-            servingSize: '375ml'
+            sugar: 0.2,
+            servingSize: '330ml'
         },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-        tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Crisp', 'Clean']
+        tags: ['Beer', 'Lager', 'Australian', 'Low-Carb', 'Crisp', 'Clean']
     },
     'sommersby': {
         name: 'Sommersby',
