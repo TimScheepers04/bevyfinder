@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA4 Setup Check - BevyFinder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .info { background: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .step h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 GA4 Setup Check & Fix</h1>
+        <p>This page will help identify and fix your Google Analytics 4 issues.</p>
+        
+        <div id="status-container"></div>
+        
+        <h3>Step-by-Step Fix:</h3>
+        <button onclick="step1CheckProperty()">1. Check GA4 Property</button>
+        <button onclick="step2CheckDataStream()">2. Check Data Stream</button>
+        <button onclick="step3CheckTracking()">3. Check Tracking Code</button>
+        <button onclick="step4SendTestData()">4. Send Test Data</button>
+        <button onclick="step5CheckRealTime()">5. Check Real-time</button>
+        <button onclick="runAllChecks()">🔍 Run All Checks</button>
+        
+        <h3>Debug Log:</h3>
+        <div class="log" id="debug-log"></div>
+        
+        <div class="step">
+            <h4>🔍 Step 1: Verify Your GA4 Property</h4>
+            <p>Go to <a href="https://analytics.google.com/" target="_blank">Google Analytics</a> and check:</p>
+            <ul>
+                <li>You're in the correct GA4 property (not Universal Analytics)</li>
+                <li>The property name matches "BevyFinder" or similar</li>
+                <li>You have admin access to the property</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <h4>🔍 Step 2: Check Data Stream</h4>
+            <p>In GA4, go to <strong>Admin → Data Streams → Web</strong> and verify:</p>
+            <ul>
+                <li>Your web stream is active</li>
+                <li>Measurement ID is: <code>G-ZSY199PZC4</code></li>
+                <li>Stream URL matches your website</li>
+                <li>Enhanced Measurement is enabled</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <h4>🔍 Step 3: Browser Issues</h4>
+            <p>Common browser issues that block GA4:</p>
+            <ul>
+                <li><strong>Ad blockers:</strong> uBlock Origin, AdBlock Plus</li>
+                <li><strong>Privacy extensions:</strong> Privacy Badger, Ghostery</li>
+                <li><strong>Browser settings:</strong> Tracking protection, Do Not Track</li>
+                <li><strong>Incognito mode:</strong> Some privacy settings are stricter</li>
+            </ul>
+        </div>
+        
+        <div class="highlight">
+            <strong>Quick Fix:</strong> Try opening this page in an incognito/private window with all extensions disabled.
+        </div>
+    </div>
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-ZSY199PZC4');
+    </script>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logDiv.textContent += logEntry;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(message, type) {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            container.appendChild(statusDiv);
+        }
+        
+        function step1CheckProperty() {
+            log('=== Step 1: Checking GA4 Property ===');
+            updateStatus('🔍 Check your GA4 property settings in the Google Analytics dashboard', 'info');
+            
+            log('1. Go to https://analytics.google.com/');
+            log('2. Make sure you\'re in a GA4 property (not Universal Analytics)');
+            log('3. Check the property name matches your website');
+            log('4. Verify you have admin access');
+            
+            // Check if we can access GA4
+            if (typeof gtag !== 'undefined') {
+                log('✅ gtag function is available - GA4 code is loaded');
+            } else {
+                log('❌ gtag function not available - GA4 code may not be loading');
+            }
+        }
+        
+        function step2CheckDataStream() {
+            log('=== Step 2: Checking Data Stream ===');
+            updateStatus('🔍 Verify your data stream settings in GA4 Admin', 'info');
+            
+            log('1. In GA4, go to Admin → Data Streams → Web');
+            log('2. Check if your web stream is active');
+            log('3. Verify Measurement ID: G-ZSY199PZC4');
+            log('4. Ensure Enhanced Measurement is enabled');
+            log('5. Check if the stream URL matches your website');
+            
+            // Test network connectivity
+            fetch('https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4', { mode: 'no-cors' })
+                .then(() => {
+                    log('✅ Network connection to googletagmanager.com is working');
+                })
+                .catch((error) => {
+                    log('❌ Network connection failed: ' + error.message);
+                });
+        }
+        
+        function step3CheckTracking() {
+            log('=== Step 3: Checking Tracking Code ===');
+            
+            if (typeof gtag !== 'undefined') {
+                updateStatus('✅ GA4 tracking code is loaded correctly', 'success');
+                log('✅ gtag function is available');
+                
+                // Check data layer
+                if (window.dataLayer && Array.isArray(window.dataLayer)) {
+                    log(`✅ Data layer initialized with ${window.dataLayer.length} entries`);
+                    log('Data layer content: ' + JSON.stringify(window.dataLayer, null, 2));
+                } else {
+                    log('❌ Data layer not properly initialized');
+                }
+            } else {
+                updateStatus('❌ GA4 tracking code is NOT loaded', 'error');
+                log('❌ gtag function is not available');
+                log('This could be due to:');
+                log('- Ad blockers or privacy extensions');
+                log('- Network restrictions');
+                log('- Browser privacy settings');
+                log('- Incorrect Measurement ID');
+            }
+        }
+        
+        function step4SendTestData() {
+            log('=== Step 4: Sending Test Data ===');
+            
+            if (typeof gtag !== 'undefined') {
+                // Send multiple test events
+                gtag('event', 'page_view', {
+                    'page_title': 'GA4 Setup Check Page',
+                    'page_location': window.location.href
+                });
+                log('✅ Sent page_view event');
+                
+                gtag('event', 'test_event', {
+                    'event_category': 'setup_check',
+                    'event_label': 'manual_test',
+                    'value': 1
+                });
+                log('✅ Sent test_event');
+                
+                gtag('event', 'search', {
+                    'event_category': 'bevyfinder',
+                    'event_label': 'Swan Draught',
+                    'search_term': 'swan draught'
+                });
+                log('✅ Sent search event');
+                
+                updateStatus('✅ Test events sent! Check Real-time reports in GA4 within 5 minutes.', 'success');
+            } else {
+                updateStatus('❌ Cannot send events - GA4 not loaded', 'error');
+                log('❌ gtag function not available');
+            }
+        }
+        
+        function step5CheckRealTime() {
+            log('=== Step 5: Checking Real-time Data ===');
+            updateStatus('📊 Go to GA4 → Real-time → Events to check for test events', 'info');
+            
+            log('1. Go to Google Analytics');
+            log('2. Navigate to Reports → Real-time');
+            log('3. Check "Real-time users" - should show 1+ if you\'re on this page');
+            log('4. Check "Real-time events" - should show test events within 5 minutes');
+            log('5. If no data appears, check the troubleshooting steps below');
+            
+            log('Troubleshooting if no real-time data:');
+            log('- Wait 5-10 minutes for data to appear');
+            log('- Check if you\'re looking at the correct GA4 property');
+            log('- Try opening this page in incognito mode');
+            log('- Disable browser extensions temporarily');
+        }
+        
+        function runAllChecks() {
+            log('=== Running All GA4 Checks ===');
+            step1CheckProperty();
+            setTimeout(() => step2CheckDataStream(), 1000);
+            setTimeout(() => step3CheckTracking(), 2000);
+            setTimeout(() => step4SendTestData(), 3000);
+            setTimeout(() => step5CheckRealTime(), 4000);
+        }
+        
+        // Auto-run initial check
+        window.addEventListener('load', () => {
+            log('Page loaded, running initial GA4 check...');
+            setTimeout(() => {
+                step3CheckTracking();
+            }, 2000);
+        });
+        
+        // Monitor gtag calls
+        const originalGtag = window.gtag;
+        if (typeof originalGtag === 'function') {
+            window.gtag = function(...args) {
+                log(`gtag called: ${JSON.stringify(args)}`);
+                return originalGtag.apply(this, args);
+            };
+        }
+    </script>
+</body>
+</html> 

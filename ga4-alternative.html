@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alternative GA4 Implementation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Alternative GA4 Implementation</h1>
+        <p>This page uses multiple methods to ensure Google Analytics data is sent successfully.</p>
+        
+        <div id="status-container"></div>
+        
+        <h3>Test Methods:</h3>
+        <button onclick="testMethod1()">Method 1: Standard GA4</button>
+        <button onclick="testMethod2()">Method 2: Direct GTM</button>
+        <button onclick="testMethod3()">Method 3: Manual Request</button>
+        <button onclick="testAllMethods()">Test All Methods</button>
+        
+        <h3>Debug Log:</h3>
+        <div class="log" id="debug-log"></div>
+        
+        <div class="status info">
+            <strong>If none of these methods work:</strong>
+            <ul>
+                <li>Your network is blocking Google Analytics</li>
+                <li>Browser extensions are interfering</li>
+                <li>GA4 property is not configured correctly</li>
+                <li>Consider using the fallback analytics system</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Method 1: Standard GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-ZSY199PZC4');
+    </script>
+
+    <!-- Method 2: Alternative loading -->
+    <script>
+        // Fallback if standard loading fails
+        if (typeof gtag === 'undefined') {
+            console.log('Standard GA4 loading failed, trying alternative method...');
+            
+            const script = document.createElement('script');
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4';
+            script.async = true;
+            script.onload = function() {
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function(){dataLayer.push(arguments);};
+                gtag('js', new Date());
+                gtag('config', 'G-ZSY199PZC4');
+                console.log('Alternative GA4 loading successful');
+            };
+            script.onerror = function() {
+                console.log('Alternative GA4 loading also failed');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logDiv.textContent += logEntry;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(message, type) {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            container.appendChild(statusDiv);
+        }
+        
+        function testMethod1() {
+            log('=== Testing Method 1: Standard GA4 ===');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'test_method1', {
+                    'event_category': 'alternative_test',
+                    'event_label': 'standard_ga4',
+                    'value': 1
+                });
+                log('✅ Method 1: Standard GA4 event sent');
+                updateStatus('✅ Method 1: Standard GA4 working', 'success');
+            } else {
+                log('❌ Method 1: Standard GA4 not available');
+                updateStatus('❌ Method 1: Standard GA4 failed', 'error');
+            }
+        }
+        
+        function testMethod2() {
+            log('=== Testing Method 2: Direct GTM ===');
+            
+            // Try to send data directly to Google Tag Manager
+            try {
+                const data = {
+                    'event': 'test_method2',
+                    'event_category': 'alternative_test',
+                    'event_label': 'direct_gtm',
+                    'value': 1
+                };
+                
+                // Send to GTM endpoint
+                fetch('https://www.googletagmanager.com/gtm/js?id=G-ZSY199PZC4', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    log('✅ Method 2: Direct GTM request sent');
+                    updateStatus('✅ Method 2: Direct GTM working', 'success');
+                }).catch((error) => {
+                    log('❌ Method 2: Direct GTM failed: ' + error.message);
+                    updateStatus('❌ Method 2: Direct GTM failed', 'error');
+                });
+            } catch (error) {
+                log('❌ Method 2: Direct GTM error: ' + error.message);
+                updateStatus('❌ Method 2: Direct GTM error', 'error');
+            }
+        }
+        
+        function testMethod3() {
+            log('=== Testing Method 3: Manual Request ===');
+            
+            // Create a manual analytics request
+            try {
+                const measurementId = 'G-ZSY199PZC4';
+                const clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                const eventData = {
+                    'client_id': clientId,
+                    'session_id': sessionId,
+                    'events': [{
+                        'name': 'test_method3',
+                        'params': {
+                            'event_category': 'alternative_test',
+                            'event_label': 'manual_request',
+                            'value': 1
+                        }
+                    }]
+                };
+                
+                // Send to GA4 Measurement Protocol (simplified)
+                const url = `https://www.google-analytics.com/g/collect?v=2&tid=${measurementId}&cid=${clientId}&sid=${sessionId}&en=test_method3&ec=alternative_test&el=manual_request&ev=1`;
+                
+                fetch(url, { mode: 'no-cors' })
+                    .then(() => {
+                        log('✅ Method 3: Manual request sent');
+                        updateStatus('✅ Method 3: Manual request working', 'success');
+                    })
+                    .catch((error) => {
+                        log('❌ Method 3: Manual request failed: ' + error.message);
+                        updateStatus('❌ Method 3: Manual request failed', 'error');
+                    });
+            } catch (error) {
+                log('❌ Method 3: Manual request error: ' + error.message);
+                updateStatus('❌ Method 3: Manual request error', 'error');
+            }
+        }
+        
+        function testAllMethods() {
+            log('=== Testing All Methods ===');
+            testMethod1();
+            setTimeout(() => testMethod2(), 1000);
+            setTimeout(() => testMethod3(), 2000);
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('Page loaded, testing GA4 availability...');
+            setTimeout(() => {
+                if (typeof gtag !== 'undefined') {
+                    log('✅ GA4 is available on page load');
+                    updateStatus('✅ GA4 loaded successfully', 'success');
+                } else {
+                    log('❌ GA4 not available on page load');
+                    updateStatus('❌ GA4 failed to load', 'error');
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html> 

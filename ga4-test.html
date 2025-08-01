@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA4 Test - BevyFinder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+    </style>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-ZSY199PZC4');
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 GA4 Test Page</h1>
+        <p>This page tests your Google Analytics 4 implementation.</p>
+        
+        <div id="status-container"></div>
+        
+        <h3>Test Actions:</h3>
+        <button onclick="testPageView()">Test Page View</button>
+        <button onclick="testSearch()">Test Search Event</button>
+        <button onclick="testFavorite()">Test Favorite Event</button>
+        <button onclick="testCustomEvent()">Test Custom Event</button>
+        <button onclick="checkGA4Status()">Check GA4 Status</button>
+        
+        <h3>Test Log:</h3>
+        <div class="log" id="test-log"></div>
+        
+        <div class="status info">
+            <strong>Next Steps:</strong>
+            <ol>
+                <li>Click the test buttons above</li>
+                <li>Go to <a href="https://analytics.google.com/" target="_blank">Google Analytics</a></li>
+                <li>Navigate to <strong>Reports → Real-time → Events</strong></li>
+                <li>Look for the test events within 5 minutes</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logDiv.textContent += logEntry;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(message, type) {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            container.appendChild(statusDiv);
+        }
+        
+        function checkGA4Status() {
+            log('=== Checking GA4 Status ===');
+            
+            if (typeof gtag !== 'undefined') {
+                log('✅ gtag function is available');
+                updateStatus('✅ Google Analytics 4 is loaded correctly', 'success');
+                
+                if (window.dataLayer && Array.isArray(window.dataLayer)) {
+                    log(`✅ Data layer initialized with ${window.dataLayer.length} entries`);
+                    log('Data layer content: ' + JSON.stringify(window.dataLayer, null, 2));
+                } else {
+                    log('❌ Data layer not properly initialized');
+                }
+            } else {
+                log('❌ gtag function is not available');
+                updateStatus('❌ Google Analytics 4 is NOT loaded', 'error');
+                log('This could be due to:');
+                log('- Ad blockers or privacy extensions');
+                log('- Network restrictions');
+                log('- Browser privacy settings');
+            }
+        }
+        
+        function testPageView() {
+            log('=== Testing Page View ===');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'page_view', {
+                    'page_title': 'GA4 Test Page',
+                    'page_location': window.location.href
+                });
+                log('✅ Page view event sent');
+                updateStatus('✅ Page view event sent successfully', 'success');
+            } else {
+                log('❌ Cannot send page view - GA4 not loaded');
+                updateStatus('❌ Cannot send page view - GA4 not loaded', 'error');
+            }
+        }
+        
+        function testSearch() {
+            log('=== Testing Search Event ===');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'search', {
+                    'event_category': 'bevyfinder',
+                    'event_label': 'Swan Draught',
+                    'search_term': 'swan draught'
+                });
+                log('✅ Search event sent');
+                updateStatus('✅ Search event sent successfully', 'success');
+            } else {
+                log('❌ Cannot send search event - GA4 not loaded');
+                updateStatus('❌ Cannot send search event - GA4 not loaded', 'error');
+            }
+        }
+        
+        function testFavorite() {
+            log('=== Testing Favorite Event ===');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'favorite', {
+                    'event_category': 'bevyfinder',
+                    'event_label': 'Carlton Draught',
+                    'beverage_name': 'Carlton Draught'
+                });
+                log('✅ Favorite event sent');
+                updateStatus('✅ Favorite event sent successfully', 'success');
+            } else {
+                log('❌ Cannot send favorite event - GA4 not loaded');
+                updateStatus('❌ Cannot send favorite event - GA4 not loaded', 'error');
+            }
+        }
+        
+        function testCustomEvent() {
+            log('=== Testing Custom Event ===');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'bevyfinder_test', {
+                    'event_category': 'testing',
+                    'event_label': 'manual_test',
+                    'value': 1,
+                    'custom_parameter': 'test_value'
+                });
+                log('✅ Custom event sent');
+                updateStatus('✅ Custom event sent successfully', 'success');
+            } else {
+                log('❌ Cannot send custom event - GA4 not loaded');
+                updateStatus('❌ Cannot send custom event - GA4 not loaded', 'error');
+            }
+        }
+        
+        // Auto-check GA4 status on page load
+        window.addEventListener('load', () => {
+            log('Page loaded, checking GA4 status...');
+            setTimeout(() => {
+                checkGA4Status();
+            }, 2000);
+        });
+        
+        // Monitor gtag calls
+        const originalGtag = window.gtag;
+        if (typeof originalGtag === 'function') {
+            window.gtag = function(...args) {
+                log(`gtag called: ${JSON.stringify(args)}`);
+                return originalGtag.apply(this, args);
+            };
+        }
+    </script>
+</body>
+</html> 

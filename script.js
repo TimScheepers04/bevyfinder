@@ -1,16 +1,483 @@
 // DOM Elements
+const welcomePage = document.getElementById('welcome-page');
+const mainApp = document.getElementById('main-app');
+const startBtn = document.getElementById('start-btn');
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 const beverageNameInput = document.getElementById('beverage-name');
 const searchBtn = document.getElementById('search-btn');
 const suggestions = document.getElementById('suggestions');
 const uploadArea = document.getElementById('upload-area');
-const photoInput = document.getElementById('photo-input');
+// File input will be created dynamically
 const previewArea = document.getElementById('preview-area');
 const previewImage = document.getElementById('preview-image');
 const removeBtn = document.getElementById('remove-btn');
 const resultsSection = document.getElementById('results-section');
 const beverageCard = document.getElementById('beverage-card');
+const uploadBtn = document.getElementById('upload-btn');
+
+// Menu and Sidebar Elements
+const menuBtn = document.getElementById('menu-btn');
+const sidebar = document.getElementById('sidebar');
+const closeMenuBtn = document.getElementById('close-menu-btn');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+
+// Favorites Elements
+const favoritesPage = document.getElementById('favorites-page');
+const favoritesContainer = document.getElementById('favorites-container');
+const emptyFavorites = document.getElementById('empty-favorites');
+
+// History Elements
+const historyPage = document.getElementById('history-page');
+const historyContainer = document.getElementById('history-container');
+const emptyHistory = document.getElementById('empty-history');
+const historyActions = document.getElementById('history-actions');
+
+// Welcome Page Functionality
+function showMainApp() {
+    welcomePage.style.display = 'none';
+    mainApp.style.display = 'block';
+    // Focus on the search input for better UX
+    setTimeout(() => {
+        if (beverageNameInput) {
+            beverageNameInput.focus();
+        }
+    }, 100);
+}
+
+// Ensure menu button is always accessible
+function ensureMenuAccessibility() {
+    if (menuBtn) {
+        menuBtn.style.display = 'flex';
+        menuBtn.style.visibility = 'visible';
+        menuBtn.style.opacity = '1';
+    }
+}
+
+// Menu and Sidebar Functionality
+function openMenu() {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function closeMenu() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+}
+
+function handleSidebarButtonClick(buttonId) {
+    console.log(`Sidebar button clicked: ${buttonId}`);
+    // Close menu after button click
+    closeMenu();
+    
+    // Track analytics
+    if (typeof analytics !== 'undefined') {
+        analytics.trackFeature('sidebar_navigation', buttonId);
+    }
+    
+    // Handle different button actions
+    switch(buttonId) {
+        case 'sidebar-btn-1': // Home
+            console.log('Home button clicked');
+            goToHome();
+            break;
+        case 'sidebar-btn-profile': // Profile
+            console.log('Profile button clicked');
+            // TODO: Implement profile functionality for social platform
+            alert('Profile feature coming soon! This will be the foundation for our social platform.');
+            break;
+        case 'sidebar-btn-2': // Favorites
+            console.log('Favorites button clicked');
+            hideAllPages();
+            favoritesPage.style.display = 'block';
+            displayFavorites();
+            if (typeof analytics !== 'undefined') {
+                analytics.trackPageView('favorites');
+            }
+            break;
+        case 'sidebar-btn-3': // History
+            console.log('History button clicked');
+            hideAllPages();
+            historyPage.style.display = 'block';
+            displayHistory();
+            if (typeof analytics !== 'undefined') {
+                analytics.trackPageView('history');
+            }
+            break;
+        case 'sidebar-btn-4': // Settings
+            console.log('Settings button clicked');
+            // Could show settings panel
+            break;
+        case 'sidebar-btn-5': // About
+            console.log('About button clicked');
+            // Could show about information
+            break;
+        default:
+            console.log('Unknown sidebar button clicked');
+    }
+}
+
+// Event Listeners
+if (startBtn) {
+    startBtn.addEventListener('click', showMainApp);
+}
+
+// Menu Event Listeners
+if (menuBtn) {
+    menuBtn.addEventListener('click', openMenu);
+}
+
+if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', closeMenu);
+}
+
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeMenu);
+}
+
+// Sidebar button event listeners
+sidebarBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        handleSidebarButtonClick(btn.id);
+    });
+});
+
+// Close menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+        closeMenu();
+    }
+});
+
+// Favorites System
+let favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
+
+function addToFavorites(beverageKey) {
+    if (!favorites.includes(beverageKey)) {
+        favorites.push(beverageKey);
+        localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+        updateFavoriteButton(beverageKey, true);
+        showFavoriteNotification('Added to favorites!', 'success');
+        
+        // Track analytics
+        if (typeof analytics !== 'undefined') {
+            analytics.trackFavorite(beverageDatabase[beverageKey].name, 'add');
+        }
+    }
+}
+
+function removeFromFavorites(beverageKey) {
+    const index = favorites.indexOf(beverageKey);
+    if (index > -1) {
+        favorites.splice(index, 1);
+        localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+        updateFavoriteButton(beverageKey, false);
+        showFavoriteNotification('Removed from favorites!', 'info');
+        
+        // Track analytics
+        if (typeof analytics !== 'undefined') {
+            analytics.trackFavorite(beverageDatabase[beverageKey].name, 'remove');
+        }
+        
+        // If we're on the favorites page, refresh it
+        if (favoritesPage.style.display !== 'none') {
+            displayFavorites();
+        }
+    }
+}
+
+function isFavorite(beverageKey) {
+    return favorites.includes(beverageKey);
+}
+
+function updateFavoriteButton(beverageKey, isFavorited) {
+    const favoriteBtn = document.querySelector(`[data-beverage="${beverageKey}"]`);
+    if (favoriteBtn) {
+        if (isFavorited) {
+            favoriteBtn.classList.add('favorited');
+            favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            favoriteBtn.classList.remove('favorited');
+            favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+        }
+    }
+}
+
+function showFavoriteNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)' : 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        animation: slideIn 0.3s ease;
+        max-width: 250px;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${type === 'success' ? 'fa-heart' : 'fa-info-circle'}" style="font-size: 1rem;"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 2000);
+}
+
+function displayFavorites() {
+    if (favorites.length === 0) {
+        favoritesContainer.style.display = 'none';
+        emptyFavorites.style.display = 'flex';
+    } else {
+        favoritesContainer.style.display = 'grid';
+        emptyFavorites.style.display = 'none';
+        
+        favoritesContainer.innerHTML = '';
+        
+        favorites.forEach(beverageKey => {
+            const beverage = beverageDatabase[beverageKey];
+            if (beverage) {
+                const favoriteCard = document.createElement('div');
+                favoriteCard.className = 'favorite-card';
+                favoriteCard.innerHTML = `
+                    <div class="favorite-card-header">
+                        <h3 class="favorite-card-title">${beverage.name}</h3>
+                        <span class="favorite-card-type">${beverage.type}</span>
+                    </div>
+                    <div class="favorite-card-details">
+                        <div><strong>ABV:</strong> ${beverage.abv}</div>
+                        <div><strong>Standard Drinks:</strong> ${beverage.standardDrinks}</div>
+                    </div>
+                    <div class="favorite-card-actions">
+                        <button class="favorite-card-btn view-favorite-btn" onclick="viewFavorite('${beverageKey}')">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="favorite-card-btn remove-favorite-btn" onclick="removeFromFavorites('${beverageKey}')">
+                            <i class="fas fa-trash"></i>
+                            Remove
+                        </button>
+                    </div>
+                `;
+                favoritesContainer.appendChild(favoriteCard);
+            }
+        });
+    }
+}
+
+function viewFavorite(beverageKey) {
+    const beverage = beverageDatabase[beverageKey];
+    if (beverage) {
+        // Hide favorites page and show main app
+        hideAllPages();
+        mainApp.style.display = 'block';
+        
+        // Display the beverage info
+        displayBeverageInfo(beverage);
+        
+        // Scroll to results
+        setTimeout(() => {
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+}
+
+function goToHome() {
+    hideAllPages();
+    mainApp.style.display = 'block';
+    clearResults();
+}
+
+function hideAllPages() {
+    welcomePage.style.display = 'none';
+    mainApp.style.display = 'none';
+    favoritesPage.style.display = 'none';
+    historyPage.style.display = 'none';
+}
+
+// History System
+let searchHistory = JSON.parse(localStorage.getItem('bevyfinder_history') || '[]');
+
+function addToHistory(beverageKey, searchMethod = 'text') {
+    const existingIndex = searchHistory.findIndex(item => item.beverageKey === beverageKey);
+    
+    // Remove existing entry if it exists
+    if (existingIndex > -1) {
+        searchHistory.splice(existingIndex, 1);
+    }
+    
+    // Add to beginning of history (most recent first)
+    const historyItem = {
+        beverageKey: beverageKey,
+        searchMethod: searchMethod,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    searchHistory.unshift(historyItem);
+    
+    // Keep only last 50 searches
+    if (searchHistory.length > 50) {
+        searchHistory = searchHistory.slice(0, 50);
+    }
+    
+    localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
+    
+    // Track analytics
+    if (typeof analytics !== 'undefined') {
+        analytics.trackSearch(beverageDatabase[beverageKey].name, searchMethod, true);
+    }
+}
+
+function removeFromHistory(beverageKey) {
+    const index = searchHistory.findIndex(item => item.beverageKey === beverageKey);
+    if (index > -1) {
+        searchHistory.splice(index, 1);
+        localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
+        displayHistory();
+    }
+}
+
+function clearHistory() {
+    if (confirm('Are you sure you want to clear all search history? This action cannot be undone.')) {
+        searchHistory = [];
+        localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
+        displayHistory();
+        showHistoryNotification('Search history cleared!', 'info');
+    }
+}
+
+function displayHistory() {
+    if (searchHistory.length === 0) {
+        historyContainer.style.display = 'none';
+        emptyHistory.style.display = 'flex';
+        historyActions.style.display = 'none';
+    } else {
+        historyContainer.style.display = 'flex';
+        emptyHistory.style.display = 'none';
+        historyActions.style.display = 'flex';
+        
+        historyContainer.innerHTML = '';
+        
+        searchHistory.forEach((historyItem, index) => {
+            const beverage = beverageDatabase[historyItem.beverageKey];
+            if (beverage) {
+                const historyCard = document.createElement('div');
+                historyCard.className = 'history-item';
+                historyCard.innerHTML = `
+                    <div class="history-item-header">
+                        <h3 class="history-item-title">${beverage.name}</h3>
+                        <span class="history-item-time">${historyItem.time}</span>
+                    </div>
+                    <div class="history-item-details">
+                        <div><strong>Type:</strong> ${beverage.type}</div>
+                        <div><strong>ABV:</strong> ${beverage.abv}</div>
+                        <div class="search-method">
+                            <i class="fas ${historyItem.searchMethod === 'image' ? 'fa-camera' : 'fa-search'}"></i>
+                            ${historyItem.searchMethod === 'image' ? 'Image Search' : 'Text Search'}
+                        </div>
+                    </div>
+                    <div class="history-item-actions">
+                        <button class="history-item-btn view-history-btn" onclick="viewHistoryItem('${historyItem.beverageKey}')">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                        <button class="history-item-btn remove-history-btn" onclick="removeFromHistory('${historyItem.beverageKey}')">
+                            <i class="fas fa-times"></i>
+                            Remove
+                        </button>
+                    </div>
+                `;
+                historyContainer.appendChild(historyCard);
+            }
+        });
+    }
+}
+
+function viewHistoryItem(beverageKey) {
+    const beverage = beverageDatabase[beverageKey];
+    if (beverage) {
+        // Hide history page and show main app
+        hideAllPages();
+        mainApp.style.display = 'block';
+        
+        // Display the beverage info
+        displayBeverageInfo(beverage);
+        
+        // Scroll to results
+        setTimeout(() => {
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+}
+
+function showHistoryNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)' : 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        animation: slideIn 0.3s ease;
+        max-width: 250px;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${type === 'success' ? 'fa-check' : 'fa-info-circle'}" style="font-size: 1rem;"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 2000);
+}
+
+// Ensure menu is accessible when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    ensureMenuAccessibility();
+});
+
+// Function to switch to search tab
+function switchToSearch() {
+    // Switch to the name input tab
+    document.querySelector('[data-tab="name"]').click();
+    // Focus on the search input
+    if (beverageNameInput) {
+        beverageNameInput.focus();
+    }
+    // Clear the photo upload
+    clearPhotoUpload();
+}
 
 // Enhanced beverage database with top 100 beers, Australian beers, and alcohol percentages
 const beverageDatabase = {
@@ -164,7 +631,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast', 'Nitrogen'],
-        description: 'A classic Irish dry stout with a creamy head and smooth finish. One 440ml can contains 1.0 standard drink.',
+        description: 'A classic Irish dry stout with a distinctive creamy head and smooth, velvety finish. Features notes of coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium-bodied with nitrogen carbonation creating a smooth, creamy mouthfeel. The finish is dry and slightly bitter with lingering coffee notes. The iconic two-part pour creates the perfect creamy head. One 440ml can contains 1.0 standard drink.',
         nutrition: {
             calories: 125,
             carbs: 10.5,
@@ -173,7 +640,7 @@ const beverageDatabase = {
             sugar: 0.8,
             servingSize: '440ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Stout', 'Irish', 'Classic', 'Creamy']
     },
     'duvel': {
@@ -183,7 +650,7 @@ const beverageDatabase = {
         abv: '8.5%',
         standardDrinks: '2.0',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Saaz hops', 'Duvel yeast'],
-        description: 'A classic Belgian strong golden ale with fruity esters and spicy hop character. One 330ml bottle contains 2.0 standard drinks.',
+        description: 'A classic Belgian strong golden ale with complex fruity esters and spicy hop character. Features notes of banana, clove, and citrus with a distinctive Belgian yeast character. Medium-bodied with high carbonation and a smooth, warming mouthfeel. The finish is dry with lingering spice and fruit notes. The high alcohol content is well-hidden behind the complex flavor profile. One 330ml bottle contains 2.0 standard drinks.',
         nutrition: {
             calories: 240,
             carbs: 24.2,
@@ -202,7 +669,7 @@ const beverageDatabase = {
         abv: '9.0%',
         standardDrinks: '2.1',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Styrian Golding hops', 'Chimay yeast'],
-        description: 'A Trappist strong dark ale with complex dark fruit and spice notes. One 330ml bottle contains 2.1 standard drinks.',
+        description: 'A Trappist strong dark ale with complex dark fruit and spice notes. Features rich notes of plum, raisin, and dark chocolate with warming spice character. Full-bodied with smooth carbonation and a rich, velvety mouthfeel. The finish is warming with lingering dark fruit and spice notes. The high alcohol content adds complexity and warmth. One 330ml bottle contains 2.1 standard drinks.',
         nutrition: {
             calories: 255,
             carbs: 25.8,
@@ -221,7 +688,7 @@ const beverageDatabase = {
         abv: '11.3%',
         standardDrinks: '2.7',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Styrian Golding hops', 'Rochefort yeast'],
-        description: 'A Trappist quadrupel with rich dark fruit, caramel, and spice flavors. One 330ml bottle contains 2.7 standard drinks.',
+        description: 'A Trappist quadrupel with rich dark fruit, caramel, and spice flavors. Features intense notes of fig, date, and dark cherry with caramel sweetness and warming spice. Full-bodied with smooth carbonation and a rich, complex mouthfeel. The finish is warming and sweet with lingering dark fruit and spice notes. The high alcohol content creates a luxurious, dessert-like experience. One 330ml bottle contains 2.7 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Quadrupel', 'Belgian', 'Trappist', 'Rich']
     },
@@ -232,7 +699,7 @@ const beverageDatabase = {
         abv: '6.2%',
         standardDrinks: '1.5',
         ingredients: ['Pilsner malt', 'Hallertau hops', 'Orval yeast', 'Brettanomyces'],
-        description: 'A unique Trappist ale with Brettanomyces for complex, funky flavors. One 330ml bottle contains 1.5 standard drinks.',
+        description: 'A unique Trappist ale with Brettanomyces for complex, funky flavors. Features notes of barnyard, leather, and citrus with a distinctive sour character. Medium-bodied with bright carbonation and a complex, layered mouthfeel. The Brettanomyces adds depth and complexity with earthy, funky notes. The finish is dry and complex with lingering sour and funky character. One 330ml bottle contains 1.5 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Belgian', 'Trappist', 'Funky']
     },
@@ -243,7 +710,7 @@ const beverageDatabase = {
         abv: '10.0%',
         standardDrinks: '2.4',
         ingredients: ['Pilsner malt', 'Candy sugar', 'Styrian Golding hops', 'La Trappe yeast'],
-        description: 'A Dutch Trappist quadrupel with rich malt and dark fruit character. One 330ml bottle contains 2.4 standard drinks.',
+        description: 'A Dutch Trappist quadrupel with rich malt and dark fruit character. Features notes of raisin, plum, and caramel with warming spice and alcohol notes. Full-bodied with smooth carbonation and a rich, velvety mouthfeel. The finish is warming and complex with lingering dark fruit and malt notes. The high alcohol content adds warmth and complexity. One 330ml bottle contains 2.4 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Quadrupel', 'Dutch', 'Trappist', 'Rich']
     },
@@ -254,7 +721,7 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.5',
         ingredients: ['Pilsner malt', 'Wheat malt', 'Styrian Golding hops', 'Saison yeast'],
-        description: 'A classic Belgian saison with spicy, fruity, and earthy notes. One 330ml bottle contains 1.5 standard drinks.',
+        description: 'A classic Belgian saison with spicy, fruity, and earthy notes. Features notes of pepper, citrus, and hay with a distinctive Belgian yeast character. Medium-bodied with bright carbonation and a dry, crisp mouthfeel. The finish is dry and refreshing with lingering spice and fruit notes. Perfect for warm weather and food pairing. One 330ml bottle contains 1.5 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Saison', 'Belgian', 'Classic', 'Spicy']
     },
@@ -364,16 +831,16 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.6%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic Australian lager with a crisp, clean taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A classic Australian lager with a crisp, clean taste. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
-            calories: 138,
-            carbs: 12.8,
-            protein: 1.2,
+            calories: 120,
+            carbs: 11.2,
+            protein: 1.1,
             fat: 0,
             sugar: 0.4,
-            servingSize: '375ml'
+            servingSize: '330ml'
         },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Crisp']
@@ -383,18 +850,18 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Bitter',
         abv: '4.9%',
-        standardDrinks: '1.2',
+        standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'Australia\'s most popular beer, known for its distinctive bitter taste. One 375ml bottle contains 1.2 standard drinks.',
+        description: 'Australia\'s most popular beer, known for its distinctive bitter taste and iconic status. Features a balanced profile with caramel malt sweetness, moderate hop bitterness, and notes of grain and light citrus. Medium-bodied with smooth carbonation and a clean, slightly dry finish. The bitterness is assertive but not overwhelming, making it a classic session beer. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
-            calories: 145,
-            carbs: 13.2,
-            protein: 1.3,
+            calories: 125,
+            carbs: 11.5,
+            protein: 1.2,
             fat: 0,
             sugar: 0.5,
-            servingSize: '375ml'
+            servingSize: '330ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Bitter', 'Australian', 'Popular', 'Classic']
     },
     'x-gold': {
@@ -402,18 +869,18 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '3.5%',
-        standardDrinks: '0.8',
+        standardDrinks: '0.7',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A mid-strength lager from Queensland, perfect for extended drinking sessions. One 375ml bottle contains 0.8 standard drinks.',
+        description: 'A mid-strength lager from Queensland, perfect for extended drinking sessions. Features a light, crisp profile with subtle malt sweetness, gentle hop bitterness, and notes of grain and light citrus. Light-bodied with bright carbonation and a clean, refreshing mouthfeel. The lower alcohol content makes it ideal for longer drinking sessions while maintaining good flavor. One 330ml bottle contains 0.7 standard drinks.',
         nutrition: {
-            calories: 105,
-            carbs: 9.8,
-            protein: 0.9,
+            calories: 90,
+            carbs: 8.5,
+            protein: 0.8,
             fat: 0,
             sugar: 0.3,
-            servingSize: '375ml'
+            servingSize: '330ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Queensland']
     },
     'crown-lager': {
@@ -421,18 +888,18 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Premium Lager',
         abv: '4.9%',
-        standardDrinks: '1.2',
+        standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'Australia\'s premium lager with a smooth, full-bodied taste. One 375ml bottle contains 1.2 standard drinks.',
+        description: 'Australia\'s premium lager with a smooth, full-bodied taste and sophisticated profile. Features rich malt sweetness, balanced hop bitterness, and notes of caramel, honey, and light floral hops. Medium to full-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is long and satisfying with a subtle sweetness that lingers. Perfect for special occasions and premium dining experiences. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
-            calories: 148,
-            carbs: 13.5,
-            protein: 1.3,
+            calories: 125,
+            carbs: 11.5,
+            protein: 1.2,
             fat: 0,
             sugar: 0.6,
-            servingSize: '375ml'
+            servingSize: '330ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Smooth']
     },
     'coopers-pale-ale': {
@@ -440,18 +907,18 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Pale Ale',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A naturally cloudy pale ale with distinctive fruity characters. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A naturally cloudy pale ale with distinctive fruity characters and traditional bottle conditioning. Features bright citrus and tropical fruit notes, balanced by moderate hop bitterness and a distinctive yeast character. Medium-bodied with natural carbonation and a complex, layered mouthfeel. The cloudiness comes from live yeast, adding depth and character. The finish is crisp with lingering fruit notes and a touch of spice. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
-            calories: 135,
-            carbs: 12.5,
-            protein: 1.2,
+            calories: 120,
+            carbs: 11.0,
+            protein: 1.1,
             fat: 0,
             sugar: 0.5,
-            servingSize: '375ml'
+            servingSize: '330ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Cloudy', 'Fruity']
     },
     'coopers-sparkling-ale': {
@@ -459,16 +926,16 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Sparkling Ale',
         abv: '5.8%',
-        standardDrinks: '1.4',
+        standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A traditional Australian sparkling ale with natural sediment. One 375ml bottle contains 1.4 standard drinks.',
+        description: 'A traditional Australian sparkling ale with natural sediment and bottle conditioning. Features rich malt complexity, moderate hop bitterness, and distinctive yeast character with notes of stone fruit and spice. Medium to full-bodied with natural carbonation and a complex, layered mouthfeel. The natural sediment adds depth and traditional character. The finish is warming with lingering malt sweetness and a touch of alcohol warmth. One 330ml bottle contains 1.2 standard drinks.',
         nutrition: {
-            calories: 175,
-            carbs: 16.8,
-            protein: 1.6,
+            calories: 150,
+            carbs: 14.5,
+            protein: 1.4,
             fat: 0,
-            sugar: 0.8,
-            servingSize: '375ml'
+            sugar: 0.7,
+            servingSize: '330ml'
         },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Sparkling Ale', 'Australian', 'Traditional', 'Sediment']
@@ -480,7 +947,7 @@ const beverageDatabase = {
         abv: '5.2%',
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A hoppy American-style pale ale with citrus and floral notes. One 330ml bottle contains 1.2 standard drinks.',
+        description: 'A hoppy American-style pale ale with vibrant citrus and floral notes. Features prominent grapefruit, orange, and pine aromas from Cascade hops, balanced by caramel malt sweetness. Medium-bodied with bright carbonation and a crisp, refreshing mouthfeel. The hop bitterness is assertive but well-balanced, creating a complex and satisfying drinking experience. Perfect for hop lovers and craft beer enthusiasts. One 330ml bottle contains 1.2 standard drinks.',
         nutrition: {
             calories: 155,
             carbs: 15.2,
@@ -489,7 +956,7 @@ const beverageDatabase = {
             sugar: 0.7,
             servingSize: '330ml'
         },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop&crop=center',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Hoppy', 'Citrus']
     },
     'stone-wood-pacific-ale': {
@@ -499,7 +966,7 @@ const beverageDatabase = {
         abv: '4.4%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
-        description: 'A tropical fruit-forward pale ale with Galaxy hops. One 330ml bottle contains 1.0 standard drink.',
+        description: 'A tropical fruit-forward pale ale showcasing the distinctive character of Galaxy hops. Features intense notes of passionfruit, mango, and citrus with a subtle pine undertone. Light to medium-bodied with bright carbonation and a smooth, juicy mouthfeel. The hop profile is bold yet approachable, creating a refreshing and aromatic drinking experience. Perfect for showcasing Australian hop varieties and tropical fruit lovers. One 330ml bottle contains 1.0 standard drink.',
         nutrition: {
             calories: 132,
             carbs: 12.8,
@@ -518,7 +985,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A sessionable extra pale ale with tropical and citrus hop character. One 330ml can contains 1.1 standard drinks.',
+        description: 'A sessionable extra pale ale with vibrant tropical and citrus hop character. Features bright notes of orange, grapefruit, and tropical fruits from Citra and Mosaic hops, balanced by light malt sweetness. Light-bodied with crisp carbonation and a smooth, refreshing mouthfeel. The hop profile is bold but the lower alcohol content makes it perfect for extended drinking sessions. Ideal for craft beer enthusiasts who want flavor without high alcohol. One 330ml can contains 1.1 standard drinks.',
         nutrition: {
             calories: 138,
             carbs: 13.2,
@@ -537,7 +1004,7 @@ const beverageDatabase = {
         abv: '6.2%',
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A bold IPA with intense tropical fruit and pine hop character. One 330ml can contains 1.5 standard drinks.',
+        description: 'A bold IPA with intense tropical fruit and pine hop character. Features explosive notes of mango, passionfruit, and grapefruit from Citra and Mosaic hops, balanced by a solid malt backbone. Medium-bodied with bright carbonation and a smooth, juicy mouthfeel. The finish is bitter and complex with lingering tropical fruit and pine notes. Perfect for hop enthusiasts and craft beer lovers. One 330ml can contains 1.5 standard drinks.',
         nutrition: {
             calories: 185,
             carbs: 18.2,
@@ -556,7 +1023,7 @@ const beverageDatabase = {
         abv: '4.8%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A sessionable pale ale with balanced malt and hop character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A sessionable pale ale with balanced malt and hop character. Features notes of caramel malt, citrus hops, and a touch of tropical fruit. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The hop bitterness is moderate and well-balanced with the malt sweetness. The finish is clean and refreshing, making it perfect for extended drinking sessions. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 145,
             carbs: 14.2,
@@ -575,7 +1042,7 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A hazy IPA with intense tropical fruit and citrus hop character. One 330ml can contains 1.6 standard drinks.',
+        description: 'A hazy IPA with intense tropical fruit and citrus hop character. Features juicy notes of mango, passionfruit, and orange from Citra and Mosaic hops. Medium-bodied with a smooth, creamy mouthfeel from the hazy appearance. The finish is juicy and smooth with minimal bitterness, characteristic of the New England IPA style. Perfect for those who enjoy hop flavor without harsh bitterness. One 330ml can contains 1.6 standard drinks.',
         nutrition: {
             calories: 195,
             carbs: 19.2,
@@ -594,7 +1061,7 @@ const beverageDatabase = {
         abv: '6.0%',
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A juicy IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        description: 'A juicy IPA with tropical fruit and citrus hop character. Features vibrant notes of mango, passionfruit, and orange from Citra and Mosaic hops. Medium-bodied with a smooth, juicy mouthfeel and bright carbonation. The finish is juicy and smooth with moderate bitterness, creating a well-balanced hop experience. Perfect for those who enjoy bold hop flavors with a smooth drinking experience. One 330ml can contains 1.4 standard drinks.',
         nutrition: {
             calories: 175,
             carbs: 17.2,
@@ -613,7 +1080,7 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Oats', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A hazy New England-style IPA with tropical fruit notes. One 330ml can contains 1.6 standard drinks.',
+        description: 'A hazy New England-style IPA with tropical fruit notes. Features juicy notes of passionfruit, mango, and citrus with a smooth, creamy mouthfeel from the hazy appearance and oat addition. Medium-bodied with bright carbonation and a smooth, pillowy texture. The finish is juicy and smooth with minimal bitterness, characteristic of the New England IPA style. Perfect for showcasing hop flavor without harsh bitterness. One 330ml can contains 1.6 standard drinks.',
         nutrition: {
             calories: 195,
             carbs: 19.5,
@@ -632,7 +1099,7 @@ const beverageDatabase = {
         abv: '6.66%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Columbus hops', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A bold IPA with intense hop character and high alcohol content. One 330ml bottle contains 1.6 standard drinks.',
+        description: 'A bold IPA with intense hop character and high alcohol content. Features aggressive notes of pine, grapefruit, and resin from Columbus and Cascade hops. Full-bodied with a strong malt backbone to support the high alcohol content. The finish is intensely bitter with lingering hop oils and warming alcohol notes. Perfect for hop enthusiasts who enjoy bold, aggressive flavors. One 330ml bottle contains 1.6 standard drinks.',
         nutrition: {
             calories: 200,
             carbs: 20.2,
@@ -651,7 +1118,7 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Earl Grey tea', 'Citra hops', 'Water', 'Yeast'],
-        description: 'An Earl Grey tea-infused IPA with citrus and bergamot notes. One 330ml bottle contains 1.6 standard drinks.',
+        description: 'An Earl Grey tea-infused IPA with citrus and bergamot notes. Features distinctive bergamot orange and black tea aromas from Earl Grey tea, balanced by citrus hop character. Medium-bodied with bright carbonation and a smooth, complex mouthfeel. The finish is unique with lingering tea tannins and citrus notes. Perfect for those who enjoy experimental beers and tea lovers. One 330ml bottle contains 1.6 standard drinks.',
         nutrition: {
             calories: 195,
             carbs: 19.5,
@@ -672,7 +1139,7 @@ const beverageDatabase = {
         abv: '4.6%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic Australian lager with a crisp, clean taste. One 375ml can contains 1.1 standard drinks.',
+        description: 'A classic Australian lager with a rich history. Features notes of pale malt, subtle hop bitterness, and a touch of grain character. Light to medium-bodied with smooth carbonation and a clean, easy-drinking finish. The finish is crisp and refreshing, making it a great choice for any occasion. One 375ml can contains 1.1 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Crisp']
     },
@@ -683,7 +1150,7 @@ const beverageDatabase = {
         abv: '4.9%',
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'Australia\'s most popular beer, a full-bodied lager with a distinctive taste. One 375ml can contains 1.2 standard drinks.',
+        description: 'Australia\'s most popular beer, a full-bodied lager with a distinctive taste and iconic status. Features balanced notes of caramel malt, moderate hop bitterness, and distinctive grain character. Medium-bodied with smooth carbonation and a satisfying mouthfeel. The finish is clean with a touch of bitterness that lingers pleasantly. Perfect for any occasion and a true Australian classic. One 375ml can contains 1.2 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Popular', 'Full-bodied']
     },
@@ -694,7 +1161,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A naturally cloudy pale ale with a distinctive fruity character. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A naturally cloudy pale ale with a distinctive fruity character and traditional bottle conditioning. Features bright citrus and tropical fruit notes from the distinctive yeast strain, balanced by moderate hop bitterness. Medium-bodied with natural carbonation and a complex, layered mouthfeel. The cloudiness comes from live yeast, adding depth and traditional character. The finish is crisp with lingering fruit notes. One 375ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 135,
             carbs: 12.5,
@@ -713,7 +1180,7 @@ const beverageDatabase = {
         abv: '5.8%',
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A bottle-conditioned pale ale with natural carbonation and complex flavors. One 375ml bottle contains 1.4 standard drinks.',
+        description: 'A bottle-conditioned pale ale with natural carbonation and complex flavors. Features rich malt complexity, moderate hop bitterness, and distinctive yeast character with notes of stone fruit and spice. Medium to full-bodied with natural carbonation and a complex, layered mouthfeel. The bottle conditioning adds depth and traditional character. The finish is warming with lingering malt sweetness. One 375ml bottle contains 1.4 standard drinks.',
         nutrition: {
             calories: 175,
             carbs: 16.8,
@@ -732,7 +1199,7 @@ const beverageDatabase = {
         abv: '6.3%',
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A rich, dark stout with coffee and chocolate notes. One 375ml bottle contains 1.5 standard drinks.',
+        description: 'A rich, dark stout with coffee and chocolate notes. Features intense notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Full-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 375ml bottle contains 1.5 standard drinks.',
         nutrition: {
             calories: 185,
             carbs: 18.2,
@@ -751,7 +1218,7 @@ const beverageDatabase = {
         abv: '4.4%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
-        description: 'A refreshing pale ale with tropical fruit notes from Galaxy hops. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A refreshing pale ale with tropical fruit notes from Galaxy hops. Features intense notes of passionfruit, mango, and citrus with a subtle pine undertone. Light to medium-bodied with bright carbonation and a smooth, juicy mouthfeel. The hop profile is bold yet approachable, creating a refreshing and aromatic drinking experience. Perfect for showcasing Australian hop varieties. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 132,
             carbs: 12.8,
@@ -770,7 +1237,7 @@ const beverageDatabase = {
         abv: '4.4%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A clean, crisp lager with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A clean, crisp lager with subtle hop character and refreshing profile. Features delicate notes of pale malt, gentle hop bitterness, and a clean, dry finish. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 125,
             carbs: 12.2,
@@ -789,7 +1256,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A sessionable extra pale ale with tropical and citrus hop character. One 330ml can contains 1.0 standard drinks.',
+        description: 'A sessionable extra pale ale with tropical and citrus hop character. Features bright notes of passionfruit, mango, and orange from Citra and Mosaic hops. Light-bodied with crisp carbonation and a smooth, refreshing mouthfeel. The finish is clean and dry with moderate bitterness, making it perfect for extended drinking sessions. Ideal for those who enjoy hop flavor without high alcohol content. One 330ml can contains 1.0 standard drinks.',
         nutrition: {
             calories: 125,
             carbs: 12.2,
@@ -808,7 +1275,7 @@ const beverageDatabase = {
         abv: '6.2%',
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A bold IPA with intense tropical fruit and pine hop character. One 330ml can contains 1.5 standard drinks.',
+        description: 'A bold IPA with intense tropical fruit and pine hop character. Features aggressive notes of passionfruit, mango, and pine resin from Citra, Mosaic, and Simcoe hops. Medium to full-bodied with strong carbonation and a complex, layered mouthfeel. The finish is intensely bitter with lingering hop oils and tropical fruit notes. Perfect for hop enthusiasts who enjoy bold, flavorful IPAs. One 330ml can contains 1.5 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -819,7 +1286,15 @@ const beverageDatabase = {
         abv: '4.8%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A sessionable pale ale with balanced malt and hop character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A sessionable pale ale with balanced malt and hop character. Features notes of caramel malt, citrus hops, and a touch of sweetness balanced by moderate bitterness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering malt sweetness and hop character. Perfect for those who enjoy traditional pale ale flavors with modern drinkability. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Sessionable', 'Balanced']
     },
@@ -830,7 +1305,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A clean, natural lager with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A clean, natural lager with subtle hop character and traditional brewing methods. Features delicate notes of pale malt, gentle hop bitterness, and a touch of grain character. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. Brewed with natural ingredients for authentic flavor. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 128,
             carbs: 12.5,
@@ -849,7 +1324,15 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A hazy IPA with intense tropical fruit and citrus hop character. One 330ml can contains 1.6 standard drinks.',
+        description: 'A hazy IPA with intense tropical fruit and citrus hop character. Features juicy notes of passionfruit, mango, and orange from Citra and Mosaic hops with a smooth, creamy mouthfeel from the hazy appearance. Medium-bodied with bright carbonation and a pillowy texture. The finish is juicy and smooth with minimal bitterness, characteristic of the New England IPA style. Perfect for showcasing hop flavor without harsh bitterness. One 330ml can contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.2,
+            protein: 1.9,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Hazy', 'Tropical']
     },
@@ -860,7 +1343,7 @@ const beverageDatabase = {
         abv: '5.0%',
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A smooth, dark stout with coffee and chocolate notes. One 330ml can contains 1.2 standard drinks.',
+        description: 'A smooth, dark stout with coffee and chocolate notes. Features rich notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 330ml can contains 1.2 standard drinks.',
         nutrition: {
             calories: 155,
             carbs: 15.2,
@@ -880,6 +1363,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A juicy IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Juicy', 'Tropical']
     },
@@ -890,7 +1381,7 @@ const beverageDatabase = {
         abv: '8.0%',
         standardDrinks: '1.9',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A bold double IPA with intense hop character and high alcohol content. One 330ml can contains 1.9 standard drinks.',
+        description: 'A bold double IPA with intense hop character and high alcohol content. Features aggressive notes of tropical fruit, pine resin, and citrus from Citra, Mosaic, and Simcoe hops. Full-bodied with strong carbonation and a complex, layered mouthfeel. The finish is intensely bitter with lingering hop oils and warming alcohol notes. Perfect for hop enthusiasts who enjoy bold, high-alcohol IPAs. One 330ml can contains 1.9 standard drinks.',
         nutrition: {
             calories: 225,
             carbs: 22.8,
@@ -909,7 +1400,15 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Oats', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A hazy New England-style IPA with tropical fruit notes. One 330ml can contains 1.6 standard drinks.',
+        description: 'A hazy New England-style IPA with tropical fruit notes. Features juicy notes of passionfruit, mango, and citrus with a smooth, creamy mouthfeel from the hazy appearance and oat addition. Medium-bodied with bright carbonation and a smooth, pillowy texture. The finish is juicy and smooth with minimal bitterness, characteristic of the New England IPA style. Perfect for showcasing hop flavor without harsh bitterness. One 330ml can contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.5,
+            protein: 1.9,
+            fat: 0,
+            sugar: 1.0,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Hazy', 'Tropical']
     },
@@ -920,7 +1419,7 @@ const beverageDatabase = {
         abv: '7.0%',
         standardDrinks: '1.7',
         ingredients: ['Malted barley', 'Mango', 'Citra hops', 'Water', 'Yeast'],
-        description: 'A mango-infused IPA with tropical fruit character. One 330ml can contains 1.7 standard drinks.',
+        description: 'A mango-infused IPA with tropical fruit character. Features intense notes of fresh mango, passionfruit, and citrus from both the fruit addition and Citra hops. Medium to full-bodied with bright carbonation and a juicy, smooth mouthfeel. The finish is fruity and smooth with moderate bitterness balanced by the natural mango sweetness. Perfect for those who enjoy fruit-forward IPAs with authentic fruit flavor. One 330ml can contains 1.7 standard drinks.',
         nutrition: {
             calories: 205,
             carbs: 20.5,
@@ -939,7 +1438,15 @@ const beverageDatabase = {
         abv: '6.66%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Columbus hops', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A bold IPA with intense hop character and high alcohol content. One 330ml bottle contains 1.6 standard drinks.',
+        description: 'A bold IPA with intense hop character and high alcohol content. Features aggressive notes of pine, grapefruit, and resin from Columbus and Cascade hops. Full-bodied with a strong malt backbone to support the high alcohol content. The finish is intensely bitter with lingering hop oils and warming alcohol notes. Perfect for hop enthusiasts who enjoy bold, aggressive flavors. One 330ml bottle contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 200,
+            carbs: 20.2,
+            protein: 2.0,
+            fat: 0,
+            sugar: 1.1,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Bold', 'High ABV']
     },
@@ -950,7 +1457,7 @@ const beverageDatabase = {
         abv: '8.5%',
         standardDrinks: '2.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A massive double IPA with intense hop character and high alcohol content. One 330ml bottle contains 2.0 standard drinks.',
+        description: 'A massive double IPA with intense hop character and high alcohol content. Features aggressive notes of tropical fruit, pine resin, and citrus from Citra, Mosaic, and Simcoe hops. Full-bodied with strong carbonation and a complex, layered mouthfeel. The finish is intensely bitter with lingering hop oils and warming alcohol notes. Perfect for hop enthusiasts who enjoy bold, high-alcohol IPAs. One 330ml bottle contains 2.0 standard drinks.',
         nutrition: {
             calories: 240,
             carbs: 24.2,
@@ -969,7 +1476,15 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Earl Grey tea', 'Citra hops', 'Water', 'Yeast'],
-        description: 'An Earl Grey tea-infused IPA with citrus and bergamot notes. One 330ml bottle contains 1.6 standard drinks.',
+        description: 'An Earl Grey tea-infused IPA with citrus and bergamot notes. Features distinctive bergamot orange and black tea aromas from Earl Grey tea, balanced by citrus hop character. Medium-bodied with bright carbonation and a smooth, complex mouthfeel. The finish is unique with lingering tea tannins and citrus notes. Perfect for those who enjoy experimental beers and tea lovers. One 330ml bottle contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.5,
+            protein: 1.9,
+            fat: 0,
+            sugar: 1.0,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'New Zealand', 'Tea-infused', 'Bergamot']
     },
@@ -980,7 +1495,7 @@ const beverageDatabase = {
         abv: '6.0%',
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Roasted barley', 'Chocolate malt', 'Water', 'Yeast'],
-        description: 'A rich porter with coffee and chocolate notes. One 330ml bottle contains 1.4 standard drinks.',
+        description: 'A rich porter with coffee and chocolate notes. Features deep notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium to full-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 330ml bottle contains 1.4 standard drinks.',
         nutrition: {
             calories: 175,
             carbs: 17.8,
@@ -999,7 +1514,7 @@ const beverageDatabase = {
         abv: '5.2%',
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A classic American-style pale ale with citrus hop character. One 330ml bottle contains 1.3 standard drinks.',
+        description: 'A classic American-style pale ale with citrus hop character. Features bright notes of grapefruit, orange, and pine from Cascade hops balanced by caramel malt sweetness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering citrus notes and moderate bitterness. Perfect for those who enjoy traditional American pale ale flavors. One 330ml bottle contains 1.3 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1010,7 +1525,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A bright, golden ale with subtle hop character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A bright, golden ale with subtle hop character and refreshing profile. Features delicate notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 145,
             carbs: 14.2,
@@ -1029,7 +1544,7 @@ const beverageDatabase = {
         abv: '4.4%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A sessionable IPA with tropical fruit hop character. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A sessionable IPA with tropical fruit hop character. Features bright notes of passionfruit, mango, and citrus from Citra and Mosaic hops. Light-bodied with crisp carbonation and a smooth, refreshing mouthfeel. The finish is clean and dry with moderate bitterness, making it perfect for extended drinking sessions. Ideal for those who enjoy hop flavor without high alcohol content. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 135,
             carbs: 13.2,
@@ -1048,7 +1563,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Northern Brewer hops', 'Water', 'Yeast'],
-        description: 'A California common-style beer with caramel malt character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A California common-style beer with caramel malt character and traditional steam brewing methods. Features notes of caramel malt, subtle hop bitterness from Northern Brewer hops, and a touch of toffee sweetness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering malt sweetness. Perfect for those who enjoy traditional American brewing styles. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 155,
             carbs: 15.2,
@@ -1067,7 +1582,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'East Kent Golding hops', 'Water', 'Yeast'],
-        description: 'An English-style pale ale with balanced malt and hop character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'An English-style pale ale with balanced malt and hop character. Features notes of biscuit malt, herbal hop character from East Kent Golding hops, and a touch of earthiness. Medium-bodied with smooth carbonation and a traditional mouthfeel. The finish is clean and balanced with lingering malt sweetness and subtle hop notes. Perfect for those who enjoy classic English brewing traditions. One 330ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 155,
             carbs: 15.2,
@@ -1086,7 +1601,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A bright, golden ale with subtle hop character. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A bright, golden ale with subtle hop character and refreshing profile. Features delicate notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 145,
             carbs: 14.2,
@@ -1107,7 +1622,15 @@ const beverageDatabase = {
         abv: '5.1%',
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A classic American-style pale ale with citrus hop character. One 330ml bottle contains 1.2 standard drinks.',
+        description: 'A classic American-style pale ale with citrus hop character. Features bright notes of grapefruit, orange, and pine from Cascade hops balanced by caramel malt sweetness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering citrus notes and moderate bitterness. Perfect for those who enjoy traditional American pale ale flavors. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1118,7 +1641,15 @@ const beverageDatabase = {
         abv: '4.6%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A German-style Kölsch with clean, crisp character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A German-style Kölsch with clean, crisp character and traditional brewing methods. Features delicate notes of pale malt, gentle hop bitterness, and a touch of grain character. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. Brewed in the traditional Kölsch style. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Kölsch', 'Australian', 'Clean', 'Crisp']
     },
@@ -1129,7 +1660,15 @@ const beverageDatabase = {
         abv: '5.0%',
         standardDrinks: '1.2',
         ingredients: ['Wheat malt', 'Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A German-style wheat beer with banana and clove notes. One 330ml bottle contains 1.2 standard drinks.',
+        description: 'A German-style wheat beer with banana and clove notes. Features distinctive notes of banana, clove, and bubblegum from the wheat yeast strain, balanced by wheat malt sweetness. Medium-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is smooth and refreshing with lingering banana and spice notes. Perfect for those who enjoy traditional German wheat beer flavors. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Hefeweizen', 'Australian', 'Wheat', 'Banana']
     },
@@ -1140,7 +1679,15 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Wheat malt', 'Hops', 'Water', 'Yeast'],
-        description: 'A Belgian-style saison with spicy and fruity character. One 330ml bottle contains 1.6 standard drinks.',
+        description: 'A Belgian-style saison with spicy and fruity character. Features notes of pepper, citrus, and stone fruit from the saison yeast strain, balanced by wheat malt complexity. Medium-bodied with bright carbonation and a dry, crisp mouthfeel. The finish is dry and refreshing with lingering spice and fruit notes. Perfect for those who enjoy traditional Belgian farmhouse ales. One 330ml bottle contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.2,
+            protein: 1.9,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Saison', 'Australian', 'Spicy', 'Fruity']
     },
@@ -1151,7 +1698,15 @@ const beverageDatabase = {
         abv: '5.2%',
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A classic American-style pale ale with citrus hop character. One 330ml bottle contains 1.3 standard drinks.',
+        description: 'A classic American-style pale ale with citrus hop character. Features bright notes of grapefruit, orange, and pine from Cascade hops balanced by caramel malt sweetness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering citrus notes and moderate bitterness. Perfect for those who enjoy traditional American pale ale flavors. One 330ml bottle contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.2,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1162,7 +1717,15 @@ const beverageDatabase = {
         abv: '5.8%',
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Roasted barley', 'Chocolate malt', 'Water', 'Yeast'],
-        description: 'A rich porter with coffee and chocolate notes. One 330ml bottle contains 1.4 standard drinks.',
+        description: 'A rich porter with coffee and chocolate notes. Features deep notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium to full-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 330ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Porter', 'Australian', 'Rich', 'Dark']
     },
@@ -1174,6 +1737,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A classic American-style pale ale with citrus hop character. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1184,7 +1755,15 @@ const beverageDatabase = {
         abv: '5.2%',
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Crystal malt', 'Hops', 'Water', 'Yeast'],
-        description: 'A rich red ale with caramel malt character. One 330ml bottle contains 1.3 standard drinks.',
+        description: 'A rich red ale with caramel malt character. Features notes of caramel, toffee, and crystal malt sweetness balanced by moderate hop bitterness. Medium-bodied with smooth carbonation and a well-rounded mouthfeel. The finish is clean and balanced with lingering malt sweetness and subtle hop notes. Perfect for those who enjoy malt-forward beers with rich character. One 330ml bottle contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.2,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Red Ale', 'Australian', 'Rich', 'Caramel']
     },
@@ -1195,7 +1774,15 @@ const beverageDatabase = {
         abv: '5.5%',
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A smooth, dark stout with coffee and chocolate notes. One 330ml bottle contains 1.3 standard drinks.',
+        description: 'A smooth, dark stout with coffee and chocolate notes. Features rich notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 330ml bottle contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.2,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'Australian', 'Dark', 'Smooth']
     },
@@ -1207,6 +1794,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A classic American-style pale ale with citrus hop character. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1218,6 +1813,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A bold IPA with tropical fruit and citrus hop character. One 330ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -1228,7 +1831,15 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A clean, crisp lager with subtle hop character. One 330ml bottle contains 1.1 standard drinks.',
+        description: 'A clean, crisp lager with subtle hop character and refreshing profile. Features delicate notes of pale malt, gentle hop bitterness, and a touch of grain character. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Clean', 'Crisp']
     },
@@ -1239,7 +1850,15 @@ const beverageDatabase = {
         abv: '6.2%',
         standardDrinks: '1.5',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A bold IPA with intense tropical fruit and pine hop character. One 330ml can contains 1.5 standard drinks.',
+        description: 'A bold IPA with intense tropical fruit and pine hop character. Features aggressive notes of passionfruit, mango, and pine resin from Citra, Mosaic, and Simcoe hops. Medium to full-bodied with strong carbonation and a complex, layered mouthfeel. The finish is intensely bitter with lingering hop oils and tropical fruit notes. Perfect for hop enthusiasts who enjoy bold, flavorful IPAs. One 330ml can contains 1.5 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 18.2,
+            protein: 1.8,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -1251,6 +1870,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A classic American-style pale ale with citrus hop character. One 330ml can contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1261,7 +1888,15 @@ const beverageDatabase = {
         abv: '5.5%',
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A smooth, dark stout with coffee and chocolate notes. One 330ml can contains 1.3 standard drinks.',
+        description: 'A smooth, dark stout with coffee and chocolate notes. Features rich notes of roasted coffee, dark chocolate, and roasted barley with a subtle sweetness. Medium-bodied with smooth carbonation and a creamy, velvety mouthfeel. The finish is rich and warming with lingering coffee and chocolate notes. Perfect for cold weather and dessert pairing. One 330ml can contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.2,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Stout', 'Australian', 'Dark', 'Smooth']
     },
@@ -1272,7 +1907,15 @@ const beverageDatabase = {
         abv: '6.5%',
         standardDrinks: '1.6',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Simcoe hops', 'Water', 'Yeast'],
-        description: 'A bold West Coast-style IPA with intense hop character. One 330ml can contains 1.6 standard drinks.',
+        description: 'A bold West Coast-style IPA with intense hop character. Features aggressive notes of pine, grapefruit, and resin from Citra, Mosaic, and Simcoe hops. Medium to full-bodied with strong carbonation and a complex, layered mouthfeel. The finish is intensely bitter with lingering hop oils and citrus notes. Perfect for hop enthusiasts who enjoy traditional West Coast IPA styles. One 330ml can contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 19.2,
+            protein: 1.9,
+            fat: 0,
+            sugar: 0.9,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'West Coast']
     },
@@ -1284,6 +1927,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Wheat malt', 'Hops', 'Water', 'Yeast'],
         description: 'A Belgian-style saison with spicy and fruity character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Saison', 'Australian', 'Spicy', 'Fruity']
     },
@@ -1295,6 +1946,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A classic American-style pale ale with citrus hop character. One 330ml can contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1306,6 +1965,14 @@ const beverageDatabase = {
         standardDrinks: '0.8',
         ingredients: ['Wheat malt', 'Malted barley', 'Raspberries', 'Water', 'Yeast'],
         description: 'A tart Berliner Weisse with raspberry character. One 330ml can contains 0.8 standard drinks.',
+        nutrition: {
+            calories: 95,
+            carbs: 9.2,
+            protein: 0.9,
+            fat: 0,
+            sugar: 1.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Berliner Weisse', 'Australian', 'Tart', 'Raspberry']
     },
@@ -1317,6 +1984,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A bold IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -1328,6 +2003,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Wheat malt', 'Malted barley', 'Lactobacillus', 'Water', 'Yeast'],
         description: 'A tart sour ale with refreshing acidity. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.2,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Sour Ale', 'Australian', 'Tart', 'Refreshing']
     },
@@ -1339,6 +2022,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Wheat malt', 'Hops', 'Water', 'Yeast'],
         description: 'A Belgian-style saison with spicy and fruity character. One 330ml bottle contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Saison', 'Australian', 'Spicy', 'Fruity']
     },
@@ -1350,6 +2041,14 @@ const beverageDatabase = {
         standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Roasted barley', 'Chocolate malt', 'Water', 'Yeast'],
         description: 'A smooth porter with coffee and chocolate notes. One 330ml bottle contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.2,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Porter', 'Australian', 'Smooth', 'Dark']
     },
@@ -1361,6 +2060,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Wheat malt', 'Malted barley', 'Salt', 'Coriander', 'Water', 'Yeast'],
         description: 'A tart gose with salt and pepper character. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.2,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Gose', 'Australian', 'Tart', 'Salty']
     },
@@ -1372,6 +2079,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A bold IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -1383,6 +2098,14 @@ const beverageDatabase = {
         standardDrinks: '2.0',
         ingredients: ['Malted barley', 'Crystal malt', 'Hops', 'Water', 'Yeast'],
         description: 'A rich barley wine with complex malt character. One 330ml can contains 2.0 standard drinks.',
+        nutrition: {
+            calories: 240,
+            carbs: 24.2,
+            protein: 2.4,
+            fat: 0,
+            sugar: 1.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Barley Wine', 'Australian', 'Rich', 'Complex']
     },
@@ -1394,6 +2117,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Crystal malt', 'Citra hops', 'Water', 'Yeast'],
         description: 'A red IPA with caramel malt and hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Red IPA', 'Australian', 'Caramel', 'Hoppy']
     },
@@ -1405,6 +2136,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
         description: 'A bold IPA with tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 17.2,
+            protein: 1.7,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
     },
@@ -1416,6 +2155,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
         description: 'A classic American-style pale ale with citrus hop character. One 330ml can contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 155,
+            carbs: 15.2,
+            protein: 1.5,
+            fat: 0,
+            sugar: 0.7,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
@@ -1427,6 +2174,14 @@ const beverageDatabase = {
         standardDrinks: '1.0',
         ingredients: ['Wheat malt', 'Malted barley', 'Lactobacillus', 'Water', 'Yeast'],
         description: 'A tart sour ale with refreshing acidity. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.2,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Sour Ale', 'Australian', 'Tart', 'Refreshing']
     },
@@ -1439,7 +2194,15 @@ const beverageDatabase = {
         abv: '5.0%',
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
-        description: 'A crisp, dry Japanese lager with a clean finish. One 330ml bottle contains 1.2 standard drinks.',
+        description: 'A crisp, dry Japanese lager with a distinctive ultra-dry finish. Features delicate notes of rice, pale malt, and subtle hop bitterness. Light-bodied with high carbonation and a smooth, thirst-quenching mouthfeel. The finish is exceptionally dry and clean, making it perfect for pairing with Japanese cuisine, sushi, or as a refreshing session beer. One 330ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 130,
+            carbs: 12.8,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Japanese', 'Crisp', 'Dry']
     },
@@ -1450,7 +2213,15 @@ const beverageDatabase = {
         abv: '3.5%',
         standardDrinks: '0.8',
         ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
-        description: 'A mid-strength version of Asahi Super Dry with the same crisp character. One 330ml bottle contains 0.8 standard drinks.',
+        description: 'A mid-strength version of Asahi Super Dry with the same crisp, dry character. Features delicate notes of rice, pale malt, and subtle hop bitterness. Light-bodied with high carbonation and a smooth, thirst-quenching mouthfeel. The finish is ultra-dry and refreshing, making it perfect for lighter drinking occasions or pairing with Japanese cuisine. One 330ml bottle contains 0.8 standard drinks.',
+        nutrition: {
+            calories: 105,
+            carbs: 10.2,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Japanese', 'Mid-strength', 'Crisp']
     },
@@ -1461,7 +2232,15 @@ const beverageDatabase = {
         abv: '0.0%',
         standardDrinks: '0.0',
         ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
-        description: 'A non-alcoholic version of Asahi Super Dry with the same crisp taste. One 330ml bottle contains 0.0 standard drinks.',
+        description: 'A non-alcoholic version of Asahi Super Dry with the same crisp taste. Features delicate notes of rice, pale malt, and subtle hop bitterness. Light-bodied with high carbonation and a smooth, thirst-quenching mouthfeel. The finish is ultra-dry and refreshing, making it perfect for those seeking a non-alcoholic option without sacrificing flavor. One 330ml bottle contains 0.0 standard drinks.',
+        nutrition: {
+            calories: 45,
+            carbs: 4.2,
+            protein: 0.4,
+            fat: 0,
+            sugar: 0.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Japanese', 'Non-alcoholic', 'Crisp']
     },
@@ -1472,7 +2251,15 @@ const beverageDatabase = {
         abv: '5.0%',
         standardDrinks: '1.8',
         ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
-        description: 'A larger serving of Asahi Super Dry in a 500ml can. One 500ml can contains 1.8 standard drinks.',
+        description: 'A larger serving of Asahi Super Dry in a 500ml can. Features the same crisp, dry character with delicate notes of rice, pale malt, and subtle hop bitterness. Light-bodied with high carbonation and a smooth, thirst-quenching mouthfeel. The finish is ultra-dry and refreshing, ideal for sharing or longer sessions. One 500ml can contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 235,
+            carbs: 23.2,
+            protein: 2.3,
+            fat: 0,
+            sugar: 1.1,
+            servingSize: '500ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Japanese', 'Crisp', 'Large Format']
     },
@@ -1483,7 +2270,15 @@ const beverageDatabase = {
         abv: '4.8%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A traditional Australian bitter from Ballarat. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A traditional Australian bitter from Ballarat. Features notes of caramel malt, earthy hops, and a touch of grain character. Medium-bodied with smooth carbonation and a classic, slightly bitter finish. The finish is clean and balanced, making it a nostalgic choice for fans of classic Victorian beers. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Bitter', 'Australian', 'Traditional', 'Victorian']
     },
@@ -1538,7 +2333,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A light, refreshing lager inspired by the Bondi lifestyle. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A light, refreshing lager inspired by the Bondi lifestyle. Features delicate notes of pale malt, gentle hop bitterness, and a crisp, clean finish. Light-bodied with bright carbonation and a thirst-quenching mouthfeel. The finish is clean and refreshing, perfect for hot weather, beach days, and casual drinking. One 330ml bottle contains 1.0 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Light', 'Refreshing']
     },
@@ -1560,7 +2355,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic Australian lager with a rich history. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A classic Australian lager with a rich history. Features notes of pale malt, subtle hop bitterness, and a touch of grain character. Light to medium-bodied with smooth carbonation and a clean, easy-drinking finish. The finish is crisp and refreshing, making it a great choice for any occasion. One 375ml bottle contains 1.1 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Historical']
     },
@@ -1571,7 +2366,7 @@ const beverageDatabase = {
         abv: '4.8%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A traditional Queensland bitter with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A traditional Queensland bitter with a distinctive taste. Features notes of caramel malt, earthy hops, and a touch of grain character. Medium-bodied with smooth carbonation and a classic, slightly bitter finish. The finish is clean and balanced, making it a nostalgic choice for fans of classic Queensland beers. One 375ml bottle contains 1.1 standard drinks.',
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Bitter', 'Australian', 'Queensland', 'Traditional']
     },
@@ -1624,9 +2419,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.2%',
-        standardDrinks: '1.0',
+        standardDrinks: '0.9',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A mid-strength lager with a smooth, easy-drinking character. One 375ml bottle contains 1.0 standard drinks.',
+        description: 'A mid-strength lager with a smooth, easy-drinking character. One 330ml bottle contains 0.9 standard drinks.',
+        nutrition: {
+            calories: 110,
+            carbs: 10.5,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Smooth']
     },
@@ -1635,9 +2438,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.2%',
-        standardDrinks: '1.0',
+        standardDrinks: '0.9',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A refreshing mid-strength lager designed to be served cold. One 375ml bottle contains 1.0 standard drinks.',
+        description: 'A refreshing mid-strength lager designed to be served cold. One 330ml bottle contains 0.9 standard drinks.',
+        nutrition: {
+            calories: 110,
+            carbs: 10.5,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Refreshing']
     },
@@ -1649,6 +2460,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A classic Australian lager with a crisp, clean taste. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 13.2,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Crisp']
     },
@@ -1657,9 +2476,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A dry, crisp lager with a clean finish. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A dry, crisp lager with a clean finish. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Dry', 'Crisp']
     },
@@ -1668,9 +2495,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '3.5%',
-        standardDrinks: '0.8',
+        standardDrinks: '0.7',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A mid-strength lager with a smooth, easy-drinking character. One 375ml bottle contains 0.8 standard drinks.',
+        description: 'A mid-strength lager with a smooth, easy-drinking character. One 330ml bottle contains 0.7 standard drinks.',
+        nutrition: {
+            calories: 90,
+            carbs: 8.5,
+            protein: 0.8,
+            fat: 0,
+            sugar: 0.3,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Smooth']
     },
@@ -1681,7 +2516,15 @@ const beverageDatabase = {
         abv: '0.0%',
         standardDrinks: '0.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A non-alcoholic lager with the same crisp taste as Carlton Draught. One 375ml bottle contains 0.0 standard drinks.',
+        description: 'A non-alcoholic lager with the same crisp taste as Carlton Draught. One 330ml bottle contains 0.0 standard drinks.',
+        nutrition: {
+            calories: 40,
+            carbs: 3.5,
+            protein: 0.3,
+            fat: 0,
+            sugar: 0.2,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Non-alcoholic', 'Crisp']
     },
@@ -1748,6 +2591,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'Australia\'s premium lager with a smooth, full-bodied taste. One 375ml bottle contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 145,
+            carbs: 14.2,
+            protein: 1.4,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Smooth']
     },
@@ -1759,6 +2610,14 @@ const beverageDatabase = {
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
         description: 'A classic Australian lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 135,
+            carbs: 13.2,
+            protein: 1.3,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '375ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Distinctive']
     },
@@ -1789,9 +2648,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.0%',
-        standardDrinks: '1.0',
+        standardDrinks: '0.9',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'An internationally recognized Australian lager with a light, refreshing taste. One 375ml bottle contains 1.0 standard drinks.',
+        description: 'An internationally recognized Australian lager with a light, refreshing taste. One 330ml bottle contains 0.9 standard drinks.',
+        nutrition: {
+            calories: 110,
+            carbs: 10.5,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'International', 'Light']
     },
@@ -1844,9 +2711,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Premium Lager',
         abv: '5.0%',
-        standardDrinks: '1.2',
+        standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A premium Tasmanian lager with a smooth, full-bodied taste. One 375ml bottle contains 1.2 standard drinks.',
+        description: 'A premium Tasmanian lager with a smooth, full-bodied taste. One 330ml bottle contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 11.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Tasmanian']
     },
@@ -1866,9 +2741,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic Australian lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A classic Australian lager with a distinctive taste. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.0,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Distinctive']
     },
@@ -1943,9 +2826,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Bitter',
         abv: '4.8%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A traditional Victorian bitter with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A traditional Victorian bitter with a distinctive taste. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Bitter', 'Australian', 'Victorian', 'Traditional']
     },
@@ -1976,9 +2867,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A Northern Territory lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A Northern Territory lager with a distinctive taste. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Northern Territory', 'Distinctive']
     },
@@ -1998,9 +2897,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '3.5%',
-        standardDrinks: '0.8',
+        standardDrinks: '0.7',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A low-carb mid-strength lager with a light, refreshing taste. One 375ml bottle contains 0.8 standard drinks.',
+        description: 'A low-carb mid-strength lager with a light, refreshing taste. One 330ml bottle contains 0.7 standard drinks.',
+        nutrition: {
+            calories: 90,
+            carbs: 8.5,
+            protein: 0.8,
+            fat: 0,
+            sugar: 0.3,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Low-carb', 'Mid-strength']
     },
@@ -2020,9 +2927,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic New South Wales lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A classic New South Wales lager with a distinctive taste. One 330ml bottle contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'New South Wales', 'Classic']
     },
@@ -2031,9 +2946,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Australian Lager',
         abv: '3.5%',
-        standardDrinks: '0.8',
+        standardDrinks: '0.7',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A low-carb mid-strength lager with a light, refreshing taste. One 375ml bottle contains 0.8 standard drinks.',
+        description: 'A low-carb mid-strength lager with a light, refreshing taste. One 330ml bottle contains 0.7 standard drinks.',
+        nutrition: {
+            calories: 90,
+            carbs: 8.5,
+            protein: 0.8,
+            fat: 0,
+            sugar: 0.3,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Low-carb', 'Mid-strength']
     },
@@ -2330,9 +3253,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Blonde Ale',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Pale malt', 'Hops', 'Water', 'Yeast'],
-        description: 'A smooth blonde ale with a clean, crisp finish. One 330ml can contains 1.1 standard drinks.',
+        description: 'A smooth blonde ale with a clean, crisp finish. Features delicate notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and crisp, making it perfect for hot weather and casual drinking. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Blonde Ale', 'Smooth', 'Clean', 'Crisp']
     },
@@ -2341,9 +3272,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Session IPA',
         abv: '4.2%',
-        standardDrinks: '1.0',
+        standardDrinks: '0.9',
         ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A sessionable IPA with tropical hop character and easy-drinking profile. One 330ml can contains 1.0 standard drinks.',
+        description: 'A sessionable IPA with tropical hop character and easy-drinking profile. Features bright notes of passionfruit, mango, and citrus from Citra and Mosaic hops, balanced by light malt sweetness. Light-bodied with crisp carbonation and a smooth, refreshing mouthfeel. The hop profile is bold but the lower alcohol content makes it perfect for extended drinking sessions. One 330ml can contains 0.9 standard drinks.',
+        nutrition: {
+            calories: 110,
+            carbs: 10.5,
+            protein: 1.0,
+            fat: 0,
+            sugar: 0.4,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Session IPA', 'Tropical', 'Sessionable', 'Hoppy']
     },
@@ -2352,9 +3291,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Pale Ale',
         abv: '5.0%',
-        standardDrinks: '1.2',
+        standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-        description: 'A classic pale ale with citrus hop character and balanced malt profile. One 330ml can contains 1.2 standard drinks.',
+        description: 'A classic pale ale with citrus hop character and balanced malt profile. Features prominent grapefruit and orange notes from Cascade hops, balanced by caramel malt sweetness. Medium-bodied with bright carbonation and a crisp, refreshing mouthfeel. The hop bitterness is assertive but well-balanced, creating a complex and satisfying drinking experience. One 330ml can contains 1.1 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 11.5,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Classic', 'Citrus', 'Balanced']
     },
@@ -2363,9 +3310,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Golden Ale',
         abv: '4.5%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Pale malt', 'Hops', 'Water', 'Yeast'],
-        description: 'A golden ale with a bright, refreshing character and subtle hop notes. One 330ml can contains 1.1 standard drinks.',
+        description: 'A golden ale with a bright, refreshing character and subtle hop notes. Features delicate notes of pale malt, gentle hop bitterness, and a touch of honey sweetness. Light to medium-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing, making it perfect for hot weather and casual drinking. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 120,
+            carbs: 11.5,
+            protein: 1.1,
+            fat: 0,
+            sugar: 0.5,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Golden Ale', 'Bright', 'Refreshing', 'Subtle']
     },
@@ -2374,9 +3329,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Hazy IPA',
         abv: '6.0%',
-        standardDrinks: '1.4',
+        standardDrinks: '1.3',
         ingredients: ['Malted barley', 'Wheat malt', 'Oats', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-        description: 'A hazy IPA with intense tropical fruit and citrus hop character. One 330ml can contains 1.4 standard drinks.',
+        description: 'A hazy IPA with intense tropical fruit and citrus hop character. Features explosive notes of passionfruit, mango, and grapefruit from Citra and Mosaic hops, with a smooth, creamy mouthfeel from the hazy appearance and oat addition. Medium-bodied with bright carbonation and a smooth, pillowy texture. The finish is juicy and smooth with minimal bitterness, characteristic of the New England IPA style. One 330ml can contains 1.3 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 16.5,
+            protein: 1.6,
+            fat: 0,
+            sugar: 0.8,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Hazy IPA', 'Tropical', 'Citrus', 'Juicy']
     },
@@ -2385,9 +3348,17 @@ const beverageDatabase = {
         type: 'Beer',
         alcohol: 'Pale Ale',
         abv: '4.8%',
-        standardDrinks: '1.1',
+        standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
-        description: 'A tropical pale ale with Galaxy hops providing passionfruit and citrus notes. One 330ml can contains 1.1 standard drinks.',
+        description: 'A tropical pale ale with Galaxy hops providing passionfruit and citrus notes. Features intense notes of passionfruit, mango, and citrus from Galaxy hops, balanced by caramel malt sweetness. Medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The hop profile is bold yet approachable, creating a refreshing and aromatic drinking experience. Perfect for showcasing Australian hop varieties and tropical fruit lovers. One 330ml can contains 1.0 standard drinks.',
+        nutrition: {
+            calories: 125,
+            carbs: 12.0,
+            protein: 1.2,
+            fat: 0,
+            sugar: 0.6,
+            servingSize: '330ml'
+        },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Tropical', 'Galaxy Hops', 'Passionfruit']
     },
@@ -2607,7 +3578,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A classic Western Australian lager with a distinctive taste. One 375ml bottle contains 1.1 standard drinks.',
+        description: 'A classic Western Australian lager with a distinctive malty sweetness and subtle hop bitterness. Features notes of caramel, toasted bread, and a hint of citrus. Medium-bodied with a smooth, clean finish and moderate carbonation. Perfect for pairing with pub food or enjoying on a hot day. One 375ml bottle contains 1.1 standard drinks.',
         nutrition: {
             calories: 135,
             carbs: 12.5,
@@ -2626,8 +3597,8 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A dry, crisp lager with a clean finish. One 375ml bottle contains 1.1 standard drinks.',
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+        description: 'A premium dry lager with exceptional crispness and a clean, refreshing finish. Features subtle notes of grain, light floral hops, and a touch of sweetness that quickly dries out. Light to medium-bodied with high carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and dry, making it perfect for hot weather or as a palate cleanser. One 375ml bottle contains 1.1 standard drinks.',
+        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Beer', 'Lager', 'Australian', 'Dry', 'Crisp']
     },
     'great-northern': {
@@ -2637,7 +3608,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A light, refreshing lager perfect for hot weather. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A light, refreshing lager with a crisp, clean profile perfect for hot weather. Features delicate notes of pale malt, subtle citrus hops, and a hint of honey sweetness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it ideal for outdoor activities and casual drinking. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 120,
             carbs: 11.2,
@@ -2656,7 +3627,7 @@ const beverageDatabase = {
         abv: '3.5%',
         standardDrinks: '0.8',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A mid-strength version of Great Northern with the same refreshing character. One 330ml bottle contains 0.8 standard drinks.',
+        description: 'A mid-strength version of Great Northern with the same refreshing character and lighter alcohol content. Features the same crisp, clean profile with delicate pale malt notes and subtle citrus hops. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. Perfect for extended drinking sessions while maintaining the refreshing character of the original. One 330ml bottle contains 0.8 standard drinks.',
         nutrition: {
             calories: 100,
             carbs: 9.5,
@@ -2675,7 +3646,7 @@ const beverageDatabase = {
         abv: '4.2%',
         standardDrinks: '1.0',
         ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast', 'Enzymes for low-carb'],
-        description: 'A low-carb Australian lager with a crisp, clean taste and smooth finish. Perfect for those watching their carb intake. One 330ml bottle contains 1.0 standard drinks.',
+        description: 'A low-carb Australian lager with a crisp, clean taste and smooth finish. Features subtle malt notes with minimal sweetness, balanced by light hop bitterness. Light-bodied with bright carbonation and a clean, dry mouthfeel. The reduced carbohydrate content makes it ideal for those watching their carb intake while still enjoying a full-flavored beer. One 330ml bottle contains 1.0 standard drinks.',
         nutrition: {
             calories: 95,
             carbs: 2.8,
@@ -2694,7 +3665,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.2',
         ingredients: ['Apple juice', 'Water', 'Sugar', 'Yeast', 'Natural flavors'],
-        description: 'A refreshing apple cider with a crisp, fruity taste. Light and easy to drink. One 330ml can contains 1.2 standard drinks.',
+        description: 'A refreshing apple cider with a crisp, fruity taste and natural apple sweetness. Features bright notes of fresh apples, subtle tartness, and a hint of floral character. Light-bodied with effervescent carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, making it perfect for warm weather and casual drinking. One 330ml can contains 1.2 standard drinks.',
         nutrition: {
             calories: 145,
             carbs: 15.2,
@@ -2713,7 +3684,7 @@ const beverageDatabase = {
         abv: '6.0%',
         standardDrinks: '1.4',
         ingredients: ['Vodka', 'Natural flavors', 'Carbonated water', 'Sugar', 'Citric acid'],
-        description: 'A premium ready-to-drink vodka premix with natural flavors. Smooth and refreshing. One 330ml can contains 1.4 standard drinks.',
+        description: 'A premium ready-to-drink vodka premix with natural flavors and smooth character. Features clean vodka notes, subtle citrus flavors, and a touch of sweetness balanced by crisp carbonation. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and crisp with minimal alcohol burn, making it perfect for casual drinking and social occasions. One 330ml can contains 1.4 standard drinks.',
         nutrition: {
             calories: 155,
             carbs: 16.5,
@@ -2732,7 +3703,7 @@ const beverageDatabase = {
         abv: '4.5%',
         standardDrinks: '1.1',
         ingredients: ['Vodka', 'Lemon flavoring', 'Carbonated water', 'Sugar', 'Natural flavors'],
-        description: 'A hard lemonade version of the classic Solo soft drink. Tangy and refreshing with a kick. One 330ml can contains 1.1 standard drinks.',
+        description: 'A hard lemonade version of the classic Solo soft drink. Features bright lemon citrus notes, tangy acidity, and a subtle sweetness balanced by clean vodka character. Light-bodied with bright carbonation and a refreshing, thirst-quenching mouthfeel. The finish is crisp and tangy with lingering lemon notes. Perfect for hot weather and outdoor activities. One 330ml can contains 1.1 standard drinks.',
         nutrition: {
             calories: 142,
             carbs: 15.8,
@@ -2751,7 +3722,7 @@ const beverageDatabase = {
         abv: '5.5%',
         standardDrinks: '1.3',
         ingredients: ['Bundaberg Rum', 'Cola', 'Carbonated water', 'Sugar', 'Natural flavors'],
-        description: 'A classic rum and cola premix featuring Bundaberg Rum. Sweet and smooth with a distinctive rum flavor. One 330ml can contains 1.3 standard drinks.',
+        description: 'A classic rum and cola premix featuring Bundaberg Rum. Features rich caramel and vanilla notes from the rum, balanced by sweet cola flavors and subtle spice. Medium-bodied with smooth carbonation and a creamy, satisfying mouthfeel. The finish is sweet and smooth with lingering rum character. Perfect for those who enjoy classic cocktails in convenient form. One 330ml can contains 1.3 standard drinks.',
         nutrition: {
             calories: 165,
             carbs: 18.2,
@@ -2770,7 +3741,7 @@ const beverageDatabase = {
         abv: '5.5%',
         standardDrinks: '1.3',
         ingredients: ['Jack Daniels Tennessee Whiskey', 'Cola', 'Carbonated water', 'Sugar', 'Natural flavors'],
-        description: 'A premium whiskey and cola premix featuring Jack Daniels. Smooth and classic with that distinctive Tennessee whiskey taste. One 330ml can contains 1.3 standard drinks.',
+        description: 'A premium whiskey and cola premix featuring Jack Daniels. Features rich caramel, vanilla, and oak notes from the Tennessee whiskey, balanced by sweet cola flavors and subtle spice. Medium-bodied with smooth carbonation and a creamy, satisfying mouthfeel. The finish is smooth and warming with lingering whiskey character. Perfect for whiskey enthusiasts who want convenience without compromising on quality. One 330ml can contains 1.3 standard drinks.',
         nutrition: {
             calories: 168,
             carbs: 18.5,
@@ -2791,7 +3762,7 @@ const beverageDatabase = {
         abv: '15-20%',
         standardDrinks: '1.5',
         ingredients: ['Tequila (2 oz)', 'Lime juice (1 oz)', 'Triple sec (1 oz)', 'Salt rim'],
-        description: 'A refreshing cocktail made with tequila, lime juice, and triple sec, typically served with salt on the rim. One standard margarita contains 1.5 standard drinks.',
+        description: 'A refreshing cocktail made with tequila, lime juice, and triple sec, typically served with salt on the rim. Features bright citrus notes from fresh lime juice, smooth agave character from tequila, and a touch of sweetness from triple sec. Light-bodied with bright acidity and a crisp, refreshing mouthfeel. The salt rim enhances the flavors and adds complexity. The finish is tart and refreshing with lingering citrus notes. Perfect for warm weather and Mexican cuisine. One standard margarita contains 1.5 standard drinks.',
         nutrition: {
             calories: 168,
             carbs: 8.5,
@@ -2810,7 +3781,7 @@ const beverageDatabase = {
         abv: '12-15%',
         standardDrinks: '1.2',
         ingredients: ['White rum (2 oz)', 'Lime juice (1 oz)', 'Mint leaves', 'Sugar (1 tsp)', 'Soda water'],
-        description: 'A traditional Cuban highball cocktail with white rum, sugar, lime juice, soda water, and mint. One standard mojito contains 1.2 standard drinks.',
+        description: 'A traditional Cuban highball cocktail with white rum, sugar, lime juice, soda water, and mint. Features bright citrus notes from fresh lime juice, herbal freshness from muddled mint, and a subtle sweetness balanced by the crisp soda water. Light and refreshing with a clean, cooling finish. Perfect for hot weather and outdoor gatherings. The mint garnish adds aromatic complexity. One standard mojito contains 1.2 standard drinks.',
         nutrition: {
             calories: 148,
             carbs: 8.2,
@@ -2829,7 +3800,7 @@ const beverageDatabase = {
         abv: '25-30%',
         standardDrinks: '1.8',
         ingredients: ['Bourbon whiskey (2 oz)', 'Angostura bitters (2-3 dashes)', 'Sugar cube', 'Orange peel'],
-        description: 'A classic whiskey cocktail with bourbon, bitters, sugar, and orange peel. One standard old fashioned contains 1.8 standard drinks.',
+        description: 'A classic whiskey cocktail with bourbon, bitters, sugar, and orange peel. Features rich caramel and vanilla notes from bourbon, complex spice from Angostura bitters, and a subtle sweetness. Full-bodied with a smooth, warming mouthfeel. The orange peel garnish adds bright citrus aromas. The finish is long and complex with lingering oak and spice notes. Perfect for sipping and sophisticated occasions. One standard old fashioned contains 1.8 standard drinks.',
         nutrition: {
             calories: 135,
             carbs: 0.4,
@@ -2848,7 +3819,7 @@ const beverageDatabase = {
         abv: '20-25%',
         standardDrinks: '1.5',
         ingredients: ['Gin (1 oz)', 'Campari (1 oz)', 'Sweet vermouth (1 oz)', 'Orange peel'],
-        description: 'An Italian cocktail with equal parts gin, Campari, and sweet vermouth. One standard negroni contains 1.5 standard drinks.',
+        description: 'An Italian cocktail with equal parts gin, Campari, and sweet vermouth. Features juniper and citrus notes from gin, bitter orange and herbs from Campari, and rich fruit and spice from vermouth. Medium-bodied with a complex, layered mouthfeel. The finish is bitter and sophisticated with lingering herbal and citrus notes. The orange peel garnish adds bright aromas. Perfect for aperitivo and sophisticated drinking. One standard negroni contains 1.5 standard drinks.',
         nutrition: {
             calories: 128,
             carbs: 0.2,
@@ -2867,7 +3838,7 @@ const beverageDatabase = {
         abv: '25-30%',
         standardDrinks: '1.8',
         ingredients: ['Rye whiskey (2 oz)', 'Sweet vermouth (1 oz)', 'Angostura bitters (2-3 dashes)', 'Cherry garnish'],
-        description: 'A classic whiskey cocktail with rye, sweet vermouth, and bitters. One standard manhattan contains 1.8 standard drinks.',
+        description: 'A classic whiskey cocktail with rye, sweet vermouth, and bitters. Features spicy rye notes, rich fruit and spice from vermouth, and complex bitterness from Angostura bitters. Full-bodied with a smooth, warming mouthfeel. The cherry garnish adds a touch of sweetness and visual appeal. The finish is long and sophisticated with lingering spice and fruit notes. Perfect for elegant occasions and whiskey enthusiasts. One standard manhattan contains 1.8 standard drinks.',
         nutrition: {
             calories: 132,
             carbs: 0.3,
@@ -2888,7 +3859,7 @@ const beverageDatabase = {
         abv: '15-20%',
         standardDrinks: '1.4',
         ingredients: ['White rum (2 oz)', 'Lime juice (1 oz)', 'Simple syrup (0.75 oz)'],
-        description: 'A classic Cuban cocktail with rum, lime juice, and simple syrup. One standard daiquiri contains 1.4 standard drinks.',
+        description: 'A classic Cuban cocktail with rum, lime juice, and simple syrup. Features bright citrus notes from fresh lime juice, subtle sweetness from simple syrup, and smooth rum character. Light and refreshing with a crisp, clean mouthfeel. The finish is tart and refreshing with lingering citrus notes. Perfect for warm weather and tropical vibes. The simple preparation highlights the quality of the rum. One standard daiquiri contains 1.4 standard drinks.',
         nutrition: {
             calories: 145,
             carbs: 7.2,
@@ -3465,6 +4436,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Vodka (2 oz)', 'Blue curaçao (1 oz)', 'Lemonade (2 oz)', 'Cherry garnish'],
         description: 'A blue-colored cocktail with vodka and blue curaçao. One standard blue lagoon contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 12.8,
+            protein: 0.2,
+            fat: 0,
+            sugar: 11.5,
+            servingSize: '5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Blue', 'Tropical', 'Sweet']
     },
@@ -3476,6 +4455,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (1.5 oz)', 'Peach schnapps (0.5 oz)', 'Cranberry juice (2 oz)', 'Orange juice (2 oz)'],
         description: 'A fruity cocktail with vodka, peach schnapps, and fruit juices. One standard sex on the beach contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 16.8,
+            protein: 1.2,
+            fat: 0,
+            sugar: 14.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Fruity', 'Peach', 'Tropical']
     },
@@ -3487,6 +4474,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (1.5 oz)', 'Peach schnapps (0.5 oz)', 'Cranberry juice (3 oz)', 'Lime wedge'],
         description: 'A simple cocktail with vodka, peach schnapps, and cranberry. One standard woo woo contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 15.2,
+            protein: 0.8,
+            fat: 0,
+            sugar: 13.8,
+            servingSize: '5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Simple', 'Peach', 'Cranberry']
     },
@@ -3498,6 +4493,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Vodka (1.5 oz)', 'Orange juice (4 oz)', 'Galliano (0.5 oz float)', 'Orange slice'],
         description: 'A highball with vodka, orange juice, and Galliano float. One standard harvey wallbanger contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 195,
+            carbs: 16.5,
+            protein: 1.8,
+            fat: 0,
+            sugar: 13.2,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Vodka', 'Highball', 'Orange', 'Galliano']
     },
@@ -3509,6 +4512,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Gin (1 oz)', 'Lemon juice (0.5 oz)', 'Simple syrup (0.5 oz)', 'Champagne (2 oz)', 'Lemon twist'],
         description: 'A champagne cocktail with gin, lemon, and simple syrup. One standard french 75 contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 8.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 6.8,
+            servingSize: '4 oz'
+        },
         image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Champagne', 'Sophisticated', 'Classic']
     },
@@ -3520,6 +4531,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Gin (2 oz)', 'Lemon juice (0.5 oz)', 'Lime juice (0.5 oz)', 'Simple syrup (1 oz)', 'Egg white', 'Heavy cream (1 oz)', 'Orange flower water (3 drops)', 'Soda water'],
         description: 'A complex gin cocktail with egg white and cream. One standard ramos gin fizz contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 225,
+            carbs: 12.5,
+            protein: 2.8,
+            fat: 8.5,
+            sugar: 10.2,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Complex', 'Egg White', 'Creamy']
     },
@@ -3531,6 +4550,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Gin (2 oz)', 'Lemon juice (0.75 oz)', 'Honey syrup (0.75 oz)', 'Lemon twist'],
         description: 'A gin cocktail with lemon juice and honey syrup. One standard bee\'s knees contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 10.8,
+            protein: 0.1,
+            fat: 0,
+            sugar: 9.5,
+            servingSize: '3.5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Honey', 'Lemon', 'Classic']
     },
@@ -3542,6 +4569,14 @@ const beverageDatabase = {
         standardDrinks: '1.6',
         ingredients: ['Gin (2 oz)', 'Lime juice (1 oz)', 'Simple syrup (0.75 oz)', 'Mint leaves (6-8)', 'Mint sprig garnish'],
         description: 'A gin cocktail with lime, simple syrup, and mint. One standard south side contains 1.6 standard drinks.',
+        nutrition: {
+            calories: 175,
+            carbs: 9.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 8.5,
+            servingSize: '3.75 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Mint', 'Lime', 'Refreshing']
     },
@@ -3553,6 +4588,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Gin (2 oz)', 'Lemon juice (1 oz)', 'Simple syrup (0.75 oz)', 'Soda water (3 oz)', 'Lemon wheel and cherry'],
         description: 'A refreshing highball with gin, lemon, and soda water. One standard tom collins contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 9.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 8.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Gin', 'Highball', 'Refreshing', 'Classic']
     },
@@ -3564,6 +4607,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Bourbon whiskey (2 oz)', 'Lemon juice (1 oz)', 'Simple syrup (0.75 oz)', 'Soda water (3 oz)', 'Lemon wheel and cherry'],
         description: 'A whiskey variation of the Tom Collins. One standard john collins contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 9.2,
+            protein: 0.1,
+            fat: 0,
+            sugar: 8.5,
+            servingSize: '6 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Highball', 'Refreshing', 'Bourbon']
     },
@@ -3575,6 +4626,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Bourbon whiskey (2.5 oz)', 'Simple syrup (0.5 oz)', 'Mint leaves (8-10)', 'Crushed ice', 'Mint sprig garnish'],
         description: 'A classic Kentucky cocktail with bourbon and mint. One standard mint julep contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 6.2,
+            protein: 0,
+            fat: 0,
+            sugar: 5.8,
+            servingSize: '3 oz'
+        },
         image: 'https://images.unsplash.com/photo-1624368432852-ee84d0c87b3b?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Mint', 'Kentucky', 'Classic']
     },
@@ -3586,6 +4645,14 @@ const beverageDatabase = {
         standardDrinks: '1.4',
         ingredients: ['Whiskey (2 oz)', 'Hot water (4 oz)', 'Honey (1 tsp)', 'Lemon juice (0.5 oz)', 'Lemon wheel', 'Cinnamon stick'],
         description: 'A warm cocktail with whiskey, hot water, and honey. One standard hot toddy contains 1.4 standard drinks.',
+        nutrition: {
+            calories: 165,
+            carbs: 8.5,
+            protein: 0.1,
+            fat: 0,
+            sugar: 7.8,
+            servingSize: '6.5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Hot', 'Honey', 'Warming']
     },
@@ -3597,6 +4664,14 @@ const beverageDatabase = {
         standardDrinks: '1.2',
         ingredients: ['Irish whiskey (1.5 oz)', 'Hot coffee (4 oz)', 'Brown sugar (1 tsp)', 'Whipped cream'],
         description: 'A warm cocktail with Irish whiskey and coffee. One standard irish coffee contains 1.2 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 8.2,
+            protein: 1.2,
+            fat: 8.5,
+            sugar: 7.8,
+            servingSize: '5.5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Hot', 'Coffee', 'Irish']
     },
@@ -3608,6 +4683,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Scotch whisky (2 oz)', 'Drambuie (0.5 oz)', 'Lemon twist'],
         description: 'A simple cocktail with Scotch and Drambuie. One standard rusty nail contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 6.8,
+            protein: 0,
+            fat: 0,
+            sugar: 5.2,
+            servingSize: '2.5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Scotch', 'Simple', 'Strong']
     },
@@ -3619,6 +4702,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Scotch whisky (2 oz)', 'Amaretto (0.5 oz)', 'Orange peel'],
         description: 'A simple cocktail with Scotch and Amaretto. One standard godfather contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 8.2,
+            protein: 0,
+            fat: 0,
+            sugar: 7.5,
+            servingSize: '2.5 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Scotch', 'Simple', 'Amaretto']
     },
@@ -3630,6 +4721,14 @@ const beverageDatabase = {
         standardDrinks: '1.8',
         ingredients: ['Scotch whisky (2 oz)', 'Sweet vermouth (0.75 oz)', 'Angostura bitters (2 dashes)', 'Cherry garnish'],
         description: 'A Scotch variation of the Manhattan. One standard rob roy contains 1.8 standard drinks.',
+        nutrition: {
+            calories: 185,
+            carbs: 7.2,
+            protein: 0,
+            fat: 0,
+            sugar: 5.8,
+            servingSize: '2.75 oz'
+        },
         image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop',
         tags: ['Cocktail', 'Whiskey', 'Scotch', 'Classic', 'Manhattan Variation']
     },
@@ -3845,7 +4944,8 @@ function hideSuggestions() {
 function selectSuggestion(beverageKey) {
     beverageNameInput.value = beverageDatabase[beverageKey].name;
     hideSuggestions();
-    searchBeverage();
+    addToHistory(beverageKey, 'text');
+    displayBeverageInfo(beverageDatabase[beverageKey]);
 }
 
 function searchBeverage() {
@@ -3867,6 +4967,7 @@ function searchBeverage() {
     });
     
     if (beverageKey) {
+        addToHistory(beverageKey, 'text');
         displayBeverageInfo(beverageDatabase[beverageKey]);
     } else {
         // Show suggestions for similar beverages
@@ -3886,9 +4987,20 @@ function searchBeverage() {
 
 // Photo upload functionality
 uploadArea.addEventListener('click', () => {
-    photoInput.click();
+    triggerFileInput();
 });
 
+// Mobile-specific touch events
+uploadArea.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    photoInput.click();
+}, { passive: false });
+
+uploadArea.addEventListener('touchend', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+// Desktop drag and drop events
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.classList.add('dragover');
@@ -3908,11 +5020,262 @@ uploadArea.addEventListener('drop', (e) => {
     }
 });
 
-photoInput.addEventListener('change', (e) => {
+// File inputs are now created dynamically for better mobile compatibility
+
+// Mobile fallback - if file input fails, show alternative options
+function checkMobileFileSupport() {
+    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // Add mobile-specific instructions
+        const mobileNote = document.createElement('p');
+        mobileNote.innerHTML = '<i class="fas fa-mobile-alt"></i> Tap to take photo or choose from gallery';
+        mobileNote.style.fontSize = '0.9rem';
+        mobileNote.style.color = '#666';
+        mobileNote.style.marginTop = '10px';
+        
+        const uploadContent = document.querySelector('.upload-content');
+        if (uploadContent && !document.querySelector('.mobile-note')) {
+            mobileNote.className = 'mobile-note';
+            uploadContent.appendChild(mobileNote);
+        }
+    }
+}
+
+// Check mobile support on page load
+document.addEventListener('DOMContentLoaded', () => {
+    checkMobileFileSupport();
+    checkForUpdates();
+});
+
+// Function to check for updates and clear cache if needed
+function checkForUpdates() {
+    // Add timestamp to force cache refresh
+    const currentVersion = '1.0.2';
+    const lastVersion = localStorage.getItem('bevyfinder-version');
+    
+    if (lastVersion !== currentVersion) {
+        // New version detected, clear cache
+        clearAllCaches();
+        localStorage.setItem('bevyfinder-version', currentVersion);
+        console.log('New version detected, cache cleared');
+    }
+}
+// Function to clear all caches
+async function clearAllCaches() {
+    try {
+        // Clear browser cache for this site
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(
+                cacheNames.map(cacheName => caches.delete(cacheName))
+            );
+        }
+        
+        // Clear localStorage (optional - uncomment if needed)
+        // localStorage.clear();
+        
+        // Force reload if service worker is available
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
+        }
+    } catch (error) {
+        console.log('Cache clearing failed:', error);
+    }
+}
+
+// Upload button event listeners
+if (uploadBtn) {
+    uploadBtn.addEventListener('click', () => {
+        triggerFileInput();
+    });
+    
+    // Mobile touch support for upload button
+    uploadBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerFileInput();
+    }, { passive: false });
+}
+
+// Function to trigger file input with mobile compatibility
+function triggerFileInput() {
+    console.log('Triggering file input...');
+    
+    // Check if we're on mobile
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('Is mobile:', isMobile);
+    
+    if (isMobile) {
+        // Mobile-specific approach
+        showMobileUploadOptions();
+    } else {
+        // Desktop approach
+        triggerDesktopFileInput();
+    }
+}
+
+// Show mobile upload options
+function showMobileUploadOptions() {
+    // Create modal for mobile upload options
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 300px;
+        width: 90%;
+    `;
+    
+    modalContent.innerHTML = `
+        <h3 style="margin-bottom: 20px; color: #333;">Choose Upload Method</h3>
+        <button id="camera-btn" style="
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        ">
+            <i class="fas fa-camera"></i> Take Photo
+        </button>
+        <button id="gallery-btn" style="
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        ">
+            <i class="fas fa-images"></i> Choose from Gallery
+        </button>
+        <button id="cancel-btn" style="
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        ">
+            Cancel
+        </button>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    document.getElementById('camera-btn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        createMobileFileInput('camera');
+    });
+    
+    document.getElementById('gallery-btn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        createMobileFileInput('gallery');
+    });
+    
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+}
+
+// Create mobile-specific file input
+function createMobileFileInput(type) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    if (type === 'camera') {
+        input.capture = 'environment';
+        console.log('Creating camera input');
+    } else {
+        console.log('Creating gallery input');
+    }
+    
+    input.style.display = 'none';
+    
+    // Add to DOM first
+    document.body.appendChild(input);
+    
+    // Add change listener
+    input.addEventListener('change', (e) => {
+        console.log('File input change event triggered');
+        if (e.target.files && e.target.files.length > 0) {
+            console.log('File selected:', e.target.files[0].name);
+            handleFileUpload(e.target.files[0]);
+        } else {
+            console.log('No file selected');
+        }
+        // Clean up
+        document.body.removeChild(input);
+    });
+    
+    // Add error handling
+    input.addEventListener('error', (e) => {
+        console.error('File input error:', e);
+        document.body.removeChild(input);
+        showError('Unable to access camera/gallery. Please try again.');
+    });
+    
+    // Trigger click with delay to ensure DOM is ready
+    setTimeout(() => {
+        try {
+            input.click();
+            console.log('File input clicked');
+        } catch (error) {
+            console.error('Error clicking file input:', error);
+            document.body.removeChild(input);
+            showError('Unable to open file picker. Please try again.');
+        }
+    }, 100);
+}
+
+// Desktop file input trigger
+function triggerDesktopFileInput() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    
+    input.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         handleFileUpload(e.target.files[0]);
     }
+        document.body.removeChild(input);
 });
+    
+    document.body.appendChild(input);
+    input.click();
+}
 
 removeBtn.addEventListener('click', () => {
     clearPhotoUpload();
@@ -3935,9 +5298,9 @@ function handleFileUpload(file) {
         uploadArea.style.display = 'none';
         previewArea.style.display = 'block';
         
-        // Simulate image recognition (in a real app, this would call an AI service)
+        // Perform actual image recognition
         setTimeout(() => {
-            simulateImageRecognition();
+            analyzeImage();
         }, 1500);
     };
     reader.readAsDataURL(file);
@@ -3947,12 +5310,10 @@ function clearPhotoUpload() {
     uploadArea.style.display = 'block';
     previewArea.style.display = 'none';
     previewImage.src = '';
-    photoInput.value = '';
     clearResults();
 }
 
-function simulateImageRecognition() {
-    // Simulate AI recognition with loading state
+async function analyzeImage() {
     const loadingText = document.createElement('div');
     loadingText.innerHTML = '<div class="loading"></div> Analyzing image...';
     loadingText.style.textAlign = 'center';
@@ -3963,59 +5324,744 @@ function simulateImageRecognition() {
     beverageCard.appendChild(loadingText);
     resultsSection.style.display = 'block';
     
-    // Simulate API delay and show a random beverage result
-    setTimeout(() => {
-        const beverages = Object.values(beverageDatabase);
-        const randomBeverage = beverages[Math.floor(Math.random() * beverages.length)];
-        displayBeverageInfo(randomBeverage, true);
-    }, 2000);
+    try {
+        const uploadedImage = document.getElementById('preview-image');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = async function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            // Convert to base64
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Use free image recognition API
+            const result = await performImageRecognition(imageData);
+            displayImageAnalysisResult(result, uploadedImage.src);
+        };
+        
+        img.src = uploadedImage.src;
+        
+    } catch (error) {
+        console.error('Image analysis error:', error);
+        showImageAnalysisError();
+    }
 }
 
-// Display results
+async function performImageRecognition(imageData) {
+    // Try multiple free OCR and image recognition services
+    const services = [
+        () => tryOCRService(imageData),
+        () => tryImageRecognitionAPI(imageData),
+        () => performLocalImageAnalysis(imageData)
+    ];
+    
+    for (const service of services) {
+        try {
+            const result = await service();
+            if (result && result.success) {
+                return result;
+            }
+        } catch (error) {
+            console.log('Service failed, trying next...', error);
+            continue;
+        }
+    }
+    
+    // Final fallback
+    return performLocalImageAnalysis(imageData);
+}
+
+async function tryOCRService(imageData) {
+    // Try multiple OCR services for better accuracy
+    const services = [
+        () => tryOCRSpace(imageData),
+        () => tryGoogleVisionAPI(imageData),
+        () => tryTesseractJS(imageData)
+    ];
+    
+    for (const service of services) {
+        try {
+            const result = await service();
+            if (result && result.success && result.text && result.text.trim().length > 0) {
+                console.log('OCR successful with text:', result.text);
+                return result;
+            }
+        } catch (error) {
+            console.log('OCR service failed, trying next...', error);
+            continue;
+        }
+    }
+    
+    throw new Error('All OCR services failed');
+}
+
+async function tryOCRSpace(imageData) {
+    // Use OCR.space with better parameters
+    const apiUrl = 'https://api.ocr.space/parse/image';
+    
+    try {
+        const formData = new FormData();
+        formData.append('apikey', 'K81724188988957'); // Free demo key
+        formData.append('language', 'eng');
+        formData.append('isOverlayRequired', 'false');
+        formData.append('filetype', 'jpg');
+        formData.append('OCREngine', '2'); // Better OCR engine
+        formData.append('scale', 'true'); // Scale image for better recognition
+        
+        // Convert base64 to blob
+        const base64Data = imageData.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        
+        formData.append('image', blob, 'beverage.jpg');
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('OCR API request failed');
+        }
+        
+        const data = await response.json();
+        
+        if (data.ParsedResults && data.ParsedResults.length > 0) {
+            const extractedText = data.ParsedResults[0].ParsedText.toLowerCase();
+            console.log('OCR.space extracted text:', extractedText);
+            
+            return {
+                success: true,
+                text: extractedText,
+                tags: extractTagsFromText(extractedText),
+                source: 'ocrspace'
+            };
+        }
+        
+        throw new Error('No text extracted from OCR.space');
+        
+    } catch (error) {
+        console.log('OCR.space failed:', error);
+        throw error;
+    }
+}
+
+async function tryGoogleVisionAPI(imageData) {
+    // Try Google Cloud Vision API (if available)
+    // This would require a real API key, so we'll simulate it
+    console.log('Google Vision API not available (requires API key)');
+    throw new Error('Google Vision API not configured');
+}
+
+async function tryTesseractJS(imageData) {
+    // Client-side OCR using Tesseract.js
+    try {
+        // Check if Tesseract is available
+        if (typeof Tesseract === 'undefined') {
+            // Load Tesseract dynamically
+            await loadTesseract();
+        }
+        
+        const result = await Tesseract.recognize(imageData, 'eng', {
+            logger: m => console.log(m)
+        });
+        
+        const extractedText = result.data.text.toLowerCase();
+        console.log('Tesseract extracted text:', extractedText);
+        
+        return {
+            success: true,
+            text: extractedText,
+            tags: extractTagsFromText(extractedText),
+            source: 'tesseract'
+        };
+        
+    } catch (error) {
+        console.log('Tesseract failed:', error);
+        throw error;
+    }
+}
+
+async function loadTesseract() {
+    // Dynamically load Tesseract.js
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+async function tryImageRecognitionAPI(imageData) {
+    // Use a free image recognition service
+    const apiUrl = 'https://api.imagga.com/v2/tags';
+    const apiKey = 'acc_2c0c0c0c0c0c0c0c'; // Demo key
+    
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${btoa(apiKey + ':')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                image: imageData.split(',')[1]
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Image recognition API failed');
+        }
+        
+        const data = await response.json();
+        
+        if (data.result && data.result.tags) {
+            const tags = data.result.tags.map(tag => tag.tag.en).slice(0, 10);
+            return {
+                success: true,
+                tags: tags,
+                source: 'imagga'
+            };
+        }
+        
+        throw new Error('No tags extracted');
+        
+    } catch (error) {
+        console.log('Image recognition API failed:', error);
+        throw error;
+    }
+}
+
+function extractTagsFromText(text) {
+    const tags = [];
+    const cleanText = text.replace(/[^\w\s]/g, ' ').toLowerCase();
+    
+    console.log('Cleaning text for analysis:', cleanText);
+    
+    // Comprehensive brand name matching
+    const brandPatterns = {
+        'swan': ['swan', 'swan draught', 'swan lager'],
+        'carlton': ['carlton', 'carlton draught', 'carlton dry', 'carlton cold'],
+        'guinness': ['guinness', 'guinness draught', 'guinness stout'],
+        'corona': ['corona', 'corona extra', 'corona lager'],
+        'heineken': ['heineken', 'heineken lager'],
+        'budweiser': ['budweiser', 'bud', 'bud light'],
+        'stella': ['stella', 'stella artois'],
+        'fosters': ['fosters', 'fosters lager'],
+        'crown': ['crown', 'crown lager'],
+        'coopers': ['coopers', 'coopers pale ale', 'coopers sparkling'],
+        'great northern': ['great northern', 'great northern brewing'],
+        'victoria bitter': ['victoria bitter', 'vb', 'victoria'],
+        'jack daniels': ['jack daniels', 'jack daniel', 'jack'],
+        'bundaberg': ['bundaberg', 'bundaberg rum'],
+        'sommersby': ['sommersby', 'sommersby cider'],
+        'hard solo': ['hard solo', 'solo'],
+        'premix': ['premix', '196', '196 premix'],
+        'varsity': ['varsity', 'varsity lager'],
+        'pure blonde': ['pure blonde', 'pureblonde'],
+        'asahi': ['asahi', 'asahi super dry'],
+        'ballarat': ['ballarat', 'ballarat bitter'],
+        'emu': ['emu', 'emu beer'],
+        'xxxx': ['xxxx', '4x', 'four x']
+    };
+    
+    // Check for brand patterns
+    for (const [brand, patterns] of Object.entries(brandPatterns)) {
+        for (const pattern of patterns) {
+            if (cleanText.includes(pattern)) {
+                tags.push(brand);
+                console.log(`Found brand: ${brand} (pattern: ${pattern})`);
+                break;
+            }
+        }
+    }
+    
+    // Beverage type keywords
+    const typeKeywords = {
+        'beer': ['beer', 'lager', 'ale', 'stout', 'porter', 'pilsner'],
+        'wine': ['wine', 'red wine', 'white wine', 'rose', 'champagne'],
+        'spirit': ['spirit', 'whiskey', 'vodka', 'gin', 'rum', 'tequila', 'brandy'],
+        'cocktail': ['cocktail', 'margarita', 'martini', 'mojito'],
+        'cider': ['cider', 'hard cider'],
+        'premix': ['premix', 'rtd', 'ready to drink']
+    };
+    
+    // Check for beverage types
+    for (const [type, keywords] of Object.entries(typeKeywords)) {
+        for (const keyword of keywords) {
+            if (cleanText.includes(keyword)) {
+                tags.push(type);
+                console.log(`Found type: ${type} (keyword: ${keyword})`);
+                break;
+            }
+        }
+    }
+    
+    // Alcohol content patterns
+    const abvPatterns = [
+        /(\d+(?:\.\d+)?)\s*%?\s*abv/i,
+        /abv\s*(\d+(?:\.\d+)?)\s*%/i,
+        /alcohol\s*(\d+(?:\.\d+)?)\s*%/i
+    ];
+    
+    for (const pattern of abvPatterns) {
+        const match = cleanText.match(pattern);
+        if (match) {
+            const abv = parseFloat(match[1]);
+            if (abv > 0 && abv <= 100) {
+                tags.push(`abv-${abv}`);
+                console.log(`Found ABV: ${abv}%`);
+            }
+        }
+    }
+    
+    // Add general beverage tag if we found anything
+    if (tags.length > 0) {
+        tags.push('beverage');
+    }
+    
+    console.log('Extracted tags:', tags);
+    return tags;
+}
+
+function performLocalImageAnalysis(imageData) {
+    // Local image analysis using canvas and basic pattern recognition
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    return new Promise((resolve) => {
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const analysis = analyzeImageData(imageData);
+            
+            resolve({
+                success: true,
+                tags: analysis.tags,
+                colors: analysis.colors,
+                text: analysis.text
+            });
+        };
+        img.src = imageData;
+    });
+}
+
+function analyzeImageData(imageData) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
+    
+    // Analyze colors
+    const colors = {};
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        
+        const colorKey = `${Math.floor(r/50)*50},${Math.floor(g/50)*50},${Math.floor(b/50)*50}`;
+        colors[colorKey] = (colors[colorKey] || 0) + 1;
+    }
+    
+    // Determine dominant colors
+    const dominantColors = Object.entries(colors)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([color]) => color.split(',').map(Number));
+    
+    // Basic pattern recognition
+    const tags = [];
+    const avgBrightness = data.reduce((sum, val, i) => sum + (i % 4 === 0 ? val : 0), 0) / (data.length / 4);
+    
+    if (avgBrightness > 150) {
+        tags.push('light colored');
+    } else if (avgBrightness < 100) {
+        tags.push('dark colored');
+    }
+    
+    // Check for common beverage colors
+    const hasRed = dominantColors.some(([r]) => r > 150);
+    const hasGreen = dominantColors.some(([,g]) => g > 150);
+    const hasBlue = dominantColors.some(([, , b]) => b > 150);
+    
+    if (hasRed && !hasGreen && !hasBlue) tags.push('red beverage');
+    if (hasGreen && !hasRed && !hasBlue) tags.push('green beverage');
+    if (hasBlue && !hasRed && !hasGreen) tags.push('blue beverage');
+    
+    tags.push('beverage container');
+    
+    return { tags, colors: dominantColors, text: 'beverage' };
+}
+function displayImageAnalysisResult(result, originalImageSrc) {
+    const analysisResult = document.createElement('div');
+    
+    if (result.success && (result.tags || result.text)) {
+        // Try to match with database
+        const matchedBeverage = findBeverageByTags(result.tags || [], result.text || '');
+        
+        if (matchedBeverage) {
+            // Find the beverage key for history tracking
+            const beverageKey = Object.keys(beverageDatabase).find(key => beverageDatabase[key] === matchedBeverage);
+            if (beverageKey) {
+                addToHistory(beverageKey, 'image');
+            }
+            displayBeverageInfo(matchedBeverage, true);
+        } else {
+            // Show analysis details
+            let analysisDetails = '';
+            if (result.text) {
+                analysisDetails += `<p><strong>Extracted Text:</strong></p><p style="font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0;">${result.text}</p>`;
+            }
+            if (result.tags && result.tags.length > 0) {
+                analysisDetails += `<p><strong>Detected Features:</strong></p><p>${result.tags.join(', ')}</p>`;
+            }
+            
+            analysisResult.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #666;">
+                    <h3>Image Analysis Complete</h3>
+                    <p><strong>Uploaded Image:</strong></p>
+                    <img src="${originalImageSrc}" alt="Uploaded beverage" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin: 10px 0;">
+                    ${analysisDetails}
+                    <p>No exact match found in database. Try searching for the beverage name.</p>
+                    <button onclick="switchToSearch()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 500;">
+                        <i class="fas fa-search"></i> Search Instead
+                    </button>
+                </div>
+            `;
+        }
+    } else {
+        showImageAnalysisError();
+    }
+    
+    if (analysisResult.innerHTML) {
+        beverageCard.appendChild(analysisResult);
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function findBeverageByTags(tags, extractedText = '') {
+    const tagString = tags.join(' ').toLowerCase();
+    const textString = extractedText.toLowerCase();
+    const matches = [];
+    
+    console.log('Matching with tags:', tags);
+    console.log('Extracted text:', textString);
+    
+    // Search through database for matches
+    for (const [key, beverage] of Object.entries(beverageDatabase)) {
+        const beverageText = `${beverage.name} ${beverage.type} ${beverage.alcohol} ${beverage.tags.join(' ')}`.toLowerCase();
+        let score = 0;
+        let matchDetails = [];
+        
+        // Exact name matching (highest priority)
+        const beverageNameLower = beverage.name.toLowerCase();
+        if (textString.includes(beverageNameLower)) {
+            score += 15;
+            matchDetails.push(`Exact name match: ${beverage.name}`);
+        }
+        
+        // Partial name matching with word boundaries
+        const beverageWords = beverageNameLower.split(/\s+/);
+        beverageWords.forEach(word => {
+            if (word.length > 2) {
+                const wordPattern = new RegExp(`\\b${word}\\b`, 'i');
+                if (wordPattern.test(textString)) {
+                    score += 8;
+                    matchDetails.push(`Word match: ${word}`);
+                }
+            }
+        });
+        
+        // Brand-specific matching with comprehensive patterns
+        const brandMatches = {
+            'swan': ['swan', 'swan draught', 'swan lager'],
+            'carlton': ['carlton', 'carlton draught', 'carlton dry', 'carlton cold'],
+            'guinness': ['guinness', 'guinness draught', 'guinness stout'],
+            'corona': ['corona', 'corona extra', 'corona lager'],
+            'heineken': ['heineken', 'heineken lager'],
+            'budweiser': ['budweiser', 'bud', 'bud light'],
+            'stella': ['stella', 'stella artois'],
+            'fosters': ['fosters', 'fosters lager'],
+            'crown': ['crown', 'crown lager'],
+            'coopers': ['coopers', 'coopers pale ale', 'coopers sparkling'],
+            'great northern': ['great northern', 'great northern brewing'],
+            'victoria bitter': ['victoria bitter', 'vb', 'victoria'],
+            'jack daniels': ['jack daniels', 'jack daniel', 'jack'],
+            'bundaberg': ['bundaberg', 'bundaberg rum'],
+            'sommersby': ['sommersby', 'sommersby cider'],
+            'hard solo': ['hard solo', 'solo'],
+            'premix': ['premix', '196', '196 premix'],
+            'varsity': ['varsity', 'varsity lager'],
+            'pure blonde': ['pure blonde', 'pureblonde'],
+            'asahi': ['asahi', 'asahi super dry'],
+            'ballarat': ['ballarat', 'ballarat bitter'],
+            'emu': ['emu', 'emu beer'],
+            'xxxx': ['xxxx', '4x', 'four x']
+        };
+        
+        // Check brand matches
+        for (const [brand, patterns] of Object.entries(brandMatches)) {
+            if (beverageText.includes(brand)) {
+                for (const pattern of patterns) {
+                    if (textString.includes(pattern) || tagString.includes(brand)) {
+                        score += 12;
+                        matchDetails.push(`Brand match: ${brand} (${pattern})`);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // ABV matching
+        if (beverage.abv) {
+            const beverageABV = parseFloat(beverage.abv);
+            const abvPattern = new RegExp(`\\b${beverageABV}\\s*%?\\b`, 'i');
+            if (abvPattern.test(textString)) {
+                score += 6;
+                matchDetails.push(`ABV match: ${beverage.abv}`);
+            }
+        }
+        
+        // Type-based matching
+        const typeMatches = {
+            'beer': ['beer', 'lager', 'ale', 'stout', 'porter', 'pilsner'],
+            'wine': ['wine', 'red wine', 'white wine', 'rose', 'champagne'],
+            'spirit': ['spirit', 'whiskey', 'vodka', 'gin', 'rum', 'tequila', 'brandy'],
+            'cocktail': ['cocktail', 'margarita', 'martini', 'mojito'],
+            'cider': ['cider', 'hard cider'],
+            'premix': ['premix', 'rtd', 'ready to drink']
+        };
+        
+        for (const [type, keywords] of Object.entries(typeMatches)) {
+            if (beverageText.includes(type)) {
+                for (const keyword of keywords) {
+                    if (textString.includes(keyword) || tagString.includes(type)) {
+                        score += 4;
+                        matchDetails.push(`Type match: ${type} (${keyword})`);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Tag-based matching
+        for (const tag of tags) {
+            if (beverageText.includes(tag) || beverage.tags.includes(tag)) {
+                score += 3;
+                matchDetails.push(`Tag match: ${tag}`);
+            }
+        }
+        
+        if (score > 0) {
+            matches.push({ 
+                beverage, 
+                score, 
+                details: matchDetails,
+                key: key 
+            });
+        }
+    }
+    
+    // Return the best match
+    if (matches.length > 0) {
+        matches.sort((a, b) => b.score - a.score);
+        
+        console.log('Top matches:');
+        matches.slice(0, 5).forEach((match, index) => {
+            console.log(`${index + 1}. ${match.beverage.name} (Score: ${match.score})`);
+            console.log(`   Details: ${match.details.join(', ')}`);
+        });
+        
+        const bestMatch = matches[0];
+        console.log(`Best match: ${bestMatch.beverage.name} with score ${bestMatch.score}`);
+        
+        // Only return if score is high enough
+        if (bestMatch.score >= 8) {
+            return bestMatch.beverage;
+        } else {
+            console.log('No high-confidence match found');
+            return null;
+        }
+    }
+    
+    return null;
+}
+
+function showImageAnalysisError() {
+    const errorResult = document.createElement('div');
+    errorResult.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+            <h3>Analysis Failed</h3>
+            <p>Unable to analyze the image. Please try:</p>
+            <ul style="text-align: left; max-width: 300px; margin: 0 auto;">
+                <li>Using a clearer image</li>
+                <li>Ensuring the beverage label is visible</li>
+                <li>Using the search function instead</li>
+            </ul>
+            <button onclick="switchToSearch()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 500;">
+                <i class="fas fa-search"></i> Use Search
+            </button>
+        </div>
+    `;
+    
+    beverageCard.appendChild(errorResult);
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Display results with serving size tabs
 function displayBeverageInfo(beverage, fromImage = false) {
     const sourceText = fromImage ? ' (Identified from image)' : '';
     
-    // Create nutrition section if available
-    const nutritionSection = beverage.nutrition ? `
-        <div class="nutrition-section">
-            <h4>Nutritional Information (per ${beverage.nutrition.servingSize})</h4>
-            <div class="nutrition-grid">
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Calories</span>
-                    <span class="nutrition-value">${beverage.nutrition.calories}</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Carbs</span>
-                    <span class="nutrition-value">${beverage.nutrition.carbs}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Protein</span>
-                    <span class="nutrition-value">${beverage.nutrition.protein}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Fat</span>
-                    <span class="nutrition-value">${beverage.nutrition.fat}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Sugar</span>
-                    <span class="nutrition-value">${beverage.nutrition.sugar}g</span>
+    // Serving size configurations
+    const servingSizes = {
+        'schooner': { name: 'Schooner', volume: 425, multiplier: 425/330 }, // 425ml
+        'pint': { name: 'Pint', volume: 570, multiplier: 570/330 }, // 570ml
+        'can-bottle': { name: 'Can/Bottle', volume: 330, multiplier: 1 }, // 330ml (standard)
+        'jug': { name: 'Jug', volume: 1140, multiplier: 1140/330 } // 1140ml (2 pints)
+    };
+    
+    // Calculate values for each serving size
+    function calculateServingValues(beverage, multiplier) {
+        const abv = parseFloat(beverage.abv) || 0;
+        const baseVolume = 330; // Standard can/bottle size
+        const volume = baseVolume * multiplier;
+        const standardDrinks = (volume * abv) / 1000;
+        
+        let nutrition = null;
+        if (beverage.nutrition) {
+            nutrition = {
+                calories: Math.round(beverage.nutrition.calories * multiplier),
+                carbs: Math.round(beverage.nutrition.carbs * multiplier * 10) / 10,
+                protein: Math.round(beverage.nutrition.protein * multiplier * 10) / 10,
+                fat: Math.round(beverage.nutrition.fat * multiplier * 10) / 10,
+                sugar: Math.round(beverage.nutrition.sugar * multiplier * 10) / 10,
+                servingSize: `${Math.round(volume)}ml`
+            };
+        }
+        
+        return {
+            volume: Math.round(volume),
+            standardDrinks: standardDrinks.toFixed(1),
+            nutrition: nutrition
+        };
+    }
+    
+    // Generate tab content for each serving size
+    function generateTabContent(servingKey, servingConfig) {
+        const values = calculateServingValues(beverage, servingConfig.multiplier);
+        
+        const nutritionSection = values.nutrition ? `
+            <div class="nutrition-section">
+                <h4>Nutritional Information (per ${values.nutrition.servingSize})</h4>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">Calories</span>
+                        <span class="nutrition-value">${values.nutrition.calories}</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">Carbs</span>
+                        <span class="nutrition-value">${values.nutrition.carbs}g</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">Protein</span>
+                        <span class="nutrition-value">${values.nutrition.protein}g</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">Fat</span>
+                        <span class="nutrition-value">${values.nutrition.fat}g</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">Sugar</span>
+                        <span class="nutrition-value">${values.nutrition.sugar}g</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    ` : '';
+        ` : '';
+        
+        return `
+            <div class="serving-details">
+                <div class="serving-info">
+                    <div class="serving-stat">
+                        <span class="stat-label">Volume</span>
+                        <span class="stat-value">${values.volume}ml</span>
+                    </div>
+                    <div class="serving-stat">
+                        <span class="stat-label">Standard Drinks</span>
+                        <span class="stat-value">${values.standardDrinks}</span>
+                    </div>
+                    ${beverage.abv ? `
+                        <div class="serving-stat">
+                            <span class="stat-label">ABV</span>
+                            <span class="stat-value">${beverage.abv}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                ${nutritionSection}
+            </div>
+        `;
+    }
+    
+    // Generate all tab contents
+    const tabContents = Object.entries(servingSizes).map(([key, config]) => 
+        generateTabContent(key, config)
+    );
     
     beverageCard.innerHTML = `
         <div class="beverage-info">
-            <img src="${beverage.image}" alt="${beverage.name}" class="beverage-image">
             <div class="beverage-details">
+                <div class="beverage-header">
+                    <div class="beverage-title">
                 <h3>${beverage.name}${sourceText}</h3>
                 <p><strong>Type:</strong> ${beverage.type}</p>
                 <p><strong>Alcohol:</strong> ${beverage.alcohol}</p>
-                ${beverage.abv ? `<p><strong>ABV:</strong> ${beverage.abv}</p>` : ''}
-                ${beverage.standardDrinks ? `<p><strong>Standard Drinks:</strong> ${beverage.standardDrinks}</p>` : ''}
+                    </div>
+                    <div class="beverage-photo-area" onclick="uploadBeveragePhoto()">
+                        <!-- Photo will be displayed here later -->
+                    </div>
+                </div>
+                
                 <p><strong>Ingredients:</strong> ${beverage.ingredients.join(', ')}</p>
                 <p><strong>Description:</strong> ${beverage.description}</p>
-                ${nutritionSection}
+                
+                <!-- Serving Size Tabs -->
+                <div class="serving-tabs">
+                    <div class="serving-tab-buttons">
+                        ${Object.entries(servingSizes).map(([key, config], index) => `
+                            <button class="serving-tab-btn ${index === 2 ? 'active' : ''}" 
+                                    onclick="switchServingTab('${key}', this)">
+                                <span class="tab-emoji">${key === 'schooner' ? '🥃' : 
+                                                       key === 'pint' ? '🍺' : 
+                                                       key === 'can-bottle' ? '🍺' : '🍷'}</span>
+                                <span class="tab-name">${config.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="serving-tab-content">
+                        ${tabContents.map((content, index) => `
+                            <div class="serving-tab-panel ${index === 2 ? 'active' : ''}" 
+                                 id="tab-${Object.keys(servingSizes)[index]}">
+                                ${content}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
                 <div class="beverage-tags">
                     ${beverage.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                 </div>
@@ -4023,13 +6069,76 @@ function displayBeverageInfo(beverage, fromImage = false) {
         </div>
     `;
     
+    // Add favorite button to the beverage card
+    const beverageKey = Object.keys(beverageDatabase).find(key => beverageDatabase[key] === beverage);
+    if (beverageKey) {
+        const favoriteBtn = document.createElement('button');
+        favoriteBtn.className = `favorite-btn ${isFavorite(beverageKey) ? 'favorited' : ''}`;
+        favoriteBtn.setAttribute('data-beverage', beverageKey);
+        favoriteBtn.innerHTML = `<i class="${isFavorite(beverageKey) ? 'fas' : 'far'} fa-heart"></i>`;
+        favoriteBtn.onclick = () => {
+            if (isFavorite(beverageKey)) {
+                removeFromFavorites(beverageKey);
+            } else {
+                addToFavorites(beverageKey);
+            }
+        };
+        
+        // Insert the favorite button into the beverage card
+        const beverageInfo = beverageCard.querySelector('.beverage-info');
+        if (beverageInfo) {
+            beverageInfo.style.position = 'relative';
+            beverageInfo.appendChild(favoriteBtn);
+        }
+    }
+    
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Function to switch between serving size tabs
+function switchServingTab(tabKey, buttonElement) {
+    // Remove active class from all buttons and panels
+    document.querySelectorAll('.serving-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.serving-tab-panel').forEach(panel => panel.classList.remove('active'));
+    
+    // Add active class to clicked button and corresponding panel
+    buttonElement.classList.add('active');
+    document.getElementById(`tab-${tabKey}`).classList.add('active');
 }
 
 function clearResults() {
     resultsSection.style.display = 'none';
     beverageCard.innerHTML = '';
+}
+
+function uploadBeveragePhoto() {
+    // Create a file input for the beverage photo
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoArea = document.querySelector('.beverage-photo-area');
+                photoArea.innerHTML = `
+                    <img src="${e.target.result}" alt="Beverage photo" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                `;
+                photoArea.style.border = 'none';
+                photoArea.style.background = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
 }
 
 function showError(message) {

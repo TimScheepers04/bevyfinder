@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Test - BevyFinder</title>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-ZSY199PZC4');
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🍺 BevyFinder Analytics Test</h1>
+        <p>This page helps you test if Google Analytics is working correctly.</p>
+        
+        <div class="status" id="status">
+            <h3>Testing Analytics...</h3>
+            <p>Click the buttons below to test different analytics events.</p>
+        </div>
+        
+        <h3>Test Events:</h3>
+        <button onclick="testPageView()">📄 Test Page View</button>
+        <button onclick="testSearch()">🔍 Test Search Event</button>
+        <button onclick="testFavorite()">⭐ Test Favorite Event</button>
+        <button onclick="testFeature()">⚙️ Test Feature Event</button>
+        <button onclick="checkAnalytics()">📊 Check Analytics Status</button>
+        
+        <h3>Instructions:</h3>
+        <ol>
+            <li>✅ Google Analytics Measurement ID is already installed (G-ZSY199PZC4)</li>
+            <li>Click the test buttons above</li>
+            <li>Go to your Google Analytics dashboard</li>
+            <li>Check "Real-time" reports to see the events</li>
+            <li>Events should appear within 24-48 hours in regular reports</li>
+        </ol>
+        
+        <h3>What to Look For:</h3>
+        <ul>
+            <li><strong>Real-time Events:</strong> Should appear immediately in GA4 Real-time reports</li>
+            <li><strong>Page Views:</strong> Check "Real-time" → "Events"</li>
+            <li><strong>Custom Events:</strong> Look for "search", "favorite", "feature" events</li>
+            <li><strong>User Properties:</strong> Should show device, location, etc.</li>
+        </ul>
+    </div>
+
+    <script>
+        // Test functions
+        function testPageView() {
+            gtag('event', 'page_view', {
+                'page_title': 'Analytics Test Page',
+                'page_location': window.location.href
+            });
+            showStatus('✅ Page view event sent!', 'success');
+        }
+        
+        function testSearch() {
+            gtag('event', 'search', {
+                'event_category': 'bevyfinder',
+                'event_label': 'Swan Draught',
+                'search_term': 'swan draught',
+                'search_method': 'text'
+            });
+            showStatus('✅ Search event sent!', 'success');
+        }
+        
+        function testFavorite() {
+            gtag('event', 'favorite', {
+                'event_category': 'bevyfinder',
+                'event_label': 'Swan Draught',
+                'action': 'add'
+            });
+            showStatus('✅ Favorite event sent!', 'success');
+        }
+        
+        function testFeature() {
+            gtag('event', 'feature', {
+                'event_category': 'bevyfinder',
+                'event_label': 'sidebar_navigation',
+                'feature_name': 'favorites_button'
+            });
+            showStatus('✅ Feature event sent!', 'success');
+        }
+        
+        function checkAnalytics() {
+            if (typeof gtag !== 'undefined') {
+                showStatus('✅ Google Analytics is loaded and ready!', 'success');
+            } else {
+                showStatus('❌ Google Analytics is not loaded. Check your Measurement ID.', 'error');
+            }
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = `<h3>${message}</h3>`;
+            status.className = `status ${type}`;
+            
+            // Auto-clear after 3 seconds
+            setTimeout(() => {
+                status.innerHTML = '<h3>Ready for testing</h3><p>Click buttons above to test analytics events.</p>';
+                status.className = 'status';
+            }, 3000);
+        }
+        
+        // Check analytics on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkAnalytics, 1000);
+        });
+    </script>
+</body>
+</html> 

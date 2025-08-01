@@ -11,6 +11,13 @@
     <meta name="author" content="BevyFinder">
     <meta name="robots" content="index, follow">
     
+    <!-- Enhanced Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Last-Modified" content="Mon, 01 Jan 2024 00:00:00 GMT">
+    <meta http-equiv="ETag" content="bevyfinder-v1.0.2">
+    
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="BevyFinder - Discover Your Perfect Beverage">
     <meta property="og:description" content="Explore the world's best beers, wines, and cocktails with detailed information about alcohol content and ingredients.">
@@ -36,9 +43,19 @@
     <link rel="preconnect" href="https://images.unsplash.com">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.0.2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-ZSY199PZC4');
+    </script>
     
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
@@ -60,79 +77,400 @@
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-            <p>Enter a photo or name of your favorite alcoholic beverage</p>
-        </header>
+        <!-- Welcome Page -->
+        <div class="welcome-page" id="welcome-page">
+            <div class="welcome-content">
+                <div class="welcome-header">
+                    <h1 class="welcome-title">
+                        <i class="fas fa-wine-glass-alt"></i> BevyFinder
+                    </h1>
+                    <p class="welcome-subtitle">Your Ultimate Beverage Discovery Platform</p>
+                </div>
+                
+                <div class="welcome-description">
+                    <p>Discover detailed information about your favorite alcoholic beverages including:</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-beer"></i> Alcohol content and standard drinks</li>
+                        <li><i class="fas fa-list"></i> Complete ingredient lists</li>
+                        <li><i class="fas fa-chart-bar"></i> Nutritional information</li>
+                        <li><i class="fas fa-camera"></i> Photo recognition capabilities</li>
+                        <li><i class="fas fa-search"></i> Smart search and suggestions</li>
+                    </ul>
+                </div>
+                
+                <div class="welcome-creator">
+                    <p>Created by <strong>Tim Scheepers</strong></p>
+                </div>
+                
+                <button class="start-btn" id="start-btn">
+                    <i class="fas fa-play"></i>
+                    Start Exploring
+                </button>
+            </div>
+        </div>
 
-        <main class="main-content">
-            <div class="input-section">
-                <div class="input-tabs">
-                    <button class="tab-btn active" data-tab="name">
-                        <i class="fas fa-edit"></i>
-                        Name Input
+        <!-- Menu Button (always visible) -->
+        <button class="menu-btn" id="menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Sidebar Menu (always available) -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-wine-glass-alt"></i> Menu</h3>
+                <button class="close-menu-btn" id="close-menu-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+                            <div class="sidebar-content">
+                    <button class="sidebar-btn" id="sidebar-btn-1">
+                        <i class="fas fa-home"></i>
+                        Home
                     </button>
-                    <button class="tab-btn" data-tab="photo">
-                        <i class="fas fa-camera"></i>
-                        Photo Upload
+                    <button class="sidebar-btn" id="sidebar-btn-profile">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </button>
+                    <button class="sidebar-btn" id="sidebar-btn-2">
+                        <i class="fas fa-star"></i>
+                        Favorites
+                    </button>
+                    <button class="sidebar-btn" id="sidebar-btn-3">
+                        <i class="fas fa-history"></i>
+                        History
+                    </button>
+                    <button class="sidebar-btn" id="sidebar-btn-4">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                    <button class="sidebar-btn" id="sidebar-btn-5">
+                        <i class="fas fa-info-circle"></i>
+                        About
                     </button>
                 </div>
+        </div>
+        
+        <!-- Overlay for sidebar (always available) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-                <!-- Name Input Tab -->
-                <div class="tab-content active" id="name-tab">
-                    <div class="input-group">
-                        <label for="beverage-name">Beverage Name</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                id="beverage-name" 
-                                placeholder="e.g., Margarita, Guinness, Chardonnay..."
-                                autocomplete="off"
-                            >
-                            <button class="search-btn" id="search-btn">
-                                <i class="fas fa-search"></i>
+        <!-- Main App (initially hidden) -->
+        <div class="main-app" id="main-app" style="display: none;">
+            <header class="header">
+                <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Enter a photo or name of your favorite alcoholic beverage</p>
+            </header>
+
+            <main class="main-content">
+                <div class="input-section">
+                    <div class="input-tabs">
+                        <button class="tab-btn active" data-tab="name">
+                            <i class="fas fa-edit"></i>
+                            Name Input
+                        </button>
+                        <button class="tab-btn" data-tab="photo">
+                            <i class="fas fa-camera"></i>
+                            Photo Upload
+                        </button>
+                    </div>
+
+                    <!-- Name Input Tab -->
+                    <div class="tab-content active" id="name-tab">
+                        <div class="input-group">
+                            <label for="beverage-name">Beverage Name</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="text" 
+                                    id="beverage-name" 
+                                    placeholder="e.g., Margarita, Guinness, Chardonnay..."
+                                    autocomplete="off"
+                                >
+                                <button class="search-btn" id="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="suggestions" id="suggestions"></div>
+                        </div>
+                    </div>
+
+                    <!-- Photo Input Tab -->
+                    <div class="tab-content" id="photo-tab">
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h3>Upload Beverage Photo</h3>
+                                <p>Drag & drop an image here or click to browse</p>
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                                    <i class="fas fa-camera"></i> AI-powered image recognition - upload a clear photo of the beverage
+                                </p>
+                                <!-- File input will be created dynamically for better mobile compatibility -->
+                                <button class="upload-btn" id="upload-btn">
+                                    Choose File
+                                </button>
+                            </div>
+                        </div>
+                        <div class="preview-area" id="preview-area" style="display: none;">
+                            <img id="preview-image" src="" alt="Preview">
+                            <button class="remove-btn" id="remove-btn">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <div class="suggestions" id="suggestions"></div>
                     </div>
                 </div>
 
-                <!-- Photo Input Tab -->
-                <div class="tab-content" id="photo-tab">
-                    <div class="upload-area" id="upload-area">
-                        <div class="upload-content">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <h3>Upload Beverage Photo</h3>
-                            <p>Drag & drop an image here or click to browse</p>
-                            <input type="file" id="photo-input" accept="image/*" hidden>
-                            <button class="upload-btn" onclick="document.getElementById('photo-input').click()">
-                                Choose File
-                            </button>
-                        </div>
+                <div class="results-section" id="results-section" style="display: none;">
+                    <h2>Beverage Information</h2>
+                    <div class="beverage-card" id="beverage-card">
+                        <!-- Results will be populated here -->
                     </div>
-                    <div class="preview-area" id="preview-area" style="display: none;">
-                        <img id="preview-image" src="" alt="Preview">
-                        <button class="remove-btn" id="remove-btn">
-                            <i class="fas fa-times"></i>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <p>Find your Bevy details now</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
+
+        <!-- Favorites Page (initially hidden) -->
+        <div class="favorites-page" id="favorites-page" style="display: none;">
+            <header class="header">
+                <h1><i class="fas fa-star"></i> My Favorites</h1>
+                <p>Your saved beverages</p>
+            </header>
+
+            <main class="main-content">
+                <div class="favorites-container" id="favorites-container">
+                    <!-- Favorites will be populated here -->
+                </div>
+                
+                <div class="empty-favorites" id="empty-favorites" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-star"></i>
+                        <h3>No Favorites Yet</h3>
+                        <p>Start exploring beverages and add them to your favorites!</p>
+                        <button class="start-exploring-btn" onclick="goToHome()">
+                            <i class="fas fa-search"></i>
+                            Start Exploring
                         </button>
                     </div>
                 </div>
-            </div>
+            </main>
 
-            <div class="results-section" id="results-section" style="display: none;">
-                <h2>Beverage Information</h2>
-                <div class="beverage-card" id="beverage-card">
-                    <!-- Results will be populated here -->
+            <footer class="footer">
+                <p>Your personal beverage collection</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
+
+        <!-- History Page (initially hidden) -->
+        <div class="history-page" id="history-page" style="display: none;">
+            <header class="header">
+                <h1><i class="fas fa-history"></i> Search History</h1>
+                <p>Your recent beverage searches</p>
+            </header>
+
+            <main class="main-content">
+                <div class="history-container" id="history-container">
+                    <!-- History will be populated here -->
                 </div>
-            </div>
-        </main>
+                
+                <div class="empty-history" id="empty-history" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>No Search History</h3>
+                        <p>Start searching for beverages to see your history here!</p>
+                        <button class="start-exploring-btn" onclick="goToHome()">
+                            <i class="fas fa-search"></i>
+                            Start Searching
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="history-actions" id="history-actions" style="display: none;">
+                    <button class="clear-history-btn" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i>
+                        Clear All History
+                    </button>
+                </div>
+            </main>
 
-        <footer class="footer">
-            <p>Find your Bevy details now</p>
-            <p>By Tim Scheepers</p>
-        </footer>
+            <footer class="footer">
+                <p>Track your beverage exploration journey</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="analytics.js?v=1.0.2"></script>
+    <script src="fallback-analytics.js?v=1.0.2"></script>
+    <script src="script.js?v=1.0.2"></script>
+    
+    <!-- Enhanced Cache Control and Auto-Update System -->
+    <script>
+        // Version tracking for cache busting
+        const CURRENT_VERSION = '1.0.2';
+        const LAST_VERSION_KEY = 'bevyfinder_last_version';
+        
+        // Check for version updates on page load
+        function checkForUpdates() {
+            const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
+            
+            if (lastVersion && lastVersion !== CURRENT_VERSION) {
+                console.log(`Version updated from ${lastVersion} to ${CURRENT_VERSION}`);
+                
+                // Clear all caches
+                clearAllCaches();
+                
+                // Update stored version
+                localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
+                
+                // Show update notification
+                showUpdateNotification();
+            } else if (!lastVersion) {
+                // First time visitor
+                localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
+            }
+        }
+        
+        // Clear all browser caches
+        async function clearAllCaches() {
+            try {
+                // Clear browser cache
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                    console.log('Browser caches cleared');
+                }
+                
+                // Clear localStorage (optional - uncomment if needed)
+                // localStorage.clear();
+                
+                // Force reload of CSS and JS files
+                const links = document.querySelectorAll('link[rel="stylesheet"], script[src]');
+                links.forEach(link => {
+                    if (link.href || link.src) {
+                        const url = new URL(link.href || link.src);
+                        url.searchParams.set('v', CURRENT_VERSION + '&t=' + Date.now());
+                        if (link.href) link.href = url.toString();
+                        if (link.src) link.src = url.toString();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error clearing caches:', error);
+            }
+        }
+        
+        // Show update notification
+        function showUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 16px 20px;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-sync-alt" style="font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">Update Complete!</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">BevyFinder has been updated to the latest version.</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Service Worker Registration with enhanced cache control
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js?v=' + CURRENT_VERSION)
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('A new version of BevyFinder is available! Would you like to update?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                        
+                        // Handle service worker messages
+                        navigator.serviceWorker.addEventListener('message', (event) => {
+                            if (event.data && event.data.type === 'CACHE_CLEARED') {
+                                console.log('Service worker cache cleared');
+                            }
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // Check for updates on page load
+        document.addEventListener('DOMContentLoaded', checkForUpdates);
+        
+        // Force refresh on page visibility change (when user returns to tab)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Check if we need to refresh (every 5 minutes)
+                const lastCheck = localStorage.getItem('bevyfinder_last_check') || 0;
+                const now = Date.now();
+                
+                if (now - lastCheck > 5 * 60 * 1000) { // 5 minutes
+                    localStorage.setItem('bevyfinder_last_check', now);
+                    
+                    // Fetch current version from server
+                    fetch(window.location.href + '?v=' + CURRENT_VERSION, { 
+                        method: 'HEAD',
+                        cache: 'no-cache'
+                    }).then(() => {
+                        // If fetch succeeds, check for updates
+                        checkForUpdates();
+                    }).catch(() => {
+                        // If fetch fails, assume offline
+                        console.log('Offline mode - skipping update check');
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html> 

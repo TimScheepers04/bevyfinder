@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Google Analytics</title>
+</head>
+<body>
+    <h1>CORS Test for Google Analytics</h1>
+    <p>This page tests if CORS policies are blocking Google Analytics.</p>
+    
+    <button onclick="testFetch()">Test Fetch to Google Analytics</button>
+    <button onclick="testScript()">Test Script Loading</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += '<p>' + message + '</p>';
+        }
+        
+        function testFetch() {
+            log('Testing fetch to googletagmanager.com...');
+            
+            fetch('https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4', {
+                mode: 'no-cors'
+            })
+            .then(() => {
+                log('✅ Fetch successful (no-cors mode)');
+            })
+            .catch((error) => {
+                log('❌ Fetch failed: ' + error.message);
+            });
+        }
+        
+        function testScript() {
+            log('Testing script loading...');
+            
+            const script = document.createElement('script');
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4';
+            script.async = true;
+            
+            script.onload = () => {
+                log('✅ Script loaded successfully');
+            };
+            
+            script.onerror = () => {
+                log('❌ Script failed to load');
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // Test if we can access the global gtag function
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (typeof gtag !== 'undefined') {
+                    log('✅ gtag function is available');
+                } else {
+                    log('❌ gtag function is not available');
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html> 

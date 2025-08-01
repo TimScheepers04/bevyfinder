@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple GA Test</title>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-ZSY199PZC4');
+    </script>
+</head>
+<body>
+    <h1>Simple Google Analytics Test</h1>
+    <p>Open browser dev tools (F12) and check the Network tab for requests to googletagmanager.com</p>
+    
+    <button onclick="sendEvent()">Send Test Event</button>
+    <button onclick="checkGA()">Check if GA is loaded</button>
+    
+    <div id="status"></div>
+    
+    <script>
+        function sendEvent() {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'test_event', {
+                    'event_category': 'test',
+                    'event_label': 'simple_test'
+                });
+                document.getElementById('status').innerHTML = '<p style="color: green;">✅ Event sent!</p>';
+            } else {
+                document.getElementById('status').innerHTML = '<p style="color: red;">❌ gtag not available</p>';
+            }
+        }
+        
+        function checkGA() {
+            if (typeof gtag !== 'undefined') {
+                document.getElementById('status').innerHTML = '<p style="color: green;">✅ Google Analytics is loaded!</p>';
+            } else {
+                document.getElementById('status').innerHTML = '<p style="color: red;">❌ Google Analytics is NOT loaded</p>';
+            }
+        }
+        
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            setTimeout(checkGA, 2000);
+        });
+    </script>
+</body>
+</html> 
