@@ -37,7 +37,15 @@ const historyActions = document.getElementById('history-actions');
 // Welcome Page Functionality
 function showMainApp() {
     welcomePage.style.display = 'none';
-    mainApp.style.display = 'block';
+    
+    // Check if user is authenticated
+    if (auth.isUserAuthenticated()) {
+        mainApp.style.display = 'block';
+    } else {
+        // Show auth page instead
+        document.getElementById('auth-page').style.display = 'flex';
+    }
+    
     // Focus on the search input for better UX
     setTimeout(() => {
         if (beverageNameInput) {
@@ -86,8 +94,13 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-profile': // Profile
             console.log('Profile button clicked');
-            // TODO: Implement profile functionality for social platform
-            alert('Profile feature coming soon! This will be the foundation for our social platform.');
+            if (auth.isUserAuthenticated()) {
+                showUserProfile();
+            } else {
+                // Show auth page
+                hideAllPages();
+                document.getElementById('auth-page').style.display = 'flex';
+            }
             break;
         case 'sidebar-btn-2': // Favorites
             console.log('Favorites button clicked');
@@ -300,7 +313,11 @@ function viewFavorite(beverageKey) {
 
 function goToHome() {
     hideAllPages();
-    mainApp.style.display = 'block';
+    if (auth.isUserAuthenticated()) {
+        mainApp.style.display = 'block';
+    } else {
+        document.getElementById('auth-page').style.display = 'flex';
+    }
     clearResults();
 }
 
@@ -6174,4 +6191,137 @@ document.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('BevyFinder initialized!');
     console.log('Available beverages:', Object.keys(beverageDatabase));
-}); 
+});
+
+// User Profile Functions
+function showUserProfile() {
+    hideAllPages();
+    
+    // Create profile page if it doesn't exist
+    let profilePage = document.getElementById('profile-page');
+    if (!profilePage) {
+        profilePage = createProfilePage();
+        document.body.appendChild(profilePage);
+    }
+    
+    profilePage.style.display = 'block';
+    updateProfileContent();
+    
+    if (typeof analytics !== 'undefined') {
+        analytics.trackPageView('profile');
+    }
+}
+
+function createProfilePage() {
+    const profilePage = document.createElement('div');
+    profilePage.id = 'profile-page';
+    profilePage.className = 'profile-page';
+    profilePage.style.display = 'none';
+    
+    profilePage.innerHTML = `
+        <header class="header">
+            <h1><i class="fas fa-user"></i> My Profile</h1>
+            <p>Manage your account and preferences</p>
+        </header>
+
+        <main class="main-content">
+            <div class="profile-container">
+                <div class="profile-section">
+                    <h3>Account Information</h3>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <label>Name:</label>
+                            <span id="profile-name"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <span id="profile-email"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Member Since:</label>
+                            <span id="profile-created"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-search"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-searches">0</span>
+                                <span class="stat-label">Searches</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-heart"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-favorites">0</span>
+                                <span class="stat-label">Favorites</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Favorite Drinks</h3>
+                    <div class="favorites-list" id="profile-favorites-list">
+                        <!-- Favorites will be populated here -->
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="profile-btn" onclick="auth.signOut()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </main>
+    `;
+    
+    return profilePage;
+}
+
+function updateProfileContent() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+
+    // Update basic info
+    document.getElementById('profile-name').textContent = user.name;
+    document.getElementById('profile-email').textContent = user.email;
+    document.getElementById('profile-created').textContent = new Date(user.createdAt).toLocaleDateString();
+    
+    // Update stats
+    document.getElementById('profile-searches').textContent = user.stats.searches;
+    document.getElementById('profile-favorites').textContent = user.stats.favorites;
+    
+    // Update favorites list
+    const favoritesList = document.getElementById('profile-favorites-list');
+    const favorites = user.profile.preferences.favoriteDrinks;
+    
+    if (favorites.length === 0) {
+        favoritesList.innerHTML = '<p class="empty-state">No favorite drinks yet. Start exploring to add some!</p>';
+    } else {
+        favoritesList.innerHTML = favorites.map(drinkKey => {
+            const drink = beverageDatabase[drinkKey];
+            if (drink) {
+                return `
+                    <div class="favorite-drink-item">
+                        <div class="drink-info">
+                            <h4>${drink.name}</h4>
+                            <span class="drink-type">${drink.type}</span>
+                        </div>
+                        <div class="drink-actions">
+                            <button class="drink-btn" onclick="viewFavorite('${drinkKey}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }).join('');
+    }
+} 
