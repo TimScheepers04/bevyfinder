@@ -578,13 +578,29 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to switch to search tab
 function switchToSearch() {
     // Switch to the name input tab
-    document.querySelector('[data-tab="name"]').click();
+    const nameTab = document.querySelector('[data-tab="name"]');
+    if (nameTab) {
+        nameTab.click();
+    }
     // Focus on the search input
     if (beverageNameInput) {
         beverageNameInput.focus();
     }
     // Clear the photo upload
     clearPhotoUpload();
+}
+
+// Debug function to check tab state
+function debugTabState() {
+    console.log('=== Tab State Debug ===');
+    console.log('Tab buttons:', tabBtns.length);
+    tabBtns.forEach(btn => {
+        console.log(`Tab: ${btn.getAttribute('data-tab')}, Active: ${btn.classList.contains('active')}`);
+    });
+    console.log('Tab contents:', tabContents.length);
+    tabContents.forEach(content => {
+        console.log(`Content: ${content.id}, Active: ${content.classList.contains('active')}, Display: ${content.style.display}`);
+    });
 }
 
     // Enhanced drink database with top 100 beers, Australian beers, and alcohol percentages
@@ -4978,10 +4994,20 @@ tabBtns.forEach(btn => {
         
         // Add active class to clicked tab and corresponding content
         btn.classList.add('active');
-        document.getElementById(`${targetTab}-tab`).classList.add('active');
+        const targetContent = document.getElementById(`${targetTab}-tab`);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
         
         // Clear previous results
         clearResults();
+        
+        // Track analytics
+        if (typeof analytics !== 'undefined') {
+            analytics.trackFeature('tab_switch', targetTab);
+        }
+        
+        console.log(`Switched to ${targetTab} tab`);
     });
 });
 
