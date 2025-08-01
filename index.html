@@ -316,13 +316,13 @@
             <div class="auth-container">
                 <div class="auth-header">
                     <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                    <p>Sign in to access your personalized drink database</p>
+                    <p>Sign up to unlock premium features and save your favorites</p>
                 </div>
 
                 <!-- Sign In Container -->
                 <div class="auth-form-container" id="signin-container">
                     <h2>Welcome Back</h2>
-                    <p>Sign in to your account to continue</p>
+                    <p>Sign in to access your saved favorites and history</p>
                     
                     <form class="auth-form" id="signin-form">
                         <div class="form-group">
@@ -355,7 +355,7 @@
                 <!-- Sign Up Container -->
                 <div class="auth-form-container" id="signup-container" style="display: none;">
                     <h2>Create Account</h2>
-                    <p>Join BevyFinder to unlock personalized features</p>
+                    <p>Join BevyFinder to save favorites, track history, and unlock premium features</p>
                     
                     <form class="auth-form" id="signup-form">
                         <div class="form-group">
@@ -400,6 +400,11 @@
                     <p id="auth-toggle-text">Don't have an account?</p>
                     <button class="auth-toggle-btn" id="toggle-signup">Sign Up</button>
                     <button class="auth-toggle-btn" id="toggle-signin" style="display: none;">Sign In</button>
+                </div>
+                
+                <!-- Skip sign up option -->
+                <div class="auth-skip">
+                    <p>Just want to search? <button class="skip-btn" onclick="goToHome()">Continue without account</button></p>
                 </div>
 
                 <!-- Features Preview -->

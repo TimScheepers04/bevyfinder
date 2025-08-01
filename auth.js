@@ -255,20 +255,20 @@ class BevyFinderAuth {
 
             console.log('User authenticated:', this.currentUser.name);
         } else {
-            // Show auth page, hide main app
-            if (authPage) authPage.style.display = 'flex';
-            if (mainApp) mainApp.style.display = 'none';
+            // Show main app for search, but hide auth page
+            if (authPage) authPage.style.display = 'none';
+            if (mainApp) mainApp.style.display = 'block';
             if (welcomePage) welcomePage.style.display = 'none';
 
             // Reset profile button
             if (profileBtn) {
                 profileBtn.innerHTML = `
                     <i class="fas fa-user"></i>
-                    Profile
+                    Sign In
                 `;
             }
 
-            console.log('User not authenticated');
+            console.log('User not authenticated - search only mode');
         }
     }
 

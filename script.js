@@ -37,14 +37,7 @@ const historyActions = document.getElementById('history-actions');
 // Welcome Page Functionality
 function showMainApp() {
     welcomePage.style.display = 'none';
-    
-    // Check if user is authenticated
-    if (auth.isUserAuthenticated()) {
-        mainApp.style.display = 'block';
-    } else {
-        // Show auth page instead
-        document.getElementById('auth-page').style.display = 'flex';
-    }
+    mainApp.style.display = 'block';
     
     // Focus on the search input for better UX
     setTimeout(() => {
@@ -97,27 +90,41 @@ function handleSidebarButtonClick(buttonId) {
             if (auth.isUserAuthenticated()) {
                 showUserProfile();
             } else {
-                // Show auth page
+                // Show auth page for sign up
                 hideAllPages();
                 document.getElementById('auth-page').style.display = 'flex';
             }
             break;
         case 'sidebar-btn-2': // Favorites
             console.log('Favorites button clicked');
-            hideAllPages();
-            favoritesPage.style.display = 'block';
-            displayFavorites();
-            if (typeof analytics !== 'undefined') {
-                analytics.trackPageView('favorites');
+            if (auth.isUserAuthenticated()) {
+                hideAllPages();
+                favoritesPage.style.display = 'block';
+                displayFavorites();
+                if (typeof analytics !== 'undefined') {
+                    analytics.trackPageView('favorites');
+                }
+            } else {
+                // Show auth page for sign up
+                hideAllPages();
+                document.getElementById('auth-page').style.display = 'flex';
+                showAuthNotification('Sign up to save your favorite drinks!', 'info');
             }
             break;
         case 'sidebar-btn-3': // History
             console.log('History button clicked');
-            hideAllPages();
-            historyPage.style.display = 'block';
-            displayHistory();
-            if (typeof analytics !== 'undefined') {
-                analytics.trackPageView('history');
+            if (auth.isUserAuthenticated()) {
+                hideAllPages();
+                historyPage.style.display = 'block';
+                displayHistory();
+                if (typeof analytics !== 'undefined') {
+                    analytics.trackPageView('history');
+                }
+            } else {
+                // Show auth page for sign up
+                hideAllPages();
+                document.getElementById('auth-page').style.display = 'flex';
+                showAuthNotification('Sign up to track your search history!', 'info');
             }
             break;
         case 'sidebar-btn-4': // Settings
@@ -169,11 +176,19 @@ document.addEventListener('keydown', (e) => {
 let favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
 
 function addToFavorites(beverageKey) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Sign up to save your favorite drinks!', 'info');
+        return;
+    }
+    
     if (!favorites.includes(beverageKey)) {
         favorites.push(beverageKey);
         localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
         updateFavoriteButton(beverageKey, true);
         showFavoriteNotification('Added to favorites!', 'success');
+        
+        // Add to user's profile favorites
+        auth.addFavoriteDrink(beverageKey);
         
         // Track analytics
         if (typeof analytics !== 'undefined') {
@@ -183,12 +198,20 @@ function addToFavorites(beverageKey) {
 }
 
 function removeFromFavorites(beverageKey) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Sign up to manage your favorite drinks!', 'info');
+        return;
+    }
+    
     const index = favorites.indexOf(beverageKey);
     if (index > -1) {
         favorites.splice(index, 1);
         localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
         updateFavoriteButton(beverageKey, false);
         showFavoriteNotification('Removed from favorites!', 'info');
+        
+        // Remove from user's profile favorites
+        auth.removeFavoriteDrink(beverageKey);
         
         // Track analytics
         if (typeof analytics !== 'undefined') {
@@ -239,7 +262,7 @@ function showFavoriteNotification(message, type) {
     notification.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
             <i class="fas ${type === 'success' ? 'fa-heart' : 'fa-info-circle'}" style="font-size: 1rem;"></i>
-            <span>${message}</span>
+        <span>${message}</span>
         </div>
     `;
     
@@ -251,6 +274,47 @@ function showFavoriteNotification(message, type) {
             document.body.removeChild(notification);
         }, 300);
     }, 2000);
+}
+
+function showAuthNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        z-index: 10000;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+        cursor: pointer;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-user-plus" style="font-size: 1.1rem;"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add click to sign up
+    notification.addEventListener('click', () => {
+        hideAllPages();
+        document.getElementById('auth-page').style.display = 'flex';
+    });
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 4000);
 }
 
 function displayFavorites() {
@@ -313,11 +377,7 @@ function viewFavorite(beverageKey) {
 
 function goToHome() {
     hideAllPages();
-    if (auth.isUserAuthenticated()) {
-        mainApp.style.display = 'block';
-    } else {
-        document.getElementById('auth-page').style.display = 'flex';
-    }
+    mainApp.style.display = 'block';
     clearResults();
 }
 
@@ -332,6 +392,15 @@ function hideAllPages() {
 let searchHistory = JSON.parse(localStorage.getItem('bevyfinder_history') || '[]');
 
 function addToHistory(beverageKey, searchMethod = 'text') {
+    // Only track history for authenticated users
+    if (!auth.isUserAuthenticated()) {
+        // Track analytics for non-authenticated users
+        if (typeof analytics !== 'undefined') {
+            analytics.trackSearch(beverageDatabase[beverageKey].name, searchMethod, true);
+        }
+        return;
+    }
+    
     const existingIndex = searchHistory.findIndex(item => item.beverageKey === beverageKey);
     
     // Remove existing entry if it exists
@@ -361,6 +430,9 @@ function addToHistory(beverageKey, searchMethod = 'text') {
     if (typeof analytics !== 'undefined') {
         analytics.trackSearch(beverageDatabase[beverageKey].name, searchMethod, true);
     }
+    
+    // Track in user profile
+    auth.trackSearch();
 }
 
 function removeFromHistory(beverageKey) {
@@ -6092,14 +6164,23 @@ function displayBeverageInfo(beverage, fromImage = false) {
         const favoriteBtn = document.createElement('button');
         favoriteBtn.className = `favorite-btn ${isFavorite(beverageKey) ? 'favorited' : ''}`;
         favoriteBtn.setAttribute('data-beverage', beverageKey);
-        favoriteBtn.innerHTML = `<i class="${isFavorite(beverageKey) ? 'fas' : 'far'} fa-heart"></i>`;
-        favoriteBtn.onclick = () => {
-            if (isFavorite(beverageKey)) {
-                removeFromFavorites(beverageKey);
-            } else {
-                addToFavorites(beverageKey);
-            }
-        };
+        
+        if (auth.isUserAuthenticated()) {
+            favoriteBtn.innerHTML = `<i class="${isFavorite(beverageKey) ? 'fas' : 'far'} fa-heart"></i>`;
+            favoriteBtn.onclick = () => {
+                if (isFavorite(beverageKey)) {
+                    removeFromFavorites(beverageKey);
+                } else {
+                    addToFavorites(beverageKey);
+                }
+            };
+        } else {
+            favoriteBtn.innerHTML = `<i class="fas fa-user-plus"></i>`;
+            favoriteBtn.title = 'Sign up to save favorites';
+            favoriteBtn.onclick = () => {
+                showAuthNotification('Sign up to save your favorite drinks!', 'info');
+            };
+        }
         
         // Insert the favorite button into the beverage card
         const beverageInfo = beverageCard.querySelector('.beverage-info');
