@@ -1,6 +1,6 @@
 {
   "name": "bevyfinder-analytics-backend",
-  "version": "1.0.0",
+  "version": "1.0.20250803175539",
   "description": "Backend analytics server for BevyFinder beverage app",
   "main": "backend-example.js",
   "scripts": {

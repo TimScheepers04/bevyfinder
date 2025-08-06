@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder Version Checker</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 BevyFinder Version Checker</h1>
+        
+        <div class="status">
+            <h3>📊 Current Status</h3>
+            <p><strong>Current Version:</strong> <span id="current-version">Loading...</span></p>
+            <p><strong>Service Worker:</strong> <span id="sw-status">Checking...</span></p>
+            <p><strong>Last Update Check:</strong> <span id="last-check">Never</span></p>
+            <p><strong>Cache Status:</strong> <span id="cache-status">Checking...</span></p>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="button" onclick="checkForUpdates()">🔄 Check for Updates</button>
+            <button class="button" onclick="clearAllCaches()">🧹 Clear All Caches</button>
+            <button class="button" onclick="forceRefresh()">⚡ Force Refresh</button>
+            <button class="button" onclick="testUpdateNotification()">🔔 Test Notification</button>
+        </div>
+        
+        <div class="log" id="log">
+            <div class="info">Version checker initialized...</div>
+        </div>
+    </div>
+
+    <script>
+        // Import functions from main app
+        const CURRENT_VERSION = '1.0.3';
+        const LAST_VERSION_KEY = 'bevyfinder_last_version';
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        async function checkForUpdates() {
+            log('Checking for updates...', 'info');
+            
+            try {
+                // Check if service worker is available
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    const channel = new MessageChannel();
+                    
+                    channel.port1.onmessage = (event) => {
+                        if (event.data.type === 'UPDATE_AVAILABLE') {
+                            log('Update available!', 'success');
+                            showUpdateNotification('Update available!', 'info');
+                        } else {
+                            log('No update available', 'info');
+                        }
+                    };
+                    
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'CHECK_UPDATE' },
+                        [channel.port2]
+                    );
+                } else {
+                    log('Service worker not available', 'error');
+                }
+            } catch (error) {
+                log(`Update check failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function clearAllCaches() {
+            log('Clearing all caches...', 'info');
+            
+            try {
+                // Clear browser cache
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => {
+                            log(`Deleting cache: ${cacheName}`, 'info');
+                            return caches.delete(cacheName);
+                        })
+                    );
+                    log('Browser caches cleared', 'success');
+                }
+                
+                // Clear service worker cache if available
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    const channel = new MessageChannel();
+                    
+                    channel.port1.onmessage = (event) => {
+                        if (event.data.type === 'CACHE_CLEARED') {
+                            log('Service worker cache cleared', 'success');
+                        }
+                    };
+                    
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'CLEAR_CACHE' },
+                        [channel.port2]
+                    );
+                }
+                
+                log('All caches cleared successfully', 'success');
+            } catch (error) {
+                log(`Error clearing caches: ${error.message}`, 'error');
+            }
+        }
+        
+        function forceRefresh() {
+            log('Force refreshing page...', 'info');
+            window.location.reload();
+        }
+        
+        function testUpdateNotification() {
+            log('Testing update notification...', 'info');
+            showUpdateNotification('Test notification!', 'info');
+        }
+        
+        function showUpdateNotification(message = 'Update Complete!', type = 'success') {
+            const notification = document.createElement('div');
+            
+            let bgColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            let icon = 'fas fa-sync-alt';
+            
+            if (type === 'info') {
+                bgColor = 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)';
+                icon = 'fas fa-info-circle';
+            }
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                color: white;
+                padding: 16px 20px;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                cursor: pointer;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="${icon}" style="font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">${message}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Click to refresh now</div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            notification.addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        function updateStatus() {
+            // Update current version
+            document.getElementById('current-version').textContent = CURRENT_VERSION;
+            
+            // Update service worker status
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    document.getElementById('sw-status').textContent = 'Active';
+                    log('Service Worker is active', 'success');
+                }).catch(() => {
+                    document.getElementById('sw-status').textContent = 'Not registered';
+                    log('Service Worker not registered', 'error');
+                });
+            } else {
+                document.getElementById('sw-status').textContent = 'Not supported';
+                log('Service Worker not supported', 'error');
+            }
+            
+            // Update last check
+            const lastCheck = localStorage.getItem('bevyfinder_last_check');
+            if (lastCheck) {
+                const date = new Date(parseInt(lastCheck));
+                document.getElementById('last-check').textContent = date.toLocaleString();
+            }
+            
+            // Update cache status
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    document.getElementById('cache-status').textContent = `${cacheNames.length} caches found`;
+                    log(`Found ${cacheNames.length} caches`, 'info');
+                });
+            } else {
+                document.getElementById('cache-status').textContent = 'Not supported';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Version checker loaded', 'success');
+            updateStatus();
+        });
+    </script>
+</body>
+</html> 

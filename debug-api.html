@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Debug</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.3); }
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            font-weight: bold;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 API Debug - Find the Problem Endpoint</h1>
+        
+        <div class="status info">
+            <h3>🧪 Test All API Endpoints</h3>
+            <p>This will test every endpoint the frontend might call to find which one is returning HTML instead of JSON.</p>
+            <button onclick="testAllEndpoints()" class="test-btn">Test All Endpoints</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="status info">
+            <h3>🔗 Quick Links</h3>
+            <button onclick="window.location.href='/'">Go to Main App</button>
+            <button onclick="window.location.href='login-test.html'">Login Test</button>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testEndpoint(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method: method,
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    signal: AbortSignal.timeout(5000)
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(url, options);
+                const text = await response.text();
+                
+                // Try to parse as JSON
+                let isJSON = false;
+                let jsonData = null;
+                try {
+                    jsonData = JSON.parse(text);
+                    isJSON = true;
+                } catch (e) {
+                    isJSON = false;
+                }
+                
+                if (isJSON) {
+                    addResult(`✅ ${method} ${url} - JSON Response (${response.status})`, 'success');
+                    if (jsonData.success === false) {
+                        addResult(`   Error: ${jsonData.message}`, 'error');
+                    }
+                } else {
+                    addResult(`❌ ${method} ${url} - HTML Response (${response.status})`, 'error');
+                    addResult(`   First 100 chars: ${text.substring(0, 100)}...`, 'error');
+                    if (text.includes('<!DOCTYPE')) {
+                        addResult(`   ⚠️ This endpoint is returning HTML instead of JSON!`, 'error');
+                    }
+                }
+                
+                return { success: isJSON, status: response.status, data: text };
+            } catch (error) {
+                addResult(`❌ ${method} ${url} - Network Error: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testAllEndpoints() {
+            addResult('Starting comprehensive API endpoint test...', 'info');
+            
+            const baseURL = 'http://192.168.4.36:3000';
+            const endpoints = [
+                // Health check
+                { url: `${baseURL}/health`, method: 'GET' },
+                
+                // Auth endpoints
+                { url: `${baseURL}/api/auth/register`, method: 'POST', body: { name: 'test', email: 'test@test.com', password: 'password123' } },
+                { url: `${baseURL}/api/auth/login`, method: 'POST', body: { email: 'test3@example.com', password: 'password123' } },
+                { url: `${baseURL}/api/auth/me`, method: 'GET' },
+                { url: `${baseURL}/api/auth/profile`, method: 'PUT', body: { name: 'test' } },
+                { url: `${baseURL}/api/auth/logout`, method: 'POST' },
+                { url: `${baseURL}/api/auth/refresh`, method: 'POST' },
+                
+                // Favorites endpoints
+                { url: `${baseURL}/api/favorites/add`, method: 'POST', body: { beverageKey: 'test-drink' } },
+                { url: `${baseURL}/api/favorites/remove`, method: 'DELETE', body: { beverageKey: 'test-drink' } },
+                
+                // Likes endpoints
+                { url: `${baseURL}/api/likes/add`, method: 'POST', body: { beverageKey: 'test-drink' } },
+                { url: `${baseURL}/api/likes/remove`, method: 'DELETE', body: { beverageKey: 'test-drink' } },
+                { url: `${baseURL}/api/likes/top`, method: 'GET' },
+                
+                // Reviews endpoints
+                { url: `${baseURL}/api/reviews`, method: 'GET' },
+                
+                // Non-existent endpoints (should return 404 JSON)
+                { url: `${baseURL}/api/nonexistent`, method: 'GET' },
+                { url: `${baseURL}/api/auth/nonexistent`, method: 'GET' },
+            ];
+            
+            for (const endpoint of endpoints) {
+                await testEndpoint(endpoint.url, endpoint.method, endpoint.body);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between requests
+            }
+            
+            addResult('All endpoint tests completed!', 'info');
+        }
+        
+        // Test on page load
+        window.addEventListener('load', () => {
+            addResult('Debug page loaded. Click "Test All Endpoints" to find the problem.', 'info');
+        });
+    </script>
+</body>
+</html> 

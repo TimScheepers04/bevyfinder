@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder API Connection Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .success { background: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; }
+        .error { background: rgba(244, 67, 54, 0.2); border: 1px solid #F44336; }
+        .info { background: rgba(33, 150, 243, 0.2); border: 1px solid #2196F3; }
+        button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍺 BevyFinder API Connection Test</h1>
+        
+        <div class="test-section">
+            <h2>Backend Server Status</h2>
+            <div id="server-status" class="status info">Testing server connection...</div>
+            <button onclick="testServerConnection()">Test Server Connection</button>
+        </div>
+
+        <div class="test-section">
+            <h2>API Client Test</h2>
+            <div id="api-status" class="status info">Testing API client...</div>
+            <button onclick="testAPIClient()">Test API Client</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Authentication Test</h2>
+            <div id="auth-status" class="status info">Testing authentication...</div>
+            <button onclick="testAuthentication()">Test Authentication</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Database Test</h2>
+            <div id="db-status" class="status info">Testing database...</div>
+            <button onclick="testDatabase()">Test Database</button>
+        </div>
+    </div>
+
+    <!-- Include the API client -->
+    <script src="server-api.js"></script>
+    
+    <script>
+        // Test server connection
+        async function testServerConnection() {
+            const statusDiv = document.getElementById('server-status');
+            statusDiv.className = 'status info';
+            statusDiv.textContent = 'Testing server connection...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/health');
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Server connected! Environment: ${data.environment}`;
+                } else {
+                    throw new Error('Server response not successful');
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Server connection failed: ${error.message}`;
+            }
+        }
+
+        // Test API client
+        async function testAPIClient() {
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.className = 'status info';
+            statusDiv.textContent = 'Testing API client...';
+            
+            try {
+                const api = new BevyFinderAPI();
+                const response = await api.request('/auth/me');
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ API client working!';
+            } catch (error) {
+                if (error.message.includes('401')) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ API client working! (No auth token - expected)';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ API client failed: ${error.message}`;
+                }
+            }
+        }
+
+        // Test authentication
+        async function testAuthentication() {
+            const statusDiv = document.getElementById('auth-status');
+            statusDiv.className = 'status info';
+            statusDiv.textContent = 'Testing authentication...';
+            
+            try {
+                const auth = new BevyFinderAuth();
+                await auth.init();
+                
+                if (auth.isUserAuthenticated()) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ User authenticated: ${auth.getCurrentUser().name}`;
+                } else {
+                    statusDiv.className = 'status info';
+                    statusDiv.textContent = 'ℹ️ No user authenticated (expected for new users)';
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Authentication failed: ${error.message}`;
+            }
+        }
+
+        // Test database
+        async function testDatabase() {
+            const statusDiv = document.getElementById('db-status');
+            statusDiv.className = 'status info';
+            statusDiv.textContent = 'Testing database...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Database working! Test user created successfully.';
+                } else if (data.message.includes('already exists')) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Database working! Test user already exists.';
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Database test failed: ${error.message}`;
+            }
+        }
+
+        // Run initial tests
+        window.addEventListener('load', () => {
+            setTimeout(testServerConnection, 1000);
+            setTimeout(testAPIClient, 2000);
+            setTimeout(testAuthentication, 3000);
+            setTimeout(testDatabase, 4000);
+        });
+    </script>
+</body>
+</html> 

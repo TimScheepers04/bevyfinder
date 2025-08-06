@@ -1,35 +1,63 @@
-// BevyFinder Authentication System
+// BevyFinder Authentication System - Now using API
 class BevyFinderAuth {
     constructor() {
         this.currentUser = null;
         this.isAuthenticated = false;
-        this.users = this.loadUsers();
+        this.api = null;
         this.init();
     }
 
     // Initialize authentication system
-    init() {
-        this.checkAuthStatus();
-        this.setupEventListeners();
-    }
-
-    // Load users from localStorage
-    loadUsers() {
-        const users = localStorage.getItem('bevyfinder_users');
-        return users ? JSON.parse(users) : {};
-    }
-
-    // Save users to localStorage
-    saveUsers() {
-        localStorage.setItem('bevyfinder_users', JSON.stringify(this.users));
+    async init() {
+        try {
+            // Initialize API with better error handling
+            this.api = new BevyFinderAPI();
+            
+            // Wait a bit for API to initialize
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await this.checkAuthStatus();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('Auth initialization error:', error);
+            // Still set up event listeners even if API fails
+            this.setupEventListeners();
+        }
     }
 
     // Check if user is already authenticated
-    checkAuthStatus() {
-        const currentUser = localStorage.getItem('bevyfinder_current_user');
-        if (currentUser) {
-            this.currentUser = JSON.parse(currentUser);
-            this.isAuthenticated = true;
+    async checkAuthStatus() {
+        console.log('🔍 Checking authentication status...');
+        
+        if (!this.api) {
+            console.log('❌ API not initialized yet');
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.updateUI();
+            return;
+        }
+        
+        try {
+            if (this.api.isAuthenticated()) {
+                console.log('✅ Token found in localStorage, validating...');
+                const response = await this.api.getCurrentUser();
+                this.currentUser = response.data.user;
+                this.isAuthenticated = true;
+                console.log('✅ Token valid, user authenticated:', this.currentUser.name);
+                this.updateUI();
+            } else {
+                console.log('❌ No token found in localStorage');
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                this.updateUI();
+            }
+        } catch (error) {
+            console.log('❌ Token invalid or expired, clearing...', error.message);
+            if (this.api) {
+                this.api.clearToken();
+            }
+            this.isAuthenticated = false;
+            this.currentUser = null;
             this.updateUI();
         }
     }
@@ -56,7 +84,7 @@ class BevyFinderAuth {
     }
 
     // Sign up new user
-    signUp(email, name, password) {
+    async signUp(email, name, password, personalDetails = null) {
         // Validate inputs
         if (!this.validateEmail(email)) {
             throw new Error('Please enter a valid email address');
@@ -70,77 +98,76 @@ class BevyFinderAuth {
             throw new Error('Password must be at least 6 characters long');
         }
 
-        // Check if user already exists
-        if (this.users[email]) {
-            throw new Error('An account with this email already exists');
+        if (!this.api) {
+            throw new Error('API not available. Please check your connection and try again.');
         }
 
-        // Create new user
-        const userId = this.generateUserId();
-        const newUser = {
-            id: userId,
-            email: email.toLowerCase(),
-            name: name.trim(),
-            password: this.hashPassword(password), // In production, use proper hashing
-            createdAt: new Date().toISOString(),
-            profile: {
-                avatar: null,
-                bio: '',
-                location: '',
-                preferences: {
-                    favoriteDrinks: [],
-                    dietaryRestrictions: [],
-                    notifications: true
-                }
-            },
-            stats: {
-                searches: 0,
-                favorites: 0,
-                lastActive: new Date().toISOString()
+        try {
+            const userData = { email, name, password };
+            if (personalDetails) {
+                userData.personalDetails = personalDetails;
             }
-        };
-
-        // Save user
-        this.users[email] = newUser;
-        this.saveUsers();
-
-        // Auto sign in
-        this.signIn(email, password);
-
-        return newUser;
+            
+            const response = await this.api.register(userData);
+            this.currentUser = response.data.user;
+            this.isAuthenticated = true;
+            this.updateUI();
+            return this.currentUser;
+        } catch (error) {
+            console.error('Sign up error:', error);
+            throw new Error(error.message || 'Failed to create account');
+        }
     }
 
     // Sign in user
-    signIn(email, password) {
-        const user = this.users[email.toLowerCase()];
-        
-        if (!user) {
-            throw new Error('No account found with this email');
+    async signIn(email, password, rememberMe = false) {
+        if (!this.api) {
+            throw new Error('API not available. Please check your connection and try again.');
         }
 
-        if (user.password !== this.hashPassword(password)) {
-            throw new Error('Incorrect password');
+        try {
+            console.log('Attempting to sign in...');
+            console.log('API base URL:', this.api.getCurrentURL());
+            
+            const response = await this.api.login({ email, password, rememberMe });
+            this.currentUser = response.data.user;
+            this.isAuthenticated = true;
+            this.updateUI();
+            return this.currentUser;
+        } catch (error) {
+            console.error('Sign in error:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                apiURL: this.api ? this.api.getCurrentURL() : 'No API'
+            });
+            
+            // Provide more helpful error messages
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                throw new Error('Connection failed. Please check your internet connection and try again.');
+            } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+                throw new Error('Invalid email or password. Please try again.');
+            } else if (error.message.includes('404') || error.message.includes('Not Found')) {
+                throw new Error('Server not found. Please check your connection and try again.');
+            } else {
+                throw new Error(error.message || 'Failed to sign in. Please try again.');
+            }
         }
-
-        // Update last active
-        user.stats.lastActive = new Date().toISOString();
-        this.saveUsers();
-
-        // Set current user
-        this.currentUser = user;
-        this.isAuthenticated = true;
-        localStorage.setItem('bevyfinder_current_user', JSON.stringify(user));
-
-        this.updateUI();
-        return user;
     }
 
     // Sign out user
-    signOut() {
-        this.currentUser = null;
-        this.isAuthenticated = false;
-        localStorage.removeItem('bevyfinder_current_user');
-        this.updateUI();
+    async signOut() {
+        try {
+            if (this.api) {
+                await this.api.logout();
+            }
+        } catch (error) {
+            console.log('Logout error (non-critical):', error);
+        } finally {
+            this.currentUser = null;
+            this.isAuthenticated = false;
+            this.updateUI();
+        }
     }
 
     // Simple password hashing (for demo - use proper hashing in production)
@@ -149,38 +176,30 @@ class BevyFinderAuth {
     }
 
     // Update user profile
-    updateProfile(updates) {
+    async updateProfile(updates) {
         if (!this.isAuthenticated) {
             throw new Error('You must be signed in to update your profile');
         }
 
-        // Update profile fields
-        if (updates.name) {
-            this.currentUser.name = updates.name.trim();
+        if (!this.api) {
+            throw new Error('API not available');
         }
 
-        if (updates.bio !== undefined) {
-            this.currentUser.profile.bio = updates.bio;
+        try {
+            // Update via API
+            const response = await this.api.updateProfile(updates);
+            
+            // Update local user data
+            this.currentUser = response.data.user;
+            
+            // Update UI
+            this.updateUI();
+            
+            return this.currentUser;
+        } catch (error) {
+            console.error('Profile update error:', error);
+            throw new Error(error.message || 'Failed to update profile');
         }
-
-        if (updates.location !== undefined) {
-            this.currentUser.profile.location = updates.location;
-        }
-
-        if (updates.preferences) {
-            this.currentUser.profile.preferences = {
-                ...this.currentUser.profile.preferences,
-                ...updates.preferences
-            };
-        }
-
-        // Save to localStorage
-        this.users[this.currentUser.email] = this.currentUser;
-        localStorage.setItem('bevyfinder_current_user', JSON.stringify(this.currentUser));
-        this.saveUsers();
-
-        this.updateUI();
-        return this.currentUser;
     }
 
     // Add favorite drink
@@ -217,58 +236,64 @@ class BevyFinderAuth {
 
     // Get user favorites
     getUserFavorites() {
-        if (!this.isAuthenticated) return [];
-        return this.currentUser.profile.preferences.favoriteDrinks;
+        return this.isAuthenticated ? this.currentUser.profile.preferences.favoriteDrinks : [];
     }
 
-    // Check if drink is favorited by user
+    // Check if drink is favorited
     isDrinkFavorited(drinkKey) {
-        if (!this.isAuthenticated) return false;
-        return this.currentUser.profile.preferences.favoriteDrinks.includes(drinkKey);
+        return this.isAuthenticated && this.currentUser.profile.preferences.favoriteDrinks.includes(drinkKey);
     }
 
     // Update UI based on authentication status
     updateUI() {
         const authPage = document.getElementById('auth-page');
-        const mainApp = document.getElementById('main-app');
-        const welcomePage = document.getElementById('welcome-page');
-        const profileBtn = document.getElementById('sidebar-btn-profile');
+        const mainContent = document.getElementById('main-content');
+        const profileMenu = document.getElementById('profile-menu');
+        const profileBtn = document.querySelector('.profile-btn-header');
 
-        if (this.isAuthenticated) {
-            // Hide auth page, show main app
-            if (authPage) authPage.style.display = 'none';
-            if (mainApp) mainApp.style.display = 'block';
-            if (welcomePage) welcomePage.style.display = 'none';
+        if (!authPage || !mainContent) {
+            console.log('UI elements not found, skipping update');
+            return;
+        }
 
-            // Update profile button
+        if (this.isAuthenticated && this.currentUser) {
+            // User is authenticated - show main content
+            authPage.style.display = 'none';
+            mainContent.style.display = 'block';
+            
+            // Update profile menu
+            if (profileMenu) {
+                this.updateProfileMenuContent();
+            }
+            
+            // Show profile button
             if (profileBtn) {
-                profileBtn.innerHTML = `
-                    <i class="fas fa-user"></i>
-                    ${this.currentUser.name}
-                `;
+                profileBtn.style.display = 'block';
             }
-
-            // Update analytics
-            if (typeof analytics !== 'undefined') {
-                analytics.trackPageView('authenticated_home');
-            }
-
-            console.log('User authenticated:', this.currentUser.name);
+            
+            console.log('✅ UI updated: User authenticated');
         } else {
-            // Show main app for search, but hide auth page
-            if (authPage) authPage.style.display = 'none';
-            if (mainApp) mainApp.style.display = 'block';
-            if (welcomePage) welcomePage.style.display = 'none';
-
-            // Reset profile button
+            // User is not authenticated - show auth page
+            authPage.style.display = 'flex';
+            mainContent.style.display = 'none';
+            
+            // Hide profile button
             if (profileBtn) {
-                profileBtn.innerHTML = `
-                    <i class="fas fa-user"></i>
-                    Sign In
-                `;
+                profileBtn.style.display = 'none';
             }
+            
+            console.log('✅ UI updated: User not authenticated');
+        }
+    }
 
-            console.log('User not authenticated - search only mode');
+    // Update profile menu content
+    updateProfileMenuContent() {
+        const profileMenu = document.getElementById('profile-menu');
+        if (!profileMenu || !this.currentUser) return;
+
+        const userName = profileMenu.querySelector('.profile-menu-header span');
+        if (userName) {
+            userName.textContent = this.currentUser.name;
         }
     }
 
@@ -292,57 +317,58 @@ class BevyFinderAuth {
             });
         }
 
-        // Toggle between sign up and sign in
-        const toggleSignUp = document.getElementById('toggle-signup');
-        const toggleSignIn = document.getElementById('toggle-signin');
-
-        if (toggleSignUp) {
-            toggleSignUp.addEventListener('click', () => {
-                this.showSignUpForm();
+        // Auth toggle
+        const authToggle = document.getElementById('auth-toggle');
+        if (authToggle) {
+            authToggle.addEventListener('click', () => {
+                if (document.getElementById('signin-container').style.display === 'none') {
+                    this.showSignInForm();
+                } else {
+                    this.showSignUpForm();
+                }
             });
         }
 
-        if (toggleSignIn) {
-            toggleSignIn.addEventListener('click', () => {
-                this.showSignInForm();
-            });
-        }
-
-        // Sign out button
-        const signOutBtn = document.getElementById('signout-btn');
-        if (signOutBtn) {
-            signOutBtn.addEventListener('click', () => {
-                this.signOut();
-            });
-        }
+        // Pre-fill email if remembered
+        this.preFillEmailIfRemembered();
     }
 
     // Handle sign up
-    handleSignUp() {
+    async handleSignUp() {
         const email = document.getElementById('signup-email').value;
         const name = document.getElementById('signup-name').value;
         const password = document.getElementById('signup-password').value;
 
         try {
-            const user = this.signUp(email, name, password);
-            this.showNotification('Account created successfully! Welcome to BevyFinder!', 'success');
+            console.log('Attempting to sign up user...');
+            const user = await this.signUp(email, name, password);
+            console.log('Sign up successful:', user);
+            this.showNotification(`Welcome to BevyFinder, ${user.name}!`, 'success');
             
             // Track analytics
             if (typeof analytics !== 'undefined') {
                 analytics.trackFeature('user_signup', 'success');
             }
         } catch (error) {
+            console.error('Sign up error:', error);
             this.showNotification(error.message, 'error');
         }
     }
 
     // Handle sign in
-    handleSignIn() {
+    async handleSignIn() {
+        console.log('handleSignIn called');
+        
         const email = document.getElementById('signin-email').value;
         const password = document.getElementById('signin-password').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+
+        console.log('Login attempt for:', email, 'Remember me:', rememberMe);
 
         try {
-            const user = this.signIn(email, password);
+            console.log('Attempting to sign in user...');
+            const user = await this.signIn(email, password, rememberMe);
+            console.log('Sign in successful:', user);
             this.showNotification(`Welcome back, ${user.name}!`, 'success');
             
             // Track analytics
@@ -350,6 +376,7 @@ class BevyFinderAuth {
                 analytics.trackFeature('user_signin', 'success');
             }
         } catch (error) {
+            console.error('Sign in error:', error);
             this.showNotification(error.message, 'error');
         }
     }
@@ -375,11 +402,13 @@ class BevyFinderAuth {
         notification.textContent = message;
 
         const authPage = document.getElementById('auth-page');
-        authPage.appendChild(notification);
+        if (authPage) {
+            authPage.appendChild(notification);
 
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
     }
 
     // Get current user
@@ -390,6 +419,27 @@ class BevyFinderAuth {
     // Check if user is authenticated
     isUserAuthenticated() {
         return this.isAuthenticated;
+    }
+
+    // Pre-fill email if "Remember Me" was used
+    preFillEmailIfRemembered() {
+        const rememberMe = localStorage.getItem('bevyfinder_remember_me');
+        const savedEmail = localStorage.getItem('bevyfinder_user_email');
+        
+        if (rememberMe === 'true' && savedEmail) {
+            const emailInput = document.getElementById('signin-email');
+            const rememberMeCheckbox = document.getElementById('remember-me');
+            
+            if (emailInput) {
+                emailInput.value = savedEmail;
+                console.log('✅ Pre-filled email from "Remember Me"');
+            }
+            
+            if (rememberMeCheckbox) {
+                rememberMeCheckbox.checked = true;
+                console.log('✅ Checked "Remember Me" checkbox');
+            }
+        }
     }
 }
 

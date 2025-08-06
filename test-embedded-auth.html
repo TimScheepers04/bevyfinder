@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Embedded Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Embedded Authentication</h1>
+        <p>This page tests the embedded authentication system from the main app.</p>
+        
+        <!-- API Connection Test -->
+        <div class="test-section">
+            <h3>🔗 API Connection Test</h3>
+            <button class="btn" onclick="testAPIConnection()">Test API Connection</button>
+            <div id="api-status" class="status info hidden"></div>
+        </div>
+        
+        <!-- Login Test -->
+        <div class="test-section">
+            <h3>🔐 Login Test</h3>
+            <div class="form-group">
+                <label for="test-email">Email:</label>
+                <input type="email" id="test-email" value="test3@example.com">
+            </div>
+            <div class="form-group">
+                <label for="test-password">Password:</label>
+                <input type="password" id="test-password" value="password123">
+            </div>
+            <button class="btn" onclick="testLogin()">Test Login</button>
+            <button class="btn" onclick="testLogout()">Test Logout</button>
+            <div id="login-status" class="status info hidden"></div>
+        </div>
+        
+        <!-- Registration Test -->
+        <div class="test-section">
+            <h3>📝 Registration Test</h3>
+            <div class="form-group">
+                <label for="test-name">Name:</label>
+                <input type="text" id="test-name" value="Test User">
+            </div>
+            <div class="form-group">
+                <label for="test-reg-email">Email:</label>
+                <input type="email" id="test-reg-email" value="test4@example.com">
+            </div>
+            <div class="form-group">
+                <label for="test-reg-password">Password:</label>
+                <input type="password" id="test-reg-password" value="password123">
+            </div>
+            <button class="btn" onclick="testRegistration()">Test Registration</button>
+            <div id="reg-status" class="status info hidden"></div>
+        </div>
+        
+        <!-- Profile Test -->
+        <div class="test-section">
+            <h3>👤 Profile Test</h3>
+            <button class="btn" onclick="testGetProfile()">Get Profile</button>
+            <button class="btn" onclick="testAuthStatus()">Check Auth Status</button>
+            <div id="profile-status" class="status info hidden"></div>
+        </div>
+        
+        <!-- Console Log -->
+        <div class="test-section">
+            <h3>📋 Console Log</h3>
+            <div id="console-log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== EMBEDDED API CLIENT (Copy from main app) =====
+        class BevyFinderAPI {
+            constructor() {
+                this.baseURL = this.initializeURL();
+                console.log('🔗 API initialized with URL:', this.baseURL);
+                this.testAndOptimizeConnection();
+            }
+            
+            initializeURL() {
+                // Smart API URL detection based on current location
+                const currentHost = window.location.hostname;
+                const currentProtocol = window.location.protocol;
+                const currentPort = window.location.port;
+                
+                console.log('🔍 Current location:', `${currentProtocol}//${currentHost}:${currentPort}`);
+                
+                // If we're on localhost or local network, use local API
+                if (currentHost === 'localhost' || currentHost === '127.0.0.1' || 
+                    currentHost.startsWith('192.168.') || currentHost.startsWith('10.') || 
+                    currentHost.startsWith('172.')) {
+                    
+                    // Try to use the same host as the frontend
+                    const localAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                    console.log('🏠 Using local API:', localAPI);
+                    return localAPI;
+                }
+                
+                // If we're on a public domain, use production API
+                if (currentHost.includes('bevyfinder.com') || currentHost.includes('netlify.app') || 
+                    currentHost.includes('vercel.app') || currentHost.includes('github.io')) {
+                    
+                    const productionAPI = 'https://bevyfinder.com/api';
+                    console.log('🌐 Using production API:', productionAPI);
+                    return productionAPI;
+                }
+                
+                // Fallback: try to detect if we're on the same network as the server
+                const fallbackAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                console.log('🔄 Using fallback API:', fallbackAPI);
+                return fallbackAPI;
+            }
+            
+            async testAndOptimizeConnection() {
+                console.log('🧪 Testing API connection...');
+                logToConsole('🧪 Testing API connection...');
+                
+                // List of possible API URLs to test
+                const possibleURLs = [
+                    this.baseURL, // Current detected URL
+                    'http://192.168.4.36:3000/api', // Your specific local network
+                    'http://localhost:3000/api', // Local development
+                    'https://bevyfinder.com/api', // Production
+                    'http://127.0.0.1:3000/api', // Alternative local
+                ];
+                
+                // Remove duplicates
+                const uniqueURLs = [...new Set(possibleURLs)];
+                
+                for (const url of uniqueURLs) {
+                    try {
+                        console.log(`🔍 Testing: ${url}`);
+                        logToConsole(`🔍 Testing: ${url}`);
+                        const response = await fetch(`${url.replace('/api', '')}/health`, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        
+                        if (response.ok) {
+                            console.log(`✅ Found working API: ${url}`);
+                            logToConsole(`✅ Found working API: ${url}`);
+                            this.baseURL = url;
+                            return;
+                        }
+                    } catch (error) {
+                        console.log(`❌ Failed: ${url} - ${error.message}`);
+                        logToConsole(`❌ Failed: ${url} - ${error.message}`);
+                    }
+                }
+                
+                console.log('⚠️ No working API found, using fallback:', this.baseURL);
+                logToConsole(`⚠️ No working API found, using fallback: ${this.baseURL}`);
+            }
+            
+            async request(endpoint, options = {}) {
+                const url = `${this.baseURL}${endpoint}`;
+                
+                const defaultOptions = {
+                    mode: 'cors',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                const finalOptions = { ...defaultOptions, ...options };
+                
+                if (options.body && typeof options.body === 'object') {
+                    finalOptions.body = JSON.stringify(options.body);
+                }
+                
+                console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
+                logToConsole(`🌐 API Request: ${options.method || 'GET'} ${url}`);
+                
+                try {
+                    const response = await fetch(url, finalOptions);
+                    const text = await response.text();
+                    
+                    console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+                    logToConsole(`📡 API Response: ${response.status} ${response.statusText}`);
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        return { success: true, data, status: response.status };
+                    } catch (e) {
+                        console.error('❌ JSON Parse Error:', text);
+                        logToConsole(`❌ JSON Parse Error: ${text}`);
+                        return { success: false, error: 'Invalid JSON response', raw: text, status: response.status };
+                    }
+                } catch (error) {
+                    console.error('❌ Network Error:', error.message);
+                    logToConsole(`❌ Network Error: ${error.message}`);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async login(email, password, rememberMe = false) {
+                return this.request('/auth/login', {
+                    method: 'POST',
+                    body: { email, password, rememberMe }
+                });
+            }
+            
+            async register(name, email, password) {
+                return this.request('/auth/register', {
+                    method: 'POST',
+                    body: { name, email, password }
+                });
+            }
+            
+            async getProfile() {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'No token' };
+                
+                return this.request('/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+            
+            async logout() {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: true };
+                
+                return this.request('/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+        }
+        
+        // ===== EMBEDDED AUTH MANAGER (Copy from main app) =====
+        class BevyFinderAuth {
+            constructor() {
+                this.api = new BevyFinderAPI();
+                this.currentUser = null;
+                this.isAuthenticated = false;
+                console.log('🔐 Auth system initialized');
+                logToConsole('🔐 Auth system initialized');
+            }
+            
+            async signIn(email, password, rememberMe = false) {
+                console.log('🔐 Attempting sign in:', email);
+                logToConsole(`🔐 Attempting sign in: ${email}`);
+                
+                try {
+                    const result = await this.api.login(email, password, rememberMe);
+                    
+                    if (result.success) {
+                        console.log('✅ Login successful');
+                        logToConsole('✅ Login successful');
+                        
+                        if (result.data.token) {
+                            localStorage.setItem('bevyfinder_token', result.data.token);
+                        }
+                        
+                        if (rememberMe) {
+                            localStorage.setItem('bevyfinder_remember_me', 'true');
+                            localStorage.setItem('bevyfinder_user_email', email);
+                        }
+                        
+                        this.currentUser = result.data.user;
+                        this.isAuthenticated = true;
+                        
+                        return { success: true, user: this.currentUser };
+                    } else {
+                        console.error('❌ Login failed:', result.error);
+                        logToConsole(`❌ Login failed: ${result.error}`);
+                        return { success: false, error: result.error };
+                    }
+                } catch (error) {
+                    console.error('❌ Login error:', error);
+                    logToConsole(`❌ Login error: ${error.message}`);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async signUp(name, email, password) {
+                console.log('📝 Attempting sign up:', email);
+                logToConsole(`📝 Attempting sign up: ${email}`);
+                
+                try {
+                    const result = await this.api.register(name, email, password);
+                    
+                    if (result.success) {
+                        console.log('✅ Registration successful');
+                        logToConsole('✅ Registration successful');
+                        
+                        if (result.data.token) {
+                            localStorage.setItem('bevyfinder_token', result.data.token);
+                        }
+                        
+                        this.currentUser = result.data.user;
+                        this.isAuthenticated = true;
+                        
+                        return { success: true, user: this.currentUser };
+                    } else {
+                        console.error('❌ Registration failed:', result.error);
+                        logToConsole(`❌ Registration failed: ${result.error}`);
+                        return { success: false, error: result.error };
+                    }
+                } catch (error) {
+                    console.error('❌ Registration error:', error);
+                    logToConsole(`❌ Registration error: ${error.message}`);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async signOut() {
+                console.log('🚪 Signing out');
+                logToConsole('🚪 Signing out');
+                
+                try {
+                    await this.api.logout();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    logToConsole(`Logout error: ${error.message}`);
+                }
+                
+                this.clearAuth();
+            }
+            
+            clearAuth() {
+                localStorage.removeItem('bevyfinder_token');
+                localStorage.removeItem('bevyfinder_remember_me');
+                localStorage.removeItem('bevyfinder_user_email');
+                this.currentUser = null;
+                this.isAuthenticated = false;
+                console.log('🧹 Auth cleared');
+                logToConsole('🧹 Auth cleared');
+            }
+            
+            async checkAuthStatus() {
+                const token = localStorage.getItem('bevyfinder_token');
+                
+                if (token) {
+                    console.log('🔍 Checking auth status with token');
+                    logToConsole('🔍 Checking auth status with token');
+                    const result = await this.api.getProfile();
+                    
+                    if (result.success) {
+                        this.currentUser = result.data.user;
+                        this.isAuthenticated = true;
+                        console.log('✅ User authenticated:', this.currentUser.name);
+                        logToConsole(`✅ User authenticated: ${this.currentUser.name}`);
+                        return { success: true, user: this.currentUser };
+                    } else {
+                        console.log('❌ Token invalid, clearing');
+                        logToConsole('❌ Token invalid, clearing');
+                        this.clearAuth();
+                        return { success: false, error: 'Invalid token' };
+                    }
+                } else {
+                    console.log('🔍 No token found');
+                    logToConsole('🔍 No token found');
+                    return { success: false, error: 'No token' };
+                }
+            }
+        }
+        
+        // ===== TEST FUNCTIONS =====
+        let auth;
+        
+        function logToConsole(message) {
+            const logDiv = document.getElementById('console-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+            element.classList.remove('hidden');
+        }
+        
+        async function testAPIConnection() {
+            logToConsole('🧪 Testing API connection...');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('api-status', `✅ API Connected: ${data.message}`, 'success');
+                    logToConsole('✅ API connection successful');
+                } else {
+                    showStatus('api-status', `❌ API Connection Failed: ${response.status}`, 'error');
+                    logToConsole(`❌ API connection failed: ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('api-status', `❌ API Connection Error: ${error.message}`, 'error');
+                logToConsole(`❌ API connection error: ${error.message}`);
+            }
+        }
+        
+        async function testLogin() {
+            if (!auth) auth = new BevyFinderAuth();
+            
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            
+            if (!email || !password) {
+                showStatus('login-status', '❌ Please enter email and password', 'error');
+                return;
+            }
+            
+            logToConsole('🧪 Testing login...');
+            const result = await auth.signIn(email, password, true);
+            
+            if (result.success) {
+                showStatus('login-status', `✅ Login successful! Welcome, ${result.user.name}`, 'success');
+            } else {
+                showStatus('login-status', `❌ Login failed: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testLogout() {
+            if (!auth) auth = new BevyFinderAuth();
+            
+            logToConsole('🧪 Testing logout...');
+            await auth.signOut();
+            showStatus('login-status', '✅ Logged out successfully', 'success');
+        }
+        
+        async function testRegistration() {
+            if (!auth) auth = new BevyFinderAuth();
+            
+            const name = document.getElementById('test-name').value;
+            const email = document.getElementById('test-reg-email').value;
+            const password = document.getElementById('test-reg-password').value;
+            
+            if (!name || !email || !password) {
+                showStatus('reg-status', '❌ Please fill in all fields', 'error');
+                return;
+            }
+            
+            logToConsole('🧪 Testing registration...');
+            const result = await auth.signUp(name, email, password);
+            
+            if (result.success) {
+                showStatus('reg-status', `✅ Registration successful! Welcome, ${result.user.name}`, 'success');
+            } else {
+                showStatus('reg-status', `❌ Registration failed: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testGetProfile() {
+            if (!auth) auth = new BevyFinderAuth();
+            
+            logToConsole('🧪 Testing get profile...');
+            const result = await auth.checkAuthStatus();
+            
+            if (result.success) {
+                showStatus('profile-status', `✅ Profile loaded: ${result.user.name} (${result.user.email})`, 'success');
+            } else {
+                showStatus('profile-status', `❌ Profile failed: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testAuthStatus() {
+            if (!auth) auth = new BevyFinderAuth();
+            
+            logToConsole('🧪 Testing auth status...');
+            const result = await auth.checkAuthStatus();
+            
+            if (result.success) {
+                showStatus('profile-status', `✅ Authenticated: ${result.user.name}`, 'success');
+            } else {
+                showStatus('profile-status', `❌ Not authenticated: ${result.error}`, 'error');
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            logToConsole('🚀 Test page loaded');
+            auth = new BevyFinderAuth();
+        });
+    </script>
+</body>
+</html> 

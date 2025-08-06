@@ -1,41 +1,142 @@
-// DOM Elements
-const welcomePage = document.getElementById('welcome-page');
-const mainApp = document.getElementById('main-app');
-const startBtn = document.getElementById('start-btn');
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
-const beverageNameInput = document.getElementById('beverage-name');
-const searchBtn = document.getElementById('search-btn');
-const suggestions = document.getElementById('suggestions');
-const uploadArea = document.getElementById('upload-area');
-// File input will be created dynamically
-const previewArea = document.getElementById('preview-area');
-const previewImage = document.getElementById('preview-image');
-const removeBtn = document.getElementById('remove-btn');
-const resultsSection = document.getElementById('results-section');
-const beverageCard = document.getElementById('beverage-card');
-const uploadBtn = document.getElementById('upload-btn');
+// Test if JavaScript is running
+console.log('Script.js loaded successfully!');
 
-// Menu and Sidebar Elements
-const menuBtn = document.getElementById('menu-btn');
-const sidebar = document.getElementById('sidebar');
-const closeMenuBtn = document.getElementById('close-menu-btn');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+// DOM Elements - will be initialized when DOM is loaded
+let welcomePage, mainApp, startBtn, tabBtns, tabContents, beverageNameInput, searchBtn, suggestions;
+let uploadArea, previewArea, previewImage, removeBtn, resultsSection, beverageCard, uploadBtn;
+let menuBtn, sidebar, closeMenuBtn, sidebarOverlay, sidebarBtns;
+let favoritesPage, favoritesContainer, emptyFavorites;
+let historyPage, historyContainer, emptyHistory, historyActions;
+let trackingPage, startSessionBtn, endSessionBtn, resetSessionBtn, sessionTime;
+let totalAlcohol, totalCalories, totalCarbs, totalProtein, totalSugar, totalFat;
+let sobrietyStatus, sobrietyDetails, bacLevel, trackingDrinkSearch, addDrinkBtn;
+let trackingDrinkSuggestions, drinkList, emptyDrinks, safetyTips;
 
-// Favorites Elements
-const favoritesPage = document.getElementById('favorites-page');
-const favoritesContainer = document.getElementById('favorites-container');
-const emptyFavorites = document.getElementById('empty-favorites');
+// Tracking State
+let currentSession = {
+    isActive: false,
+    startTime: null,
+    drinks: [],
+    totalAlcohol: 0,
+    totalCalories: 0,
+    totalCarbs: 0,
+    totalSugar: 0,
+    totalFat: 0
+};
 
-// History Elements
-const historyPage = document.getElementById('history-page');
-const historyContainer = document.getElementById('history-container');
-const emptyHistory = document.getElementById('empty-history');
-const historyActions = document.getElementById('history-actions');
+// Search timeout for debouncing
+let searchTimeout;
+
+// API Client
+const api = new BevyFinderAPI();
+
+// Auth system - already declared in auth.js
+// const auth = new BevyFinderAuth();
+
+// Search Filters
+let currentFilters = {
+    type: 'all',
+    abvMin: 0,
+    abvMax: 15,
+    country: 'all',
+    rating: 0,
+    price: 'all'
+};
+
+// Filter Functions
+function toggleAdvancedFilters() {
+    const filters = document.getElementById('advanced-filters');
+    const filterBtn = document.getElementById('filter-btn');
+    
+    if (filters.style.display === 'none') {
+        filters.style.display = 'block';
+        filterBtn.style.background = '#1976D2';
+        filterBtn.innerHTML = '<i class="fas fa-filter"></i>';
+    } else {
+        filters.style.display = 'none';
+        filterBtn.style.background = '#2196F3';
+        filterBtn.innerHTML = '<i class="fas fa-filter"></i>';
+    }
+}
+
+function updateABVDisplay() {
+    const abvMin = document.getElementById('abv-min').value;
+    const abvMax = document.getElementById('abv-max').value;
+    const display = document.getElementById('abv-range-display');
+    
+    display.textContent = `${abvMin}% - ${abvMax}%`;
+    
+    // Update current filters
+    currentFilters.abvMin = parseFloat(abvMin);
+    currentFilters.abvMax = parseFloat(abvMax);
+}
+
+function applyFilters() {
+    const typeFilter = document.getElementById('type-filter').value;
+    const countryFilter = document.getElementById('country-filter').value;
+    const ratingFilter = parseFloat(document.getElementById('rating-filter').value);
+    
+    currentFilters.type = typeFilter;
+    currentFilters.country = countryFilter;
+    currentFilters.rating = ratingFilter;
+    
+    // Apply filters to current search results
+    filterSearchResults();
+    
+    showNotification('Filters applied!', 'success');
+}
+
+function clearFilters() {
+    // Reset filter inputs
+    document.getElementById('type-filter').value = 'all';
+    document.getElementById('country-filter').value = 'all';
+    document.getElementById('rating-filter').value = '0';
+    document.getElementById('abv-min').value = '0';
+    document.getElementById('abv-max').value = '15';
+    
+    // Reset current filters
+    currentFilters = {
+        type: 'all',
+        abvMin: 0,
+        abvMax: 15,
+        country: 'all',
+        rating: 0,
+        price: 'all'
+    };
+    
+    updateABVDisplay();
+    filterSearchResults();
+    
+    showNotification('Filters cleared!', 'info');
+}
+
+function filterSearchResults() {
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection.style.display === 'none') return;
+    
+    const beverageCard = document.getElementById('beverage-card');
+    const currentBeverage = beverageCard.dataset.beverageKey;
+    
+    if (currentBeverage && beverageDatabase[currentBeverage]) {
+        const beverage = beverageDatabase[currentBeverage];
+        
+        // Check if beverage matches filters
+        const matchesType = currentFilters.type === 'all' || beverage.type === currentFilters.type;
+        const matchesCountry = currentFilters.country === 'all' || beverage.country === currentFilters.country;
+        const matchesABV = parseFloat(beverage.abv) >= currentFilters.abvMin && parseFloat(beverage.abv) <= currentFilters.abvMax;
+        
+        if (matchesType && matchesCountry && matchesABV) {
+            beverageCard.style.display = 'block';
+        } else {
+            beverageCard.style.display = 'none';
+            showNotification('No beverages match your current filters', 'warning');
+        }
+    }
+}
 
 // Welcome Page Functionality
 function showMainApp() {
+    console.log('showMainApp function called!');
     welcomePage.style.display = 'none';
     mainApp.style.display = 'block';
     
@@ -58,6 +159,7 @@ function ensureMenuAccessibility() {
 
 // Menu and Sidebar Functionality
 function openMenu() {
+    console.log('openMenu function called!');
     sidebar.classList.add('open');
     sidebarOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
@@ -71,6 +173,8 @@ function closeMenu() {
 
 function handleSidebarButtonClick(buttonId) {
     console.log(`Sidebar button clicked: ${buttonId}`);
+    console.log('Button ID type:', typeof buttonId);
+    console.log('Button ID value:', buttonId);
     // Close menu after button click
     closeMenu();
     
@@ -87,6 +191,16 @@ function handleSidebarButtonClick(buttonId) {
             hideAllPages();
             mainApp.style.display = 'block';
             clearResults();
+            break;
+        case 'sidebar-btn-dashboard': // Dashboard
+            console.log('Dashboard button clicked');
+            if (auth.isUserAuthenticated()) {
+                showDashboard();
+            } else {
+                // Show auth page for sign up
+                hideAllPages();
+                document.getElementById('auth-page').style.display = 'flex';
+            }
             break;
         case 'sidebar-btn-profile': // Profile
             console.log('Profile button clicked');
@@ -138,6 +252,16 @@ function handleSidebarButtonClick(buttonId) {
             console.log('About button clicked');
             // Could show about information
             break;
+        case 'sidebar-btn-tracking': // Tracking
+            console.log('Tracking button clicked');
+            if (!auth.isUserAuthenticated()) {
+                showNotification('Night Tracker is exclusive to BevyFinder members. Please sign in to access this feature.', 'info');
+                showAuthPage();
+            } else {
+                showTrackingPage();
+            }
+            break;
+
         default:
             console.log('Unknown sidebar button clicked');
     }
@@ -148,25 +272,9 @@ if (startBtn) {
     startBtn.addEventListener('click', showMainApp);
 }
 
-// Menu Event Listeners
-if (menuBtn) {
-    menuBtn.addEventListener('click', openMenu);
-}
+// Menu Event Listeners will be set up in DOMContentLoaded
 
-if (closeMenuBtn) {
-    closeMenuBtn.addEventListener('click', closeMenu);
-}
-
-if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', closeMenu);
-}
-
-// Sidebar button event listeners
-sidebarBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        handleSidebarButtonClick(btn.id);
-    });
-});
+// Sidebar button event listeners will be set up in DOMContentLoaded
 
 // Close menu on escape key
 document.addEventListener('keydown', (e) => {
@@ -175,32 +283,50 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Favorites System
-let favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
+// Favorites System - Now using API
+let favorites = [];
 
-function addToFavorites(beverageKey) {
+// Load favorites from API on initialization
+async function loadFavorites() {
+    if (auth.isUserAuthenticated()) {
+        try {
+            const user = auth.getCurrentUser();
+            favorites = user.profile.preferences.favoriteDrinks || [];
+        } catch (error) {
+            console.error('Failed to load favorites:', error);
+            favorites = [];
+        }
+    }
+}
+
+async function addToFavorites(beverageKey) {
     if (!auth.isUserAuthenticated()) {
         showAuthNotification('Sign up to save your favorite drinks!', 'info');
         return;
     }
     
     if (!favorites.includes(beverageKey)) {
-        favorites.push(beverageKey);
-        localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
-        updateFavoriteButton(beverageKey, true);
-        showFavoriteNotification('Added to favorites!', 'success');
-        
-        // Add to user's profile favorites
-        auth.addFavoriteDrink(beverageKey);
-        
-        // Track analytics
-        if (typeof analytics !== 'undefined') {
-            analytics.trackFavorite(beverageDatabase[beverageKey].name, 'add');
+        try {
+            // Add to API
+            await auth.addFavoriteDrink(beverageKey);
+            
+            // Update local state
+            favorites.push(beverageKey);
+            updateFavoriteButton(beverageKey, true);
+            showFavoriteNotification('Added to favorites!', 'success');
+            
+            // Track analytics
+            if (typeof analytics !== 'undefined') {
+                analytics.trackFavorite(beverageDatabase[beverageKey].name, 'add');
+            }
+        } catch (error) {
+            console.error('Failed to add favorite:', error);
+            showFavoriteNotification('Failed to add favorite', 'error');
         }
     }
 }
 
-function removeFromFavorites(beverageKey) {
+async function removeFromFavorites(beverageKey) {
     if (!auth.isUserAuthenticated()) {
         showAuthNotification('Sign up to manage your favorite drinks!', 'info');
         return;
@@ -208,22 +334,27 @@ function removeFromFavorites(beverageKey) {
     
     const index = favorites.indexOf(beverageKey);
     if (index > -1) {
-        favorites.splice(index, 1);
-        localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
-        updateFavoriteButton(beverageKey, false);
-        showFavoriteNotification('Removed from favorites!', 'info');
-        
-        // Remove from user's profile favorites
-        auth.removeFavoriteDrink(beverageKey);
-        
-        // Track analytics
-        if (typeof analytics !== 'undefined') {
-            analytics.trackFavorite(beverageDatabase[beverageKey].name, 'remove');
-        }
-        
-        // If we're on the favorites page, refresh it
-        if (favoritesPage.style.display !== 'none') {
-            displayFavorites();
+        try {
+            // Remove from API
+            await auth.removeFavoriteDrink(beverageKey);
+            
+            // Update local state
+            favorites.splice(index, 1);
+            updateFavoriteButton(beverageKey, false);
+            showFavoriteNotification('Removed from favorites!', 'info');
+            
+            // Track analytics
+            if (typeof analytics !== 'undefined') {
+                analytics.trackFavorite(beverageDatabase[beverageKey].name, 'remove');
+            }
+            
+            // If we're on the favorites page, refresh it
+            if (favoritesPage.style.display !== 'none') {
+                displayFavorites();
+            }
+        } catch (error) {
+            console.error('Failed to remove favorite:', error);
+            showFavoriteNotification('Failed to remove favorite', 'error');
         }
     }
 }
@@ -242,6 +373,98 @@ function updateFavoriteButton(beverageKey, isFavorited) {
             favoriteBtn.classList.remove('favorited');
             favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
         }
+    }
+}
+
+// Like functionality
+function isLiked(beverageKey) {
+    if (!auth.isUserAuthenticated()) return false;
+    const likedDrinks = JSON.parse(localStorage.getItem('bevyfinder_liked_drinks') || '[]');
+    return likedDrinks.includes(beverageKey);
+}
+
+function getLikeCount(beverageKey) {
+    const likeCounts = JSON.parse(localStorage.getItem('bevyfinder_like_counts') || '{}');
+    return likeCounts[beverageKey] || 0;
+}
+
+async function likeBeverage(beverageKey) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Please sign in to like drinks!', 'info');
+        return;
+    }
+
+    try {
+        // Update local storage
+        const likedDrinks = JSON.parse(localStorage.getItem('bevyfinder_liked_drinks') || '[]');
+        if (!likedDrinks.includes(beverageKey)) {
+            likedDrinks.push(beverageKey);
+            localStorage.setItem('bevyfinder_liked_drinks', JSON.stringify(likedDrinks));
+        }
+
+        // Update like count
+        const likeCounts = JSON.parse(localStorage.getItem('bevyfinder_like_counts') || '{}');
+        likeCounts[beverageKey] = (likeCounts[beverageKey] || 0) + 1;
+        localStorage.setItem('bevyfinder_like_counts', JSON.stringify(likeCounts));
+
+        // Update UI
+        updateLikeButton(beverageKey, true);
+        showNotification('Drink liked!', 'success');
+
+        // Send to backend if available
+        try {
+            await api.likeDrink(beverageKey);
+        } catch (error) {
+            console.log('Backend like failed, using local storage:', error);
+        }
+    } catch (error) {
+        console.error('Error liking beverage:', error);
+        showNotification('Failed to like drink', 'error');
+    }
+}
+
+async function unlikeBeverage(beverageKey) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Please sign in to unlike drinks!', 'info');
+        return;
+    }
+
+    try {
+        // Update local storage
+        const likedDrinks = JSON.parse(localStorage.getItem('bevyfinder_liked_drinks') || '[]');
+        const index = likedDrinks.indexOf(beverageKey);
+        if (index > -1) {
+            likedDrinks.splice(index, 1);
+            localStorage.setItem('bevyfinder_liked_drinks', JSON.stringify(likedDrinks));
+        }
+
+        // Update like count
+        const likeCounts = JSON.parse(localStorage.getItem('bevyfinder_like_counts') || '{}');
+        likeCounts[beverageKey] = Math.max(0, (likeCounts[beverageKey] || 0) - 1);
+        localStorage.setItem('bevyfinder_like_counts', JSON.stringify(likeCounts));
+
+        // Update UI
+        updateLikeButton(beverageKey, false);
+        showNotification('Drink unliked!', 'info');
+
+        // Send to backend if available
+        try {
+            await api.unlikeDrink(beverageKey);
+        } catch (error) {
+            console.log('Backend unlike failed, using local storage:', error);
+        }
+    } catch (error) {
+        console.error('Error unliking beverage:', error);
+        showNotification('Failed to unlike drink', 'error');
+    }
+}
+
+function updateLikeButton(beverageKey, isLiked) {
+    const likeBtn = document.querySelector(`.like-btn[data-beverage="${beverageKey}"]`);
+    if (likeBtn) {
+        likeBtn.className = `like-btn ${isLiked ? 'liked' : ''}`;
+        likeBtn.innerHTML = `<i class="${isLiked ? 'fas' : 'far'} fa-thumbs-up"></i> <span class="like-count">${getLikeCount(beverageKey)}</span>`;
+        likeBtn.title = isLiked ? 'Unlike this drink' : 'Like this drink';
     }
 }
 
@@ -406,6 +629,12 @@ function hideAllPages() {
     favoritesPage.style.display = 'none';
     historyPage.style.display = 'none';
     
+    // Hide dashboard page
+    const dashboardPage = document.getElementById('dashboard-page');
+    if (dashboardPage) {
+        dashboardPage.style.display = 'none';
+    }
+    
     // Hide dynamically created profile page
     const profilePage = document.getElementById('profile-page');
     if (profilePage) {
@@ -418,13 +647,30 @@ function hideAllPages() {
         authPage.style.display = 'none';
     }
     
-    console.log('All pages hidden');
+    // Hide tracking page
+    const trackingPage = document.getElementById('tracking-page');
+    if (trackingPage) {
+        trackingPage.style.display = 'none';
+    }
 }
 
-// History System
-let searchHistory = JSON.parse(localStorage.getItem('bevyfinder_history') || '[]');
+// History System - Now using API
+let searchHistory = [];
 
-function addToHistory(beverageKey, searchMethod = 'text') {
+// Load history from API on initialization
+async function loadHistory() {
+    if (auth.isUserAuthenticated()) {
+        try {
+            const user = auth.getCurrentUser();
+            searchHistory = user.profile.preferences.searchHistory || [];
+        } catch (error) {
+            console.error('Failed to load history:', error);
+            searchHistory = [];
+        }
+    }
+}
+
+async function addToHistory(beverageKey, searchMethod = 'text') {
     // Only track history for authenticated users
     if (!auth.isUserAuthenticated()) {
         // Track analytics for non-authenticated users
@@ -457,32 +703,46 @@ function addToHistory(beverageKey, searchMethod = 'text') {
         searchHistory = searchHistory.slice(0, 50);
     }
     
-    localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
-    
     // Track analytics
     if (typeof analytics !== 'undefined') {
         analytics.trackSearch(beverageDatabase[beverageKey].name, searchMethod, true);
     }
     
     // Track in user profile
-    auth.trackSearch();
-}
-
-function removeFromHistory(beverageKey) {
-    const index = searchHistory.findIndex(item => item.beverageKey === beverageKey);
-    if (index > -1) {
-        searchHistory.splice(index, 1);
-        localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
-        displayHistory();
+    try {
+        await auth.trackSearch();
+    } catch (error) {
+        console.error('Failed to track search:', error);
     }
 }
 
-function clearHistory() {
+async function removeFromHistory(beverageKey) {
+    const index = searchHistory.findIndex(item => item.beverageKey === beverageKey);
+    if (index > -1) {
+        searchHistory.splice(index, 1);
+        displayHistory();
+        
+        // Update server (you'll need to add this endpoint)
+        try {
+            // await api.request(`/user/history/${beverageKey}`, { method: 'DELETE' });
+        } catch (error) {
+            console.error('Failed to remove from history:', error);
+        }
+    }
+}
+
+async function clearHistory() {
     if (confirm('Are you sure you want to clear all search history? This action cannot be undone.')) {
         searchHistory = [];
-        localStorage.setItem('bevyfinder_history', JSON.stringify(searchHistory));
         displayHistory();
         showHistoryNotification('Search history cleared!', 'info');
+        
+        // Update server (you'll need to add this endpoint)
+        try {
+            // await api.request('/user/history', { method: 'DELETE' });
+        } catch (error) {
+            console.error('Failed to clear history:', error);
+        }
     }
 }
 
@@ -585,8 +845,17 @@ function showHistoryNotification(message, type) {
 }
 
 // Ensure menu is accessible when page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     ensureMenuAccessibility();
+    
+    // Initialize data from API
+    try {
+        await loadFavorites();
+        await loadHistory();
+        console.log('✅ Data loaded from API successfully');
+    } catch (error) {
+        console.error('❌ Failed to load data from API:', error);
+    }
 });
 
 // Function to switch to search tab
@@ -1787,25 +2056,6 @@ const beverageDatabase = {
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Citrus']
     },
-    '4-pines-kolsch': {
-        name: '4 Pines Kölsch',
-        type: 'Beer',
-        alcohol: 'Kölsch',
-        abv: '4.6%',
-        standardDrinks: '1.1',
-        ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
-        description: 'A German-style Kölsch with clean, crisp character and traditional brewing methods. Features delicate notes of pale malt, gentle hop bitterness, and a touch of grain character. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing with minimal bitterness, making it perfect for hot weather and casual drinking. Brewed in the traditional Kölsch style. One 330ml bottle contains 1.1 standard drinks.',
-        nutrition: {
-            calories: 145,
-            carbs: 14.2,
-            protein: 1.4,
-            fat: 0,
-            sugar: 0.6,
-            servingSize: '330ml'
-        },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-        tags: ['Beer', 'Kölsch', 'Australian', 'Clean', 'Crisp']
-    },
     '4-pines-hefeweizen': {
         name: '4 Pines Hefeweizen',
         type: 'Beer',
@@ -1824,25 +2074,6 @@ const beverageDatabase = {
         },
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
         tags: ['Beer', 'Hefeweizen', 'Australian', 'Wheat', 'Banana']
-    },
-    'bridge-road-brewers-chevalier-saison': {
-        name: 'Bridge Road Brewers Chevalier Saison',
-        type: 'Beer',
-        alcohol: 'Saison',
-        abv: '6.5%',
-        standardDrinks: '1.6',
-        ingredients: ['Malted barley', 'Wheat malt', 'Hops', 'Water', 'Yeast'],
-        description: 'A Belgian-style saison with spicy and fruity character. Features notes of pepper, citrus, and stone fruit from the saison yeast strain, balanced by wheat malt complexity. Medium-bodied with bright carbonation and a dry, crisp mouthfeel. The finish is dry and refreshing with lingering spice and fruit notes. Perfect for those who enjoy traditional Belgian farmhouse ales. One 330ml bottle contains 1.6 standard drinks.',
-        nutrition: {
-            calories: 195,
-            carbs: 19.2,
-            protein: 1.9,
-            fat: 0,
-            sugar: 0.9,
-            servingSize: '330ml'
-        },
-        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-        tags: ['Beer', 'Saison', 'Australian', 'Spicy', 'Fruity']
     },
     'bridge-road-brewers-beechworth-pale-ale': {
         name: 'Bridge Road Brewers Beechworth Pale Ale',
@@ -4625,7 +4856,7 @@ const beverageDatabase = {
         alcohol: 'Vodka',
         abv: '12-15%',
         standardDrinks: '1.2',
-        ingredients: ['Vodka (1.5 oz)', 'Peach schnapps (0.5 oz)', 'Cranberry juice (3 oz)', 'Lime wedge'],
+        ingredients: ['Vodka (1.5 oz)', 'Peach schnapps (0.5 oz)', 'Cranberry juice (3 oz)', 'Lemon wedge'],
         description: 'A simple cocktail with vodka, peach schnapps, and cranberry. One standard woo woo contains 1.2 standard drinks.',
         nutrition: {
             calories: 185,
@@ -5012,70 +5243,9 @@ const beverageDatabase = {
     }
 };
 
-// Tab switching functionality
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        
-        // Remove active class from all tabs and contents
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-        
-        // Add active class to clicked tab and corresponding content
-        btn.classList.add('active');
-        const targetContent = document.getElementById(`${targetTab}-tab`);
-        if (targetContent) {
-            targetContent.classList.add('active');
-        }
-        
-        // Clear previous results
-        clearResults();
-        
-        // Track analytics
-        if (typeof analytics !== 'undefined') {
-            analytics.trackFeature('tab_switch', targetTab);
-        }
-        
-        console.log(`Switched to ${targetTab} tab`);
-    });
-});
+// Tab switching functionality will be set up after DOM elements are initialized
 
-// Name input functionality
-let searchTimeout;
-
-beverageNameInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    
-    // Clear previous timeout
-    clearTimeout(searchTimeout);
-    
-    if (query.length < 2) {
-        hideSuggestions();
-        return;
-    }
-    
-    // Debounce search
-    searchTimeout = setTimeout(() => {
-        showSuggestions(query);
-    }, 300);
-});
-
-beverageNameInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    if (query.length >= 2) {
-        showSuggestions(query);
-    } else {
-        hideSuggestions();
-    }
-});
-
-beverageNameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        searchBeverage();
-    }
-});
-
-searchBtn.addEventListener('click', searchBeverage);
+// Name input functionality will be set up after DOM elements are initialized
 
 function showSuggestions(query) {
     const matches = Object.keys(beverageDatabase).filter(beverage => {
@@ -5148,40 +5318,7 @@ function searchBeverage() {
     }
 }
 
-// Photo upload functionality
-uploadArea.addEventListener('click', () => {
-    triggerFileInput();
-});
-
-// Mobile-specific touch events
-uploadArea.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    photoInput.click();
-}, { passive: false });
-
-uploadArea.addEventListener('touchend', (e) => {
-    e.preventDefault();
-}, { passive: false });
-
-// Desktop drag and drop events
-uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.classList.add('dragover');
-});
-
-uploadArea.addEventListener('dragleave', () => {
-    uploadArea.classList.remove('dragover');
-});
-
-uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFileUpload(files[0]);
-    }
-});
+// Photo upload functionality will be set up in DOMContentLoaded
 
 // File inputs are now created dynamically for better mobile compatibility
 
@@ -5440,9 +5577,7 @@ function triggerDesktopFileInput() {
     input.click();
 }
 
-removeBtn.addEventListener('click', () => {
-    clearPhotoUpload();
-});
+// Remove button event listener will be set up after DOM elements are initialized
 
 function handleFileUpload(file) {
     if (!file.type.startsWith('image/')) {
@@ -6232,15 +6367,39 @@ function displayBeverageInfo(beverage, fromImage = false) {
         </div>
     `;
     
-    // Add favorite button to the beverage card
+    // Add like and favorite buttons to the beverage card
     const beverageKey = Object.keys(beverageDatabase).find(key => beverageDatabase[key] === beverage);
     if (beverageKey) {
+        // Create action buttons container
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'beverage-action-buttons';
+        
+        // Like button
+        const likeBtn = document.createElement('button');
+        likeBtn.className = `like-btn ${isLiked(beverageKey) ? 'liked' : ''}`;
+        likeBtn.setAttribute('data-beverage', beverageKey);
+        likeBtn.innerHTML = `<i class="${isLiked(beverageKey) ? 'fas' : 'far'} fa-thumbs-up"></i> <span class="like-count">${getLikeCount(beverageKey)}</span>`;
+        likeBtn.title = isLiked(beverageKey) ? 'Unlike this drink' : 'Like this drink';
+        likeBtn.onclick = () => {
+            if (auth.isUserAuthenticated()) {
+                if (isLiked(beverageKey)) {
+                    unlikeBeverage(beverageKey);
+                } else {
+                    likeBeverage(beverageKey);
+                }
+            } else {
+                showAuthNotification('Sign up to like drinks!', 'info');
+            }
+        };
+        
+        // Favorite button
         const favoriteBtn = document.createElement('button');
         favoriteBtn.className = `favorite-btn ${isFavorite(beverageKey) ? 'favorited' : ''}`;
         favoriteBtn.setAttribute('data-beverage', beverageKey);
         
         if (auth.isUserAuthenticated()) {
             favoriteBtn.innerHTML = `<i class="${isFavorite(beverageKey) ? 'fas' : 'far'} fa-heart"></i>`;
+            favoriteBtn.title = isFavorite(beverageKey) ? 'Remove from favorites' : 'Add to favorites';
             favoriteBtn.onclick = () => {
                 if (isFavorite(beverageKey)) {
                     removeFromFavorites(beverageKey);
@@ -6256,13 +6415,50 @@ function displayBeverageInfo(beverage, fromImage = false) {
             };
         }
         
-        // Insert the favorite button into the beverage card
-        const beverageInfo = beverageCard.querySelector('.beverage-info');
-        if (beverageInfo) {
-            beverageInfo.style.position = 'relative';
-            beverageInfo.appendChild(favoriteBtn);
+        // Add buttons to container
+        actionButtons.appendChild(likeBtn);
+        actionButtons.appendChild(favoriteBtn);
+        
+        // Insert the action buttons into the beverage card header
+        const beverageHeader = beverageCard.querySelector('.beverage-header');
+        if (beverageHeader) {
+            beverageHeader.appendChild(actionButtons);
         }
     }
+
+    // Add reviews section
+    const reviewsSection = document.createElement('div');
+    reviewsSection.className = 'reviews-section';
+    reviewsSection.innerHTML = `
+        <h3><i class="fas fa-star"></i> Reviews</h3>
+        <div class="reviews-container" id="reviews-container-${beverageKey}">
+            <div class="loading-reviews">Loading reviews...</div>
+        </div>
+        <div class="review-form" id="review-form-${beverageKey}" style="display: none;">
+            <h4>Write a Review</h4>
+            <div class="rating-input">
+                <label>Rating:</label>
+                <div class="star-rating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+            </div>
+            <textarea placeholder="Share your thoughts about this drink..." maxlength="1000"></textarea>
+            <button onclick="submitReview('${beverageKey}')" class="submit-review-btn">
+                <i class="fas fa-paper-plane"></i> Submit Review
+            </button>
+        </div>
+        <button onclick="toggleReviewForm('${beverageKey}')" class="write-review-btn" id="write-review-btn-${beverageKey}">
+            <i class="fas fa-edit"></i> Write a Review
+        </button>
+    `;
+    beverageCard.appendChild(reviewsSection);
+
+    // Load reviews
+    loadReviews(beverageKey);
     
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth' });
@@ -6313,6 +6509,219 @@ function uploadBeveragePhoto() {
     document.body.removeChild(fileInput);
 }
 
+// Review Functions
+async function loadReviews(drinkId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/reviews/drink/${drinkId}`);
+        const data = await response.json();
+        
+        const container = document.getElementById(`reviews-container-${drinkId}`);
+        if (!container) return;
+
+        if (data.success) {
+            displayReviews(drinkId, data.data);
+        } else {
+            container.innerHTML = '<p class="no-reviews">No reviews yet</p>';
+        }
+    } catch (error) {
+        console.error('Error loading reviews:', error);
+        const container = document.getElementById(`reviews-container-${drinkId}`);
+        if (container) {
+            container.innerHTML = '<p class="error-loading">Error loading reviews</p>';
+        }
+    }
+}
+
+function displayReviews(drinkId, reviewData) {
+    const container = document.getElementById(`reviews-container-${drinkId}`);
+    if (!container) return;
+
+    const { reviews, stats } = reviewData;
+
+    if (reviews.length === 0) {
+        container.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review!</p>';
+        return;
+    }
+
+    let reviewsHTML = `
+        <div class="reviews-summary">
+            <div class="average-rating">
+                <span class="rating-number">${stats.average}</span>
+                <div class="stars">
+                    ${generateStars(stats.average)}
+                </div>
+                <span class="review-count">(${stats.count} reviews)</span>
+            </div>
+        </div>
+        <div class="reviews-list">
+    `;
+
+    reviews.forEach(review => {
+        reviewsHTML += `
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <span class="reviewer-name">${review.userId.name}</span>
+                        <div class="review-stars">
+                            ${generateStars(review.rating)}
+                        </div>
+                    </div>
+                    <span class="review-date">${new Date(review.createdAt).toLocaleDateString()}</span>
+                </div>
+                ${review.review ? `<div class="review-text">${review.review}</div>` : ''}
+                <div class="review-actions">
+                    <button onclick="markReviewHelpful('${review._id}')" class="helpful-btn">
+                        <i class="fas fa-thumbs-up"></i> Helpful (${review.helpful})
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    reviewsHTML += '</div>';
+    container.innerHTML = reviewsHTML;
+}
+
+function generateStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    let starsHTML = '';
+
+    for (let i = 1; i <= 5; i++) {
+        if (i <= fullStars) {
+            starsHTML += '<i class="fas fa-star"></i>';
+        } else if (i === fullStars + 1 && hasHalfStar) {
+            starsHTML += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+            starsHTML += '<i class="far fa-star"></i>';
+        }
+    }
+
+    return starsHTML;
+}
+
+function toggleReviewForm(drinkId) {
+    const form = document.getElementById(`review-form-${drinkId}`);
+    const btn = document.getElementById(`write-review-btn-${drinkId}`);
+    
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+        
+        // Setup star rating
+        setupStarRating(drinkId);
+    } else {
+        form.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-edit"></i> Write a Review';
+    }
+}
+
+function setupStarRating(drinkId) {
+    const stars = document.querySelectorAll(`#review-form-${drinkId} .star-rating i`);
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', () => {
+            const rating = parseInt(star.dataset.rating);
+            highlightStars(stars, rating);
+        });
+
+        star.addEventListener('click', () => {
+            selectedRating = parseInt(star.dataset.rating);
+            highlightStars(stars, selectedRating);
+        });
+    });
+
+    document.querySelector(`#review-form-${drinkId} .star-rating`).addEventListener('mouseleave', () => {
+        highlightStars(stars, selectedRating);
+    });
+}
+
+function highlightStars(stars, rating) {
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.className = 'fas fa-star';
+        } else {
+            star.className = 'far fa-star';
+        }
+    });
+}
+
+async function submitReview(drinkId) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Please sign in to write reviews', 'warning');
+        return;
+    }
+
+    const form = document.getElementById(`review-form-${drinkId}`);
+    const stars = form.querySelectorAll('.star-rating i.fas');
+    const textarea = form.querySelector('textarea');
+    
+    const rating = stars.length;
+    const review = textarea.value.trim();
+
+    if (rating === 0) {
+        showNotification('Please select a rating', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/reviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth.api.getToken()}`
+            },
+            body: JSON.stringify({
+                drinkId,
+                rating,
+                review
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Review submitted successfully!', 'success');
+            toggleReviewForm(drinkId);
+            loadReviews(drinkId);
+        } else {
+            showNotification(data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        showNotification('Failed to submit review', 'error');
+    }
+}
+
+async function markReviewHelpful(reviewId) {
+    if (!auth.isUserAuthenticated()) {
+        showAuthNotification('Please sign in to mark reviews as helpful', 'warning');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/reviews/${reviewId}/helpful`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${auth.api.getToken()}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Update the helpful count in the UI
+            const btn = event.target.closest('.helpful-btn');
+            if (btn) {
+                btn.innerHTML = `<i class="fas fa-thumbs-up"></i> Helpful (${data.data.helpful})`;
+            }
+        }
+    } catch (error) {
+        console.error('Error marking review helpful:', error);
+    }
+}
+
 function showError(message) {
     // Create a temporary error message
     const errorDiv = document.createElement('div');
@@ -6348,6 +6757,282 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Available beverages:', Object.keys(beverageDatabase));
 });
 
+// Dashboard Functions
+function showDashboard() {
+    hideAllPages();
+    const dashboardPage = document.getElementById('dashboard-page');
+    
+    if (dashboardPage) {
+        dashboardPage.style.display = 'block';
+        updateDashboardContent();
+    }
+}
+
+function updateDashboardContent() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+
+    const container = document.getElementById('dashboard-container');
+    const emptyDashboard = document.getElementById('empty-dashboard');
+
+    if (!user.stats || (user.stats.searches === 0 && user.stats.favorites === 0)) {
+        container.style.display = 'none';
+        emptyDashboard.style.display = 'flex';
+        return;
+    }
+
+    container.style.display = 'block';
+    emptyDashboard.style.display = 'none';
+
+    container.innerHTML = `
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <i class="fas fa-search"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.stats.searches || 0}</span>
+                    <span class="stat-label">Total Searches</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-heart"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.stats.favorites || 0}</span>
+                    <span class="stat-label">Favorites</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.profile?.preferences?.favoriteDrinks?.length || 0}</span>
+                    <span class="stat-label">Drinks Rated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-sections">
+            <div class="dashboard-section">
+                <h3><i class="fas fa-chart-line"></i> Recent Activity</h3>
+                <div class="recent-activity" id="recent-activity">
+                    <!-- Recent activity will be populated here -->
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h3><i class="fas fa-trophy"></i> Top Favorites</h3>
+                <div class="top-favorites" id="top-favorites">
+                    <!-- Top favorites will be populated here -->
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Populate recent activity
+    populateRecentActivity();
+    
+    // Populate top favorites
+    populateTopFavorites();
+}
+
+function populateRecentActivity() {
+    const recentActivity = document.getElementById('recent-activity');
+    if (!recentActivity) return;
+
+    const user = auth.getCurrentUser();
+    const history = searchHistory.slice(0, 5); // Last 5 searches
+
+    if (history.length === 0) {
+        recentActivity.innerHTML = '<p class="no-activity">No recent activity</p>';
+        return;
+    }
+
+    recentActivity.innerHTML = history.map(item => {
+        const beverage = beverageDatabase[item.beverageKey];
+        if (!beverage) return '';
+        
+        return `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">${beverage.name}</div>
+                    <div class="activity-time">${item.time} - ${item.date}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function populateTopFavorites() {
+    const topFavorites = document.getElementById('top-favorites');
+    if (!topFavorites) return;
+
+    const user = auth.getCurrentUser();
+    const favorites = user.profile?.preferences?.favoriteDrinks || [];
+
+    if (favorites.length === 0) {
+        topFavorites.innerHTML = '<p class="no-favorites">No favorites yet</p>';
+        return;
+    }
+
+    const topFavoritesList = favorites.slice(0, 5).map(drinkKey => {
+        const beverage = beverageDatabase[drinkKey];
+        if (!beverage) return '';
+        
+        return `
+            <div class="favorite-item">
+                <div class="favorite-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="favorite-content">
+                    <div class="favorite-title">${beverage.name}</div>
+                    <div class="favorite-type">${beverage.type} • ${beverage.abv}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    topFavorites.innerHTML = topFavoritesList;
+}
+
+// Dashboard Functions
+function showDashboard() {
+    hideAllPages();
+    const dashboardPage = document.getElementById('dashboard-page');
+    
+    if (dashboardPage) {
+        dashboardPage.style.display = 'block';
+        updateDashboardContent();
+    }
+}
+
+function updateDashboardContent() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+
+    const container = document.getElementById('dashboard-container');
+    const emptyDashboard = document.getElementById('empty-dashboard');
+
+    if (!user.stats || (user.stats.searches === 0 && user.stats.favorites === 0)) {
+        container.style.display = 'none';
+        emptyDashboard.style.display = 'flex';
+        return;
+    }
+
+    container.style.display = 'block';
+    emptyDashboard.style.display = 'none';
+
+    container.innerHTML = `
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <i class="fas fa-search"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.stats.searches || 0}</span>
+                    <span class="stat-label">Total Searches</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-heart"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.stats.favorites || 0}</span>
+                    <span class="stat-label">Favorites</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star"></i>
+                <div class="stat-info">
+                    <span class="stat-value">${user.profile?.preferences?.favoriteDrinks?.length || 0}</span>
+                    <span class="stat-label">Drinks Rated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-sections">
+            <div class="dashboard-section">
+                <h3><i class="fas fa-chart-line"></i> Recent Activity</h3>
+                <div class="recent-activity" id="recent-activity">
+                    <!-- Recent activity will be populated here -->
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h3><i class="fas fa-trophy"></i> Top Favorites</h3>
+                <div class="top-favorites" id="top-favorites">
+                    <!-- Top favorites will be populated here -->
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Populate recent activity
+    populateRecentActivity();
+    
+    // Populate top favorites
+    populateTopFavorites();
+}
+
+function populateRecentActivity() {
+    const recentActivity = document.getElementById('recent-activity');
+    if (!recentActivity) return;
+
+    const user = auth.getCurrentUser();
+    const history = searchHistory.slice(0, 5); // Last 5 searches
+
+    if (history.length === 0) {
+        recentActivity.innerHTML = '<p class="no-activity">No recent activity</p>';
+        return;
+    }
+
+    recentActivity.innerHTML = history.map(item => {
+        const beverage = beverageDatabase[item.beverageKey];
+        if (!beverage) return '';
+        
+        return `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">${beverage.name}</div>
+                    <div class="activity-time">${item.time} - ${item.date}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function populateTopFavorites() {
+    const topFavorites = document.getElementById('top-favorites');
+    if (!topFavorites) return;
+
+    const user = auth.getCurrentUser();
+    const favorites = user.profile?.preferences?.favoriteDrinks || [];
+
+    if (favorites.length === 0) {
+        topFavorites.innerHTML = '<p class="no-favorites">No favorites yet</p>';
+        return;
+    }
+
+    const topFavoritesList = favorites.slice(0, 5).map(drinkKey => {
+        const beverage = beverageDatabase[drinkKey];
+        if (!beverage) return '';
+        
+        return `
+            <div class="favorite-item">
+                <div class="favorite-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="favorite-content">
+                    <div class="favorite-title">${beverage.name}</div>
+                    <div class="favorite-type">${beverage.type} • ${beverage.abv}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    topFavorites.innerHTML = topFavoritesList;
+}
+
 // User Profile Functions
 function showUserProfile() {
     hideAllPages();
@@ -6376,61 +7061,116 @@ function createProfilePage() {
     profilePage.innerHTML = `
         <header class="header">
             <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-            <p>Manage your account and preferences</p>
+            <p>Your Personal Profile & Account Details</p>
         </header>
 
         <main class="main-content">
             <div class="profile-container">
                 <div class="profile-section">
-                    <h3>Account Information</h3>
+                    <h3><i class="fas fa-user-circle"></i> Account Information</h3>
                     <div class="profile-info">
                         <div class="info-item">
-                            <label>Name:</label>
-                            <span id="profile-name"></span>
+                            <label><i class="fas fa-user"></i> Full Name:</label>
+                            <span id="profile-name" class="profile-value"></span>
                         </div>
                         <div class="info-item">
-                            <label>Email:</label>
-                            <span id="profile-email"></span>
+                            <label><i class="fas fa-envelope"></i> Email Address:</label>
+                            <span id="profile-email" class="profile-value"></span>
                         </div>
                         <div class="info-item">
-                            <label>Member Since:</label>
-                            <span id="profile-created"></span>
+                            <label><i class="fas fa-calendar-alt"></i> Member Since:</label>
+                            <span id="profile-created" class="profile-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-clock"></i> Last Active:</label>
+                            <span id="profile-last-active" class="profile-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-id-badge"></i> User ID:</label>
+                            <span id="profile-id" class="profile-value"></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="profile-section">
-                    <h3>Statistics</h3>
+                    <h3><i class="fas fa-user-cog"></i> Personal Details</h3>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <label><i class="fas fa-birthday-cake"></i> Age:</label>
+                            <span id="profile-age" class="profile-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-weight"></i> Weight:</label>
+                            <span id="profile-weight" class="profile-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-ruler-vertical"></i> Height:</label>
+                            <span id="profile-height" class="profile-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-venus-mars"></i> Gender:</label>
+                            <span id="profile-gender" class="profile-value"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3><i class="fas fa-chart-bar"></i> Activity Statistics</h3>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <i class="fas fa-search"></i>
                             <div class="stat-info">
                                 <span class="stat-value" id="profile-searches">0</span>
-                                <span class="stat-label">Searches</span>
+                                <span class="stat-label">Total Searches</span>
                             </div>
                         </div>
                         <div class="stat-card">
                             <i class="fas fa-heart"></i>
                             <div class="stat-info">
                                 <span class="stat-value" id="profile-favorites">0</span>
-                                <span class="stat-label">Favorites</span>
+                                <span class="stat-label">Favorite Drinks</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-star"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-reviews">0</span>
+                                <span class="stat-label">Reviews Written</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-trophy"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-level">New</span>
+                                <span class="stat-label">Member Level</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="profile-section">
-                    <h3>Favorite Drinks</h3>
+                    <h3><i class="fas fa-heart"></i> Your Favorite Drinks</h3>
                     <div class="favorites-list" id="profile-favorites-list">
                         <!-- Favorites will be populated here -->
                     </div>
                 </div>
 
-                <div class="profile-actions">
-                    <button class="profile-btn" onclick="auth.signOut()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Sign Out
-                    </button>
+                <div class="profile-section">
+                    <h3><i class="fas fa-cog"></i> Account Actions</h3>
+                    <div class="profile-actions">
+                        <button class="profile-btn primary" onclick="editProfile()">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                        <button class="profile-btn secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export Data
+                        </button>
+                        <button class="profile-btn danger" onclick="auth.signOut()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -6446,18 +7186,55 @@ function updateProfileContent() {
     // Update basic info
     document.getElementById('profile-name').textContent = user.name;
     document.getElementById('profile-email').textContent = user.email;
-    document.getElementById('profile-created').textContent = new Date(user.createdAt).toLocaleDateString();
+    document.getElementById('profile-created').textContent = new Date(user.createdAt).toLocaleDateString('en-AU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    document.getElementById('profile-last-active').textContent = new Date(user.stats.lastActive).toLocaleDateString('en-AU', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    document.getElementById('profile-id').textContent = user.id;
+    
+    // Update personal details
+    if (user.personalDetails) {
+        document.getElementById('profile-age').textContent = user.personalDetails.age ? `${user.personalDetails.age} years` : 'Not set';
+        document.getElementById('profile-weight').textContent = user.personalDetails.weight ? `${user.personalDetails.weight} kg` : 'Not set';
+        document.getElementById('profile-height').textContent = user.personalDetails.height ? `${user.personalDetails.height} cm` : 'Not set';
+        document.getElementById('profile-gender').textContent = user.personalDetails.gender ? user.personalDetails.gender.charAt(0).toUpperCase() + user.personalDetails.gender.slice(1) : 'Not set';
+    } else {
+        document.getElementById('profile-age').textContent = 'Not set';
+        document.getElementById('profile-weight').textContent = 'Not set';
+        document.getElementById('profile-height').textContent = 'Not set';
+        document.getElementById('profile-gender').textContent = 'Not set';
+    }
     
     // Update stats
-    document.getElementById('profile-searches').textContent = user.stats.searches;
-    document.getElementById('profile-favorites').textContent = user.stats.favorites;
+    document.getElementById('profile-searches').textContent = user.stats.searches || 0;
+    document.getElementById('profile-favorites').textContent = user.stats.favorites || 0;
+    document.getElementById('profile-reviews').textContent = '0'; // Will be updated when reviews are implemented
+    document.getElementById('profile-level').textContent = getMemberLevel(user.stats.searches);
     
     // Update favorites list
     const favoritesList = document.getElementById('profile-favorites-list');
-    const favorites = user.profile.preferences.favoriteDrinks;
+    const favorites = user.profile.preferences.favoriteDrinks || [];
     
     if (favorites.length === 0) {
-        favoritesList.innerHTML = '<p class="empty-state">No favorite drinks yet. Start exploring to add some!</p>';
+        favoritesList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <h3>No favorites yet</h3>
+                <p>Start exploring drinks to add them to your favorites!</p>
+                <button class="start-exploring-btn" onclick="goToHome()">
+                    <i class="fas fa-search"></i>
+                    Start Exploring
+                </button>
+            </div>
+        `;
     } else {
         favoritesList.innerHTML = favorites.map(drinkKey => {
             const drink = beverageDatabase[drinkKey];
@@ -6467,10 +7244,14 @@ function updateProfileContent() {
                         <div class="drink-info">
                             <h4>${drink.name}</h4>
                             <span class="drink-type">${drink.type}</span>
+                            <span class="drink-abv">${drink.abv}% ABV</span>
                         </div>
                         <div class="drink-actions">
-                            <button class="drink-btn" onclick="viewFavorite('${drinkKey}')">
+                            <button class="drink-btn" onclick="viewFavorite('${drinkKey}')" title="View Details">
                                 <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="drink-btn remove" onclick="removeFromFavorites('${drinkKey}')" title="Remove from Favorites">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -6479,4 +7260,1170 @@ function updateProfileContent() {
             return '';
         }).join('');
     }
-} 
+}
+
+// Helper function to determine member level
+function getMemberLevel(searches) {
+    if (searches >= 100) return 'Expert';
+    if (searches >= 50) return 'Enthusiast';
+    if (searches >= 20) return 'Regular';
+    if (searches >= 5) return 'Beginner';
+    return 'New';
+}
+
+// Profile action functions
+function editProfile() {
+    const user = auth.getCurrentUser();
+    if (!user) {
+        showNotification('Please sign in to edit your profile', 'error');
+        return;
+    }
+    
+    // Create edit profile form
+    const editForm = document.createElement('div');
+    editForm.className = 'edit-profile-modal';
+    editForm.innerHTML = `
+        <div class="edit-profile-overlay">
+            <div class="edit-profile-container">
+                <div class="edit-profile-header">
+                    <h3><i class="fas fa-edit"></i> Edit Profile</h3>
+                    <button class="close-edit-btn" onclick="closeEditProfile()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form class="edit-profile-form" id="edit-profile-form">
+                    <div class="form-section">
+                        <h4><i class="fas fa-user"></i> Account Information</h4>
+                        <div class="form-group">
+                            <label for="edit-name">Full Name</label>
+                            <input type="text" id="edit-name" value="${user.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">Email Address</label>
+                            <input type="email" id="edit-email" value="${user.email}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4><i class="fas fa-lock"></i> Security</h4>
+                        <div class="form-group">
+                            <label for="edit-password">New Password (leave blank to keep current)</label>
+                            <input type="password" id="edit-password" placeholder="Enter new password">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-confirm-password">Confirm New Password</label>
+                            <input type="password" id="edit-confirm-password" placeholder="Confirm new password">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4><i class="fas fa-user-cog"></i> Personal Details</h4>
+                        <div class="form-group">
+                            <label for="edit-age">Age</label>
+                            <input type="number" id="edit-age" value="${user.personalDetails?.age || ''}" min="18" max="120" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-weight">Weight (kg)</label>
+                            <input type="number" id="edit-weight" value="${user.personalDetails?.weight || ''}" min="30" max="300" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-height">Height (cm)</label>
+                            <input type="number" id="edit-height" value="${user.personalDetails?.height || ''}" min="100" max="250" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-gender">Gender</label>
+                            <select id="edit-gender" required>
+                                <option value="">Select gender</option>
+                                <option value="male" ${user.personalDetails?.gender === 'male' ? 'selected' : ''}>Male</option>
+                                <option value="female" ${user.personalDetails?.gender === 'female' ? 'selected' : ''}>Female</option>
+                                <option value="other" ${user.personalDetails?.gender === 'other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="edit-profile-actions">
+                        <button type="button" class="cancel-btn" onclick="closeEditProfile()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(editForm);
+    
+    // Add form submission handler
+    document.getElementById('edit-profile-form').addEventListener('submit', handleProfileUpdate);
+}
+
+function closeEditProfile() {
+    const modal = document.querySelector('.edit-profile-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function handleProfileUpdate(event) {
+    event.preventDefault();
+    
+    const user = auth.getCurrentUser();
+    if (!user) {
+        showNotification('Please sign in to update your profile', 'error');
+        return;
+    }
+    
+    // Get form values
+    const name = document.getElementById('edit-name').value.trim();
+    const email = document.getElementById('edit-email').value.trim();
+    const password = document.getElementById('edit-password').value;
+    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    const age = parseInt(document.getElementById('edit-age').value);
+    const weight = parseFloat(document.getElementById('edit-weight').value);
+    const height = parseInt(document.getElementById('edit-height').value);
+    const gender = document.getElementById('edit-gender').value;
+    
+    // Validation
+    if (!name || !email) {
+        showNotification('Name and email are required', 'error');
+        return;
+    }
+    
+    if (password && password !== confirmPassword) {
+        showNotification('Passwords do not match', 'error');
+        return;
+    }
+    
+    if (age < 18 || age > 120) {
+        showNotification('Age must be between 18 and 120', 'error');
+        return;
+    }
+    
+    if (weight < 30 || weight > 300) {
+        showNotification('Weight must be between 30 and 300 kg', 'error');
+        return;
+    }
+    
+    if (height < 100 || height > 250) {
+        showNotification('Height must be between 100 and 250 cm', 'error');
+        return;
+    }
+    
+    if (!gender) {
+        showNotification('Please select your gender', 'error');
+        return;
+    }
+    
+    try {
+        // Prepare update data
+        const updateData = {
+            name,
+            email,
+            personalDetails: {
+                age,
+                weight,
+                height,
+                gender
+            }
+        };
+        
+        // Add password if provided
+        if (password) {
+            updateData.password = password;
+        }
+        
+        // Update profile
+        await auth.updateProfile(updateData);
+        
+        showNotification('Profile updated successfully!', 'success');
+        closeEditProfile();
+        
+        // Refresh profile display
+        updateProfileContent();
+        
+    } catch (error) {
+        showNotification('Failed to update profile: ' + error.message, 'error');
+    }
+}
+
+function exportData() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+    
+    const data = {
+        user: {
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt,
+            stats: user.stats,
+            favorites: user.profile.preferences.favoriteDrinks
+        },
+        exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bevyfinder-data-${user.name}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Data exported successfully!', 'success');
+}
+
+// Night Tracker Functions
+function showTrackingPage() {
+    // Check if user is authenticated
+    if (!auth.isUserAuthenticated()) {
+        showNotification('Please sign in to access the Night Tracker', 'error');
+        showAuthPage();
+        return;
+    }
+    
+    hideAllPages();
+    trackingPage.style.display = 'block';
+    loadTrackingSession();
+    updateTrackingDisplay();
+}
+
+function loadTrackingSession() {
+    const savedSession = localStorage.getItem('bevyfinder_tracking_session');
+    if (savedSession) {
+        currentSession = JSON.parse(savedSession);
+        if (currentSession.isActive) {
+            startSessionTimer();
+        }
+    }
+}
+
+function saveTrackingSession() {
+    localStorage.setItem('bevyfinder_tracking_session', JSON.stringify(currentSession));
+}
+
+function startSession() {
+    currentSession.isActive = true;
+    currentSession.startTime = new Date().toISOString();
+    currentSession.drinks = [];
+    currentSession.totalAlcohol = 0;
+    currentSession.totalCalories = 0;
+    currentSession.totalCarbs = 0;
+
+    currentSession.totalSugar = 0;
+    currentSession.totalFat = 0;
+    
+    saveTrackingSession();
+    startSessionTimer();
+    updateTrackingDisplay();
+    updateSessionButtons();
+}
+
+function endSession() {
+    currentSession.isActive = false;
+    saveTrackingSession();
+    stopSessionTimer();
+    updateTrackingDisplay();
+    updateSessionButtons();
+}
+
+function resetSession() {
+    currentSession = {
+        isActive: false,
+        startTime: null,
+        drinks: [],
+        totalAlcohol: 0,
+        totalCalories: 0,
+        totalCarbs: 0,
+
+        totalSugar: 0,
+        totalFat: 0
+    };
+    
+    saveTrackingSession();
+    stopSessionTimer();
+    updateTrackingDisplay();
+    updateSessionButtons();
+}
+
+function startSessionTimer() {
+    if (currentSession.timerInterval) {
+        clearInterval(currentSession.timerInterval);
+    }
+    
+    currentSession.timerInterval = setInterval(() => {
+        updateSessionTime();
+    }, 1000);
+}
+
+function stopSessionTimer() {
+    if (currentSession.timerInterval) {
+        clearInterval(currentSession.timerInterval);
+        currentSession.timerInterval = null;
+    }
+}
+
+function updateSessionTime() {
+    if (!currentSession.isActive || !currentSession.startTime) {
+        sessionTime.textContent = '00:00:00';
+        return;
+    }
+    
+    const startTime = new Date(currentSession.startTime);
+    const now = new Date();
+    const diff = now - startTime;
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    sessionTime.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateSessionButtons() {
+    if (currentSession.isActive) {
+        startSessionBtn.style.display = 'none';
+        endSessionBtn.style.display = 'inline-block';
+        resetSessionBtn.style.display = 'inline-block';
+    } else {
+        startSessionBtn.style.display = 'inline-block';
+        endSessionBtn.style.display = 'none';
+        resetSessionBtn.style.display = currentSession.drinks.length > 0 ? 'inline-block' : 'none';
+    }
+}
+
+function updateTrackingDisplay() {
+    // Update summary cards
+    totalAlcohol.textContent = currentSession.totalAlcohol.toFixed(1);
+    totalCalories.textContent = Math.round(currentSession.totalCalories);
+    totalCarbs.textContent = Math.round(currentSession.totalCarbs);
+    totalSugar.textContent = Math.round(currentSession.totalSugar);
+    totalFat.textContent = Math.round(currentSession.totalFat);
+    
+    // Update detailed nutrition display
+    const totalCaloriesDetailed = document.getElementById('total-calories-detailed');
+    if (totalCaloriesDetailed) {
+        totalCaloriesDetailed.textContent = Math.round(currentSession.totalCalories);
+    }
+    
+    // Update sobriety status
+    updateSobrietyStatus();
+    
+    // Update drink list
+    updateDrinkList();
+    
+    // Update session buttons
+    updateSessionButtons();
+    
+    // Update session time
+    updateSessionTime();
+}
+
+function updateSobrietyStatus() {
+    const user = auth.getCurrentUser();
+    let status, details, className, bac = 0;
+    
+    if (currentSession.totalAlcohol === 0) {
+        status = 'Sober';
+        details = 'No alcohol consumed';
+        className = 'sober';
+    } else {
+        // Calculate BAC using AI-enhanced algorithm
+        bac = calculateBAC(user);
+        
+        // AI-powered intoxication assessment
+        const intoxicationData = assessIntoxication(bac, user);
+        status = intoxicationData.status;
+        details = intoxicationData.details;
+        className = intoxicationData.className;
+    }
+    
+    sobrietyStatus.textContent = status;
+    sobrietyDetails.textContent = details;
+    
+    // Update BAC display
+    if (bacLevel) {
+        bacLevel.textContent = `BAC: ${(bac * 1000).toFixed(3)}%`;
+        
+        // Color code BAC level based on realistic thresholds
+        if (bac < 0.03) {
+            bacLevel.style.color = '#4CAF50'; // Green - Safe
+        } else if (bac < 0.08) {
+            bacLevel.style.color = '#8BC34A'; // Light Green - Caution
+        } else if (bac < 0.15) {
+            bacLevel.style.color = '#ff9800'; // Orange - Warning
+        } else if (bac < 0.25) {
+            bacLevel.style.color = '#f44336'; // Red - Danger
+        } else if (bac < 0.35) {
+            bacLevel.style.color = '#9c27b0'; // Purple - Critical
+        } else {
+            bacLevel.style.color = '#000000'; // Black - Extreme Danger
+        }
+    }
+    
+    // Update CSS class
+    const sobrietyCard = sobrietyStatus.closest('.summary-card');
+    sobrietyCard.className = `summary-card sobriety-card ${className}`;
+    
+    // Store BAC for other calculations
+    currentSession.currentBAC = bac;
+}
+
+function calculateBAC(user) {
+    if (!user || !user.personalDetails) {
+        // Fallback to simple calculation if no personal details
+        return currentSession.totalAlcohol * 0.02; // Simple fallback
+    }
+    
+    const { age, weight, height, gender } = user.personalDetails;
+    
+    // Calculate time since first drink
+    const sessionStart = currentSession.startTime ? new Date(currentSession.startTime) : new Date();
+    const now = new Date();
+    const hoursElapsed = (now - sessionStart) / (1000 * 60 * 60);
+    
+    // Simplified but realistic BAC calculation
+    // 1 standard drink = 14g pure alcohol
+    const totalAlcoholGrams = currentSession.totalAlcohol * 14;
+    
+    // Widmark factor (r) - standard values
+    const r = gender === 'male' ? 0.68 : 0.55;
+    const weightGrams = weight * 1000;
+    
+    // Widmark formula: BAC = (A / (r * W)) * 100 - (β * t)
+    let bac = (totalAlcoholGrams / (r * weightGrams)) * 100;
+    
+    // Metabolism rate (β) - standard values
+    const metabolismRate = gender === 'male' ? 0.015 : 0.017;
+    bac -= (metabolismRate * hoursElapsed);
+    
+    // Ensure BAC doesn't go below 0
+    return Math.max(0, bac);
+}
+
+function getWidmarkFactor(gender, age, weight, height) {
+    // Realistic Widmark factor calculation
+    let baseFactor = gender === 'male' ? 0.68 : 0.55;
+    
+    // Age adjustments (minimal impact)
+    if (age < 25) baseFactor *= 0.98; // Slightly faster in young adults
+    else if (age > 65) baseFactor *= 1.02; // Slightly slower in elderly
+    
+    // BMI adjustments (minimal impact)
+    const heightMeters = height / 100;
+    const bmi = weight / (heightMeters * heightMeters);
+    if (bmi > 30) baseFactor *= 1.02; // Slight impact for high BMI
+    else if (bmi < 18.5) baseFactor *= 0.98; // Slight impact for low BMI
+    
+    return baseFactor;
+}
+
+function getMetabolismRate(gender, age, weight) {
+    // Realistic metabolism rate calculation
+    let baseRate = gender === 'male' ? 0.015 : 0.017; // Standard rates per hour
+    
+    // Age adjustments (minimal impact)
+    if (age < 25) baseRate *= 1.02; // Slightly faster in young adults
+    else if (age > 65) baseRate *= 0.98; // Slightly slower in elderly
+    
+    // Weight adjustments (minimal impact)
+    if (weight < 60) baseRate *= 1.01; // Very slight impact for lighter people
+    else if (weight > 100) baseRate *= 0.99; // Very slight impact for heavier people
+    
+    return baseRate;
+}
+
+function assessIntoxication(bac, user) {
+    // Realistic intoxication assessment based on real-world BAC levels
+    const { age, gender } = user?.personalDetails || {};
+    
+    let status, details, className;
+    
+    if (bac === 0) {
+        status = 'Sober';
+        details = 'No alcohol detected';
+        className = 'sober';
+    } else if (bac < 0.03) {
+        status = 'Sober';
+        details = 'Minimal effects - safe to drive';
+        className = 'sober';
+    } else if (bac < 0.05) {
+        status = 'Slightly Buzzed';
+        details = 'Mild euphoria - judgment may be slightly impaired';
+        className = 'buzzed';
+    } else if (bac < 0.08) {
+        status = 'Buzzed';
+        details = 'Relaxed, talkative - coordination slightly affected';
+        className = 'buzzed';
+    } else if (bac < 0.10) {
+        status = 'Legally Impaired';
+        details = 'Illegal to drive - judgment and coordination impaired';
+        className = 'drunk';
+    } else if (bac < 0.15) {
+        status = 'Drunk';
+        details = 'Clear impairment - do not drive, seek safe transport';
+        className = 'drunk';
+    } else if (bac < 0.20) {
+        status = 'Very Drunk';
+        details = 'Severe impairment - slurred speech, poor coordination';
+        className = 'very-drunk';
+    } else if (bac < 0.25) {
+        status = 'Heavily Intoxicated';
+        details = 'Confusion, disorientation - medical attention advised';
+        className = 'very-drunk';
+    } else if (bac < 0.35) {
+        status = 'Severely Intoxicated';
+        details = 'Stupor, unconsciousness possible - seek medical help';
+        className = 'very-drunk';
+    } else if (bac < 0.45) {
+        status = 'Dangerously Intoxicated';
+        details = 'Coma, death possible - call emergency services immediately';
+        className = 'very-drunk';
+    } else {
+        status = 'Life-Threatening';
+        details = 'Extreme danger - call emergency services immediately';
+        className = 'very-drunk';
+    }
+    
+    // Add personalized warnings
+    if (age && age < 21) {
+        details += ' (Underage drinking is illegal)';
+    }
+    
+    if (bac >= 0.08) {
+        details += ' - DO NOT DRIVE';
+    } else if (bac >= 0.05) {
+        details += ' - Consider alternative transportation';
+    }
+    
+    // Add health warnings for high BAC
+    if (bac >= 0.20) {
+        details += ' - Seek medical attention if symptoms worsen';
+    }
+    
+    return { status, details, className };
+}
+
+function updateDrinkList() {
+    if (currentSession.drinks.length === 0) {
+        drinkList.style.display = 'none';
+        emptyDrinks.style.display = 'block';
+        return;
+    }
+    
+    drinkList.style.display = 'block';
+    emptyDrinks.style.display = 'none';
+    
+    drinkList.innerHTML = '';
+    
+    currentSession.drinks.forEach((drink, index) => {
+        const drinkItem = document.createElement('div');
+        drinkItem.className = 'drink-item';
+        drinkItem.innerHTML = `
+            <div class="drink-info">
+                <div class="drink-name">${drink.name}</div>
+                <div class="drink-details">
+                    ${drink.servingSize}ml • ${drink.abv}% ABV • ${Math.round(drink.calories)} cal
+                </div>
+                <div class="drink-time">${drink.time}</div>
+            </div>
+            <button class="drink-remove" onclick="removeDrink(${index})">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        drinkList.appendChild(drinkItem);
+    });
+}
+
+function addDrink() {
+    const searchValue = trackingDrinkSearch.value.trim();
+    if (!searchValue) {
+        showNotification('Please enter a drink name', 'error');
+        return;
+    }
+    
+    // Find drink in database
+    const drink = findDrinkByName(searchValue);
+    if (!drink) {
+        showNotification('Drink not found. Please try a different name.', 'error');
+        return;
+    }
+    
+    // Add drink to session
+    const drinkEntry = {
+        name: drink.name,
+        servingSize: drink.servingSize || 330,
+        abv: drink.abv || 5,
+        calories: drink.calories || 150,
+        carbs: drink.carbs || 15,
+        sugar: drink.sugar || 5,
+        fat: drink.fat || 0,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    currentSession.drinks.push(drinkEntry);
+    
+    // Update totals
+    currentSession.totalAlcohol += (drinkEntry.servingSize * drinkEntry.abv / 100) / 10; // Standard drinks
+    currentSession.totalCalories += drinkEntry.calories;
+    currentSession.totalCarbs += drinkEntry.carbs;
+    currentSession.totalSugar += drinkEntry.sugar;
+    currentSession.totalFat += drinkEntry.fat;
+    
+    saveTrackingSession();
+    updateTrackingDisplay();
+    
+    // Clear search
+    trackingDrinkSearch.value = '';
+    hideTrackingSuggestions();
+    
+    showNotification(`Added ${drinkEntry.name}`, 'success');
+}
+
+function removeDrink(index) {
+    const drink = currentSession.drinks[index];
+    
+    // Subtract from totals
+    currentSession.totalAlcohol -= (drink.servingSize * drink.abv / 100) / 10;
+    currentSession.totalCalories -= drink.calories;
+    currentSession.totalCarbs -= drink.carbs;
+    currentSession.totalSugar -= drink.sugar;
+    currentSession.totalFat -= drink.fat;
+    
+    // Remove drink
+    currentSession.drinks.splice(index, 1);
+    
+    saveTrackingSession();
+    updateTrackingDisplay();
+    
+    showNotification(`Removed ${drink.name}`, 'success');
+}
+
+function findDrinkByName(name) {
+    const searchTerm = name.toLowerCase();
+    
+    for (const [key, drink] of Object.entries(beverageDatabase)) {
+        if (drink.name.toLowerCase().includes(searchTerm)) {
+            return { ...drink, key };
+        }
+    }
+    
+    return null;
+}
+
+function showTrackingSuggestions(query) {
+    if (!query.trim()) {
+        hideTrackingSuggestions();
+        return;
+    }
+    
+    const suggestions = [];
+    const searchTerm = query.toLowerCase();
+    
+    for (const [key, drink] of Object.entries(beverageDatabase)) {
+        if (drink.name.toLowerCase().includes(searchTerm)) {
+            suggestions.push({ ...drink, key });
+        }
+        
+        if (suggestions.length >= 5) break;
+    }
+    
+    if (suggestions.length > 0) {
+        trackingDrinkSuggestions.innerHTML = '';
+        suggestions.forEach(drink => {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'suggestion-item';
+            suggestion.textContent = drink.name;
+            suggestion.onclick = () => {
+                trackingDrinkSearch.value = drink.name;
+                hideTrackingSuggestions();
+            };
+            trackingDrinkSuggestions.appendChild(suggestion);
+        });
+        trackingDrinkSuggestions.style.display = 'block';
+    } else {
+        hideTrackingSuggestions();
+    }
+}
+
+function hideTrackingSuggestions() {
+    trackingDrinkSuggestions.style.display = 'none';
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function showAuthPage() {
+    hideAllPages();
+    const authPage = document.getElementById('auth-page');
+    if (authPage) {
+        authPage.style.display = 'block';
+    }
+}
+
+// Profile Menu Functions
+function toggleProfileMenu() {
+    const profileMenu = document.getElementById('profile-menu');
+    const isVisible = profileMenu.style.display !== 'none';
+    
+    if (isVisible) {
+        profileMenu.style.display = 'none';
+    } else {
+        profileMenu.style.display = 'block';
+        updateProfileMenuContent();
+    }
+}
+
+function updateProfileMenuContent() {
+    const username = document.getElementById('profile-menu-username');
+    const signinBtn = document.getElementById('profile-menu-signin');
+    const signupBtn = document.getElementById('profile-menu-signup');
+    const profileBtn = document.getElementById('profile-menu-profile');
+    const signoutBtn = document.getElementById('profile-menu-signout');
+    
+    if (auth.isAuthenticated && auth.currentUser) {
+        username.textContent = auth.currentUser.name;
+        signinBtn.style.display = 'none';
+        signupBtn.style.display = 'none';
+        profileBtn.style.display = 'block';
+        signoutBtn.style.display = 'block';
+    } else {
+        username.textContent = 'Guest';
+        signinBtn.style.display = 'block';
+        signupBtn.style.display = 'block';
+        profileBtn.style.display = 'none';
+        signoutBtn.style.display = 'none';
+    }
+}
+
+// Pinboard Dashboard Functions
+function showFeaturedPage() {
+    hideAllPages();
+    const featuredPage = document.getElementById('featured-page');
+    if (featuredPage) {
+        featuredPage.style.display = 'flex';
+        loadFeaturedDrinks();
+    } else {
+        showNotification('Featured page coming soon!', 'info');
+    }
+}
+
+function showFriendsPage() {
+    showNotification('Friends page coming soon!', 'info');
+}
+
+function showSettings() {
+    showNotification('Settings page coming soon!', 'info');
+}
+
+function showAbout() {
+    showNotification('About page coming soon!', 'info');
+}
+
+// Featured page functionality
+async function loadFeaturedDrinks() {
+    try {
+        // Get like counts for all drinks
+        const likeCounts = JSON.parse(localStorage.getItem('bevyfinder_like_counts') || '{}');
+        
+        // Sort drinks by like count (descending)
+        const sortedDrinks = Object.entries(likeCounts)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10) // Top 10
+            .map(([beverageKey, likeCount]) => ({
+                beverageKey,
+                likeCount,
+                beverage: beverageDatabase[beverageKey]
+            }))
+            .filter(item => item.beverage); // Only include drinks that exist in database
+
+        displayFeaturedDrinks(sortedDrinks);
+    } catch (error) {
+        console.error('Error loading featured drinks:', error);
+        showNotification('Failed to load featured drinks', 'error');
+    }
+}
+
+function displayFeaturedDrinks(featuredDrinks) {
+    const featuredContainer = document.getElementById('featured-container');
+    if (!featuredContainer) return;
+
+    if (featuredDrinks.length === 0) {
+        featuredContainer.innerHTML = `
+            <div class="empty-featured">
+                <div class="empty-state">
+                    <i class="fas fa-fire"></i>
+                    <h3>No Featured Drinks Yet</h3>
+                    <p>Start liking drinks to see them featured here!</p>
+                    <button class="start-exploring-btn" onclick="goToHome()">
+                        <i class="fas fa-search"></i>
+                        Start Exploring
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    featuredContainer.innerHTML = featuredDrinks.map((item, index) => `
+        <div class="featured-card" onclick="viewFeaturedDrink('${item.beverageKey}')">
+            <div class="featured-rank">#${index + 1}</div>
+            <div class="featured-info">
+                <h3>${item.beverage.name}</h3>
+                <p class="featured-type">${item.beverage.type}</p>
+                <p class="featured-description">${item.beverage.description.substring(0, 100)}${item.beverage.description.length > 100 ? '...' : ''}</p>
+                <div class="featured-stats">
+                    <span class="like-count-display">
+                        <i class="fas fa-thumbs-up"></i> ${item.likeCount} likes
+                    </span>
+                    <span class="abv-display">
+                        <i class="fas fa-wine-bottle"></i> ${item.beverage.abv || 'N/A'}% ABV
+                    </span>
+                </div>
+            </div>
+            <div class="featured-actions">
+                <button class="like-btn ${isLiked(item.beverageKey) ? 'liked' : ''}" 
+                        onclick="event.stopPropagation(); ${isLiked(item.beverageKey) ? 'unlikeBeverage' : 'likeBeverage'}('${item.beverageKey}')">
+                    <i class="${isLiked(item.beverageKey) ? 'fas' : 'far'} fa-thumbs-up"></i>
+                </button>
+                <button class="favorite-btn ${isFavorite(item.beverageKey) ? 'favorited' : ''}" 
+                        onclick="event.stopPropagation(); ${isFavorite(item.beverageKey) ? 'removeFromFavorites' : 'addToFavorites'}('${item.beverageKey}')">
+                    <i class="${isFavorite(item.beverageKey) ? 'fas' : 'far'} fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewFeaturedDrink(beverageKey) {
+    const beverage = beverageDatabase[beverageKey];
+    if (beverage) {
+        goToHome();
+        setTimeout(() => {
+            displayBeverageInfo(beverage);
+        }, 100);
+    }
+}
+
+// Profile Functions
+function signOut() {
+    if (auth) {
+        auth.signOut();
+        showNotification('Signed out successfully!', 'success');
+        // Close profile menu
+        const profileMenu = document.getElementById('profile-menu');
+        if (profileMenu) {
+            profileMenu.style.display = 'none';
+        }
+    }
+}
+
+function showProfilePage() {
+    showNotification('Profile page coming soon!', 'info');
+    // Close profile menu
+    const profileMenu = document.getElementById('profile-menu');
+    if (profileMenu) {
+        profileMenu.style.display = 'none';
+    }
+}
+
+
+
+// Initialize authentication system
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+    console.log('DOM Content Loaded - Initializing app...');
+    
+    // Initialize DOM elements
+    welcomePage = document.getElementById('welcome-page');
+    mainApp = document.getElementById('main-app');
+    startBtn = document.getElementById('start-btn');
+    
+    console.log('DOM Elements found:', {
+        welcomePage: !!welcomePage,
+        mainApp: !!mainApp,
+        startBtn: !!startBtn
+    });
+    tabBtns = document.querySelectorAll('.tab-btn');
+    tabContents = document.querySelectorAll('.tab-content');
+    beverageNameInput = document.getElementById('beverage-name');
+    searchBtn = document.getElementById('search-btn');
+    suggestions = document.getElementById('suggestions');
+    uploadArea = document.getElementById('upload-area');
+    previewArea = document.getElementById('preview-area');
+    previewImage = document.getElementById('preview-image');
+    removeBtn = document.getElementById('remove-btn');
+    resultsSection = document.getElementById('results-section');
+    beverageCard = document.getElementById('beverage-card');
+    uploadBtn = document.getElementById('upload-btn');
+    
+    // Menu and Sidebar Elements
+    menuBtn = document.getElementById('menu-btn');
+    sidebar = document.getElementById('sidebar');
+    closeMenuBtn = document.getElementById('close-menu-btn');
+    sidebarOverlay = document.getElementById('sidebar-overlay');
+    sidebarBtns = document.querySelectorAll('.sidebar-btn');
+    
+    console.log('Menu Elements found:', {
+        menuBtn: !!menuBtn,
+        sidebar: !!sidebar,
+        closeMenuBtn: !!closeMenuBtn,
+        sidebarOverlay: !!sidebarOverlay,
+        sidebarBtns: sidebarBtns.length
+    });
+    
+    // Favorites Elements
+    favoritesPage = document.getElementById('favorites-page');
+    favoritesContainer = document.getElementById('favorites-container');
+    emptyFavorites = document.getElementById('empty-favorites');
+    
+    // History Elements
+    historyPage = document.getElementById('history-page');
+    historyContainer = document.getElementById('history-container');
+    emptyHistory = document.getElementById('empty-history');
+    historyActions = document.getElementById('history-actions');
+    
+    // Tracking Elements
+    trackingPage = document.getElementById('tracking-page');
+    startSessionBtn = document.getElementById('start-session-btn');
+    endSessionBtn = document.getElementById('end-session-btn');
+    resetSessionBtn = document.getElementById('reset-session-btn');
+    sessionTime = document.getElementById('session-time');
+    totalAlcohol = document.getElementById('total-alcohol');
+    totalCalories = document.getElementById('total-calories');
+    totalCarbs = document.getElementById('total-carbs');
+    totalProtein = document.getElementById('total-protein');
+    totalSugar = document.getElementById('total-sugar');
+    totalFat = document.getElementById('total-fat');
+    sobrietyStatus = document.getElementById('sobriety-status');
+    sobrietyDetails = document.getElementById('sobriety-details');
+    bacLevel = document.getElementById('bac-level');
+    trackingDrinkSearch = document.getElementById('tracking-drink-search');
+    addDrinkBtn = document.getElementById('add-drink-btn');
+    trackingDrinkSuggestions = document.getElementById('tracking-drink-suggestions');
+    drinkList = document.getElementById('drink-list');
+    emptyDrinks = document.getElementById('empty-drinks');
+    safetyTips = document.getElementById('safety-tips');
+    
+    // Set up event listeners
+    console.log('Setting up event listeners...');
+    
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const profileMenu = document.getElementById('profile-menu');
+        const profileButtons = document.querySelectorAll('.profile-btn-header');
+        
+        let isProfileButton = false;
+        profileButtons.forEach(btn => {
+            if (btn.contains(event.target)) {
+                isProfileButton = true;
+            }
+        });
+        
+        if (!isProfileButton && profileMenu && !profileMenu.contains(event.target)) {
+            profileMenu.style.display = 'none';
+        }
+    });
+    
+    if (startBtn) {
+        console.log('Adding click listener to start button');
+        startBtn.addEventListener('click', showMainApp);
+    } else {
+        console.error('Start button not found!');
+    }
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', searchBeverage);
+    }
+    
+    if (beverageNameInput) {
+        beverageNameInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                showSuggestions(query);
+            }, 300);
+        });
+        
+        beverageNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                searchBeverage();
+            }
+        });
+    }
+    
+    // Menu Event Listeners
+    if (menuBtn) {
+        console.log('Adding click listener to menu button');
+        menuBtn.addEventListener('click', openMenu);
+    } else {
+        console.error('Menu button not found!');
+    }
+    
+    if (closeMenuBtn) {
+        closeMenuBtn.addEventListener('click', closeMenu);
+    }
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeMenu);
+    }
+    
+    // Sidebar button event listeners
+    sidebarBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            handleSidebarButtonClick(btn.id);
+        });
+    });
+    
+    // Tab switching functionality
+    if (tabBtns && tabBtns.length > 0) {
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                btn.classList.add('active');
+                const targetContent = document.getElementById(`${targetTab}-tab`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+                
+                // Clear previous results
+                clearResults();
+                
+                // Track analytics
+                if (typeof analytics !== 'undefined') {
+                    analytics.trackFeature('tab_switch', targetTab);
+                }
+                
+                console.log(`Switched to ${targetTab} tab`);
+            });
+        });
+    }
+    
+    // Photo upload functionality
+    if (uploadArea) {
+        uploadArea.addEventListener('click', () => {
+            triggerFileInput();
+        });
+        
+        // Mobile-specific touch events
+        uploadArea.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const photoInput = document.getElementById('photo-input');
+            if (photoInput) photoInput.click();
+        }, { passive: false });
+        
+        uploadArea.addEventListener('touchend', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+        
+        // Desktop drag and drop events
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+    }
+    
+    // Remove button functionality
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            clearPhotoUpload();
+        });
+    }
+    
+    // Session control buttons
+    if (startSessionBtn) {
+        startSessionBtn.addEventListener('click', startSession);
+    }
+    if (endSessionBtn) {
+        endSessionBtn.addEventListener('click', endSession);
+    }
+    if (resetSessionBtn) {
+        resetSessionBtn.addEventListener('click', resetSession);
+    }
+    
+    // Add drink button
+    if (addDrinkBtn) {
+        addDrinkBtn.addEventListener('click', addDrink);
+    }
+    
+    // Drink search input
+    if (trackingDrinkSearch) {
+        trackingDrinkSearch.addEventListener('input', (e) => {
+            showTrackingSuggestions(e.target.value);
+        });
+        
+        trackingDrinkSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addDrink();
+            }
+        });
+        
+        trackingDrinkSearch.addEventListener('blur', () => {
+            setTimeout(hideTrackingSuggestions, 200);
+        });
+    }
+    
+    console.log('App initialized successfully!');
+    } catch (error) {
+        console.error('Error during app initialization:', error);
+    }
+});
+
+// Final test - if you see this, the script loaded completely
+console.log('Script.js finished loading!');

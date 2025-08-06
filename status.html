@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BevyFinder Status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .url { 
+            background: rgba(255, 255, 255, 0.2); 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍺 BevyFinder Status</h1>
+        
+        <div class="status info">
+            <h3>📱 Mobile Access URLs</h3>
+            <div class="url">Main App: http://192.168.4.36:8080</div>
+            <div class="url">Test Page: http://192.168.4.36:8080/simple-test.html</div>
+            <div class="url">Status Page: http://192.168.4.36:8080/status.html</div>
+        </div>
+        
+        <div class="status info">
+            <h3>🔑 Login Credentials</h3>
+            <div class="url">Email: test3@example.com</div>
+            <div class="url">Password: password123</div>
+        </div>
+        
+        <button onclick="testAll()">Test All Connections</button>
+        <button onclick="testLogin()">Test Login</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        async function testAll() {
+            addResult('Testing all connections...', 'info');
+            
+            // Test frontend server
+            try {
+                const response = await fetch('http://192.168.4.36:8080/');
+                if (response.ok) {
+                    addResult('✅ Frontend server (port 8080) is working', 'success');
+                } else {
+                    addResult(`❌ Frontend server failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Frontend server error: ${error.message}`, 'error');
+            }
+            
+            // Test backend server
+            try {
+                const response = await fetch('http://192.168.4.36:3000/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Backend server (port 3000) is working: ${data.message}`, 'success');
+                } else {
+                    addResult(`❌ Backend server failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Backend server error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            addResult('Testing login with test3@example.com...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Login successful! Welcome ${data.data.user.name}`, 'success');
+                } else {
+                    const data = await response.json();
+                    addResult(`❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(testAll, 1000);
+        });
+    </script>
+</body>
+</html> 

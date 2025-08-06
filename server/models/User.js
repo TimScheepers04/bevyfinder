@@ -23,6 +23,28 @@ const userSchema = new mongoose.Schema({
         minlength: [6, 'Password must be at least 6 characters long'],
         select: false // Don't include password in queries by default
     },
+    personalDetails: {
+        age: {
+            type: Number,
+            min: [18, 'Must be at least 18 years old'],
+            max: [120, 'Age cannot exceed 120 years']
+        },
+        weight: {
+            type: Number,
+            min: [30, 'Weight must be at least 30 kg'],
+            max: [300, 'Weight cannot exceed 300 kg']
+        },
+        height: {
+            type: Number,
+            min: [100, 'Height must be at least 100 cm'],
+            max: [250, 'Height cannot exceed 250 cm']
+        },
+        gender: {
+            type: String,
+            enum: ['male', 'female', 'other'],
+            required: false
+        }
+    },
     profile: {
         avatar: {
             type: String,
@@ -40,6 +62,10 @@ const userSchema = new mongoose.Schema({
         },
         preferences: {
             favoriteDrinks: [{
+                type: String,
+                ref: 'Drink'
+            }],
+            likedDrinks: [{
                 type: String,
                 ref: 'Drink'
             }],
@@ -172,8 +198,25 @@ userSchema.methods.trackSearch = function() {
 };
 
 // Method to update profile
-userSchema.methods.updateProfile = function(updates) {
-    Object.assign(this, updates);
+userSchema.methods.updateProfile = async function(updates) {
+    // Handle email change - check if new email is already taken
+    if (updates.email && updates.email !== this.email) {
+        const existingUser = await this.constructor.findByEmail(updates.email);
+        if (existingUser) {
+            throw new Error('Email is already in use');
+        }
+    }
+    
+    // Update fields
+    if (updates.name) this.name = updates.name;
+    if (updates.email) this.email = updates.email.toLowerCase();
+    if (updates.password) this.password = updates.password; // Will be hashed by pre-save middleware
+    if (updates.personalDetails) this.personalDetails = updates.personalDetails;
+    if (updates.profile) this.profile = { ...this.profile, ...updates.profile };
+    
+    // Update last active
+    this.stats.lastActive = new Date();
+    
     return this.save();
 };
 

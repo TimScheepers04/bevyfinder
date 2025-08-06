@@ -41,7 +41,7 @@ router.post('/register', [
             });
         }
 
-        const { name, email, password } = req.body;
+        const { name, email, password, personalDetails } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findByEmail(email);
@@ -56,7 +56,8 @@ router.post('/register', [
         const user = new User({
             name,
             email,
-            password
+            password,
+            personalDetails
         });
 
         await user.save();
@@ -168,10 +169,18 @@ router.post('/login', [
 // @access  Private
 router.get('/me', protect, async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
         res.json({
             success: true,
             data: {
-                user: req.user.getPublicProfile()
+                user: user.getPublicProfile()
             }
         });
     } catch (error) {
@@ -186,35 +195,27 @@ router.get('/me', protect, async (req, res) => {
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 // @access  Private
-router.put('/profile', [
-    protect,
-    body('name')
-        .optional()
-        .trim()
-        .isLength({ min: 2, max: 50 })
-        .withMessage('Name must be between 2 and 50 characters'),
-    body('profile.bio')
-        .optional()
-        .isLength({ max: 500 })
-        .withMessage('Bio cannot exceed 500 characters'),
-    body('profile.location')
-        .optional()
-        .isLength({ max: 100 })
-        .withMessage('Location cannot exceed 100 characters')
-], async (req, res) => {
+router.put('/profile', protect, async (req, res) => {
     try {
-        // Check for validation errors
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
                 success: false,
-                message: 'Validation error',
-                errors: errors.array()
+                message: 'User not found'
             });
         }
 
-        const updates = req.body;
-        const user = await req.user.updateProfile(updates);
+        // Update allowed fields
+        const { name, profile } = req.body;
+        if (name) user.name = name;
+        if (profile) {
+            if (profile.preferences) user.profile.preferences = { ...user.profile.preferences, ...profile.preferences };
+            if (profile.avatar) user.profile.avatar = profile.avatar;
+            if (profile.bio) user.profile.bio = profile.bio;
+            if (profile.location) user.profile.location = profile.location;
+        }
+
+        await user.save();
 
         res.json({
             success: true,
@@ -233,14 +234,12 @@ router.put('/profile', [
 });
 
 // @route   POST /api/auth/logout
-// @desc    Logout user (client-side token removal)
+// @desc    Logout user
 // @access  Private
 router.post('/logout', protect, async (req, res) => {
     try {
-        // Update last active
-        req.user.stats.lastActive = new Date();
-        await req.user.save();
-
+        // In a real app, you might want to blacklist the token
+        // For now, we'll just return success
         res.json({
             success: true,
             message: 'Logged out successfully'
@@ -259,8 +258,16 @@ router.post('/logout', protect, async (req, res) => {
 // @access  Private
 router.post('/refresh', protect, async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
         // Generate new token
-        const token = generateToken(req.user._id);
+        const token = generateToken(user._id);
 
         res.json({
             success: true,

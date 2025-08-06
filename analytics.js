@@ -1,5 +1,6 @@
-// BevyFinder Analytics Module
+// BevyFinder Analytics Module v1.0.3
 // This module provides analytics tracking for the beverage app
+console.log('Analytics.js v1.0.3 loaded successfully!');
 
 class BevyFinderAnalytics {
     constructor() {
@@ -119,8 +120,14 @@ class BevyFinderAnalytics {
         localStorage.setItem('bevyfinder_analytics_events', JSON.stringify(events));
     }
 
-    // Upload stored events to backend
+    // Upload stored events to backend (disabled for now)
     async uploadStoredEvents() {
+        // Skip upload for now - just store events locally
+        // This prevents the "Failed to fetch" error
+        return;
+        
+        // Uncomment below when you have a backend endpoint set up
+        /*
         const events = JSON.parse(localStorage.getItem('bevyfinder_analytics_events') || '[]');
         if (events.length === 0) return;
 
@@ -142,6 +149,7 @@ class BevyFinderAnalytics {
         } catch (error) {
             console.error('Analytics: Failed to upload events', error);
         }
+        */
     }
 
     // Send to Google Analytics (if you want to use GA4)
@@ -170,19 +178,14 @@ class BevyFinderAnalytics {
 // Create global analytics instance
 const analytics = new BevyFinderAnalytics();
 
-// Upload stored events when page loads
+// Initialize analytics when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Upload any stored events
-    analytics.uploadStoredEvents();
-    
     // Track initial page view
     analytics.trackPageView('welcome');
 });
 
-// Upload events before page unload
-window.addEventListener('beforeunload', () => {
-    analytics.uploadStoredEvents();
-});
+// Note: Event upload is disabled for now to prevent "Failed to fetch" errors
+// Events are still stored locally in localStorage
 
 // Export for use in other files
 window.BevyFinderAnalytics = BevyFinderAnalytics;

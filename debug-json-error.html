@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug JSON Error - BevyFinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .response-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug JSON Error</h1>
+        <p>This page will help identify exactly where the "Invalid JSON response" error is coming from.</p>
+        
+        <!-- Direct API Test -->
+        <div class="test-section">
+            <h3>🔗 Direct API Test</h3>
+            <p>Testing direct connection to the API without any smart detection:</p>
+            <button class="btn" onclick="testDirectAPI()">Test Direct API (192.168.4.36:3000)</button>
+            <button class="btn" onclick="testLocalhostAPI()">Test Localhost API</button>
+            <button class="btn" onclick="testProductionAPI()">Test Production API</button>
+            <div id="direct-status" class="status info hidden"></div>
+            <div id="direct-response" class="response-box hidden"></div>
+        </div>
+        
+        <!-- Smart Detection Test -->
+        <div class="test-section">
+            <h3>🧠 Smart Detection Test</h3>
+            <p>Testing the smart API URL detection system:</p>
+            <button class="btn" onclick="testSmartDetection()">Test Smart Detection</button>
+            <button class="btn" onclick="testAllEndpoints()">Test All Endpoints</button>
+            <div id="smart-status" class="status info hidden"></div>
+            <div id="smart-response" class="response-box hidden"></div>
+        </div>
+        
+        <!-- Login Test -->
+        <div class="test-section">
+            <h3>🔐 Login Test</h3>
+            <p>Testing login with different API endpoints:</p>
+            <button class="btn" onclick="testLoginDirect()">Login (Direct)</button>
+            <button class="btn" onclick="testLoginSmart()">Login (Smart)</button>
+            <button class="btn" onclick="testLoginMainApp()">Login (Main App Method)</button>
+            <div id="login-status" class="status info hidden"></div>
+            <div id="login-response" class="response-box hidden"></div>
+        </div>
+        
+        <!-- Current Location Info -->
+        <div class="test-section">
+            <h3>📍 Current Location</h3>
+            <div id="location-info" class="log"></div>
+        </div>
+        
+        <!-- Detailed Log -->
+        <div class="test-section">
+            <h3>📋 Detailed Log</h3>
+            <div id="detailed-log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('detailed-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+            element.classList.remove('hidden');
+        }
+        
+        function showResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.textContent = response;
+            element.classList.remove('hidden');
+        }
+        
+        function updateLocationInfo() {
+            const info = `Current Location:
+Hostname: ${window.location.hostname}
+Protocol: ${window.location.protocol}
+Port: ${window.location.port || '80/443'}
+Full URL: ${window.location.href}
+User Agent: ${navigator.userAgent}`;
+            
+            document.getElementById('location-info').textContent = info;
+        }
+        
+        async function testDirectAPI() {
+            log('🧪 Testing direct API connection...');
+            showStatus('direct-status', 'Testing...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const text = await response.text();
+                log(`📡 Response Status: ${response.status} ${response.statusText}`);
+                log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+                log(`📡 Response Text: ${text.substring(0, 500)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    showStatus('direct-status', `✅ Direct API Working: ${data.message}`, 'success');
+                    showResponse('direct-response', JSON.stringify(data, null, 2));
+                } catch (e) {
+                    showStatus('direct-status', `❌ JSON Parse Error: ${e.message}`, 'error');
+                    showResponse('direct-response', text);
+                }
+            } catch (error) {
+                showStatus('direct-status', `❌ Network Error: ${error.message}`, 'error');
+                log(`❌ Network Error: ${error.message}`);
+            }
+        }
+        
+        async function testLocalhostAPI() {
+            log('🧪 Testing localhost API...');
+            showStatus('direct-status', 'Testing localhost...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const text = await response.text();
+                log(`📡 Localhost Response: ${response.status} - ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    showStatus('direct-status', `✅ Localhost API Working: ${data.message}`, 'success');
+                } catch (e) {
+                    showStatus('direct-status', `❌ Localhost JSON Error: ${e.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('direct-status', `❌ Localhost Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testProductionAPI() {
+            log('🧪 Testing production API...');
+            showStatus('direct-status', 'Testing production...', 'info');
+            
+            try {
+                const response = await fetch('https://bevyfinder.com/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const text = await response.text();
+                log(`📡 Production Response: ${response.status} - ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    showStatus('direct-status', `✅ Production API Working: ${data.message}`, 'success');
+                } catch (e) {
+                    showStatus('direct-status', `❌ Production JSON Error: ${e.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('direct-status', `❌ Production Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSmartDetection() {
+            log('🧪 Testing smart detection...');
+            showStatus('smart-status', 'Testing smart detection...', 'info');
+            
+            // Copy the smart detection logic from the main app
+            const currentHost = window.location.hostname;
+            const currentProtocol = window.location.protocol;
+            const currentPort = window.location.port;
+            
+            log(`🔍 Current location: ${currentProtocol}//${currentHost}:${currentPort}`);
+            
+            let detectedAPI;
+            
+            if (currentHost === 'localhost' || currentHost === '127.0.0.1' || 
+                currentHost.startsWith('192.168.') || currentHost.startsWith('10.') || 
+                currentHost.startsWith('172.')) {
+                
+                detectedAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                log(`🏠 Detected local API: ${detectedAPI}`);
+            } else if (currentHost.includes('bevyfinder.com') || currentHost.includes('netlify.app') || 
+                       currentHost.includes('vercel.app') || currentHost.includes('github.io')) {
+                
+                detectedAPI = 'https://bevyfinder.com/api';
+                log(`🌐 Detected production API: ${detectedAPI}`);
+            } else {
+                detectedAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                log(`🔄 Detected fallback API: ${detectedAPI}`);
+            }
+            
+            try {
+                const response = await fetch(`${detectedAPI.replace('/api', '')}/health`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const text = await response.text();
+                log(`📡 Smart Detection Response: ${response.status} - ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    showStatus('smart-status', `✅ Smart Detection Working: ${data.message}`, 'success');
+                    showResponse('smart-response', `Detected API: ${detectedAPI}\n\nResponse: ${JSON.stringify(data, null, 2)}`);
+                } catch (e) {
+                    showStatus('smart-status', `❌ Smart Detection JSON Error: ${e.message}`, 'error');
+                    showResponse('smart-response', `Detected API: ${detectedAPI}\n\nRaw Response: ${text}`);
+                }
+            } catch (error) {
+                showStatus('smart-status', `❌ Smart Detection Network Error: ${error.message}`, 'error');
+                log(`❌ Smart Detection Error: ${error.message}`);
+            }
+        }
+        
+        async function testAllEndpoints() {
+            log('🧪 Testing all possible endpoints...');
+            
+            const endpoints = [
+                'http://192.168.4.36:3000',
+                'http://localhost:3000',
+                'https://bevyfinder.com',
+                'http://127.0.0.1:3000',
+                `${window.location.protocol}//${window.location.hostname}:3000`
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    log(`🔍 Testing: ${endpoint}/health`);
+                    const response = await fetch(`${endpoint}/health`, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    const text = await response.text();
+                    
+                    if (response.ok) {
+                        try {
+                            const data = JSON.parse(text);
+                            log(`✅ Working: ${endpoint} - ${data.message}`);
+                        } catch (e) {
+                            log(`⚠️ HTML Response: ${endpoint} - ${text.substring(0, 100)}...`);
+                        }
+                    } else {
+                        log(`❌ Failed: ${endpoint} - ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    log(`❌ Error: ${endpoint} - ${error.message}`);
+                }
+            }
+        }
+        
+        async function testLoginDirect() {
+            log('🧪 Testing direct login...');
+            showStatus('login-status', 'Testing direct login...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const text = await response.text();
+                log(`📡 Login Response: ${response.status} - ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        showStatus('login-status', `✅ Direct Login Success: ${data.data.user.name}`, 'success');
+                        showResponse('login-response', JSON.stringify(data, null, 2));
+                    } else {
+                        showStatus('login-status', `❌ Direct Login Failed: ${data.message}`, 'error');
+                    }
+                } catch (e) {
+                    showStatus('login-status', `❌ Login JSON Error: ${e.message}`, 'error');
+                    showResponse('login-response', text);
+                }
+            } catch (error) {
+                showStatus('login-status', `❌ Login Network Error: ${error.message}`, 'error');
+                log(`❌ Login Error: ${error.message}`);
+            }
+        }
+        
+        async function testLoginSmart() {
+            log('🧪 Testing smart login...');
+            showStatus('login-status', 'Testing smart login...', 'info');
+            
+            // Use the same smart detection logic
+            const currentHost = window.location.hostname;
+            const currentProtocol = window.location.protocol;
+            let detectedAPI;
+            
+            if (currentHost === 'localhost' || currentHost === '127.0.0.1' || 
+                currentHost.startsWith('192.168.') || currentHost.startsWith('10.') || 
+                currentHost.startsWith('172.')) {
+                detectedAPI = `${currentProtocol}//${currentHost}:3000/api`;
+            } else if (currentHost.includes('bevyfinder.com')) {
+                detectedAPI = 'https://bevyfinder.com/api';
+            } else {
+                detectedAPI = `${currentProtocol}//${currentHost}:3000/api`;
+            }
+            
+            try {
+                const response = await fetch(`${detectedAPI}/auth/login`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const text = await response.text();
+                log(`📡 Smart Login Response: ${response.status} - ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        showStatus('login-status', `✅ Smart Login Success: ${data.data.user.name}`, 'success');
+                        showResponse('login-response', `Detected API: ${detectedAPI}\n\nResponse: ${JSON.stringify(data, null, 2)}`);
+                    } else {
+                        showStatus('login-status', `❌ Smart Login Failed: ${data.message}`, 'error');
+                    }
+                } catch (e) {
+                    showStatus('login-status', `❌ Smart Login JSON Error: ${e.message}`, 'error');
+                    showResponse('login-response', `Detected API: ${detectedAPI}\n\nRaw Response: ${text}`);
+                }
+            } catch (error) {
+                showStatus('login-status', `❌ Smart Login Network Error: ${error.message}`, 'error');
+                log(`❌ Smart Login Error: ${error.message}`);
+            }
+        }
+        
+        async function testLoginMainApp() {
+            log('🧪 Testing main app login method...');
+            showStatus('login-status', 'Testing main app method...', 'info');
+            
+            // Copy the exact login method from the main app
+            try {
+                const baseURL = 'http://192.168.4.36:3000/api';
+                const url = `${baseURL}/auth/login`;
+                
+                log(`🌐 API Request: POST ${url}`);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123',
+                        rememberMe: false
+                    })
+                });
+                
+                const text = await response.text();
+                log(`📡 API Response: ${response.status} ${response.statusText}`);
+                log(`📡 Response Text: ${text.substring(0, 300)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        showStatus('login-status', `✅ Main App Login Success: ${data.data.user.name}`, 'success');
+                        showResponse('login-response', JSON.stringify(data, null, 2));
+                    } else {
+                        showStatus('login-status', `❌ Main App Login Failed: ${data.message}`, 'error');
+                    }
+                } catch (e) {
+                    showStatus('login-status', `❌ Main App JSON Error: ${e.message}`, 'error');
+                    showResponse('login-response', text);
+                }
+            } catch (error) {
+                showStatus('login-status', `❌ Main App Network Error: ${error.message}`, 'error');
+                log(`❌ Main App Error: ${error.message}`);
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 Debug page loaded');
+            updateLocationInfo();
+        });
+    </script>
+</body>
+</html> 

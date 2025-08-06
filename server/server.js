@@ -3,26 +3,85 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const validateEnv = require('./config/validateEnv');
 require('dotenv').config();
+
+// Validate environment variables on startup
+validateEnv();
+
+// Import middleware
+const { sanitizeInput } = require('./middleware/sanitize');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const reviewRoutes = require('./routes/reviews');
+const favoritesRoutes = require('./routes/favorites');
+const likesRoutes = require('./routes/likes');
 
 // Initialize express app
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'", // For inline scripts
+                "https://www.googletagmanager.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'", // For inline styles
+                "https://fonts.googleapis.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            fontSrc: [
+                "'self'",
+                "https://fonts.gstatic.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            imgSrc: [
+                "'self'",
+                "data:",
+                "https:",
+                "https://images.unsplash.com"
+            ],
+            connectSrc: [
+                "'self'",
+                "https://www.google-analytics.com",
+                "https://analytics.google.com"
+            ],
+            frameSrc: ["'none'"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: []
+        }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['http://localhost:3000', 'https://bevyfinder.com'];
+    : ['http://localhost:3000', 'http://localhost:8080', 'https://bevyfinder.com'];
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
+        
+        // In development, allow all localhost and network IP origins
+        if (process.env.NODE_ENV === 'development') {
+            if (origin.includes('localhost') || 
+                origin.includes('127.0.0.1') || 
+                origin.includes('192.168.4.36') ||
+                origin.includes('192.168.4.35')) {
+                return callback(null, true);
+            }
+        }
         
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
@@ -36,6 +95,9 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Apply sanitization to all routes
+app.use(sanitizeInput);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -51,6 +113,26 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
+// Additional security headers
+app.use((req, res, next) => {
+    // Prevent clickjacking
+    res.setHeader('X-Frame-Options', 'DENY');
+    
+    // Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Enable XSS protection
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    
+    // Referrer policy
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Permissions policy
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
@@ -63,6 +145,9 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/favorites', favoritesRoutes);
+app.use('/api/likes', likesRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -128,31 +213,41 @@ app.use((err, req, res, next) => {
 // Connect to MongoDB
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+        const mongoUri = process.env.MONGODB_URI;
+        if (!mongoUri) {
+            throw new Error('MONGODB_URI not found in environment variables');
+        }
+        
+        const conn = await mongoose.connect(mongoUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);
+        return true;
     } catch (error) {
         console.error('MongoDB connection error:', error);
-        process.exit(1);
+        console.log('Please check your MONGODB_URI in the .env file');
+        return false;
     }
 };
+
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
     try {
-        // Connect to database
+        // Connect to database (or start without it)
         await connectDB();
 
         // Start server
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 BevyFinder API server running on port ${PORT}`);
             console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+            console.log(`🌐 Network access: http://192.168.4.36:${PORT}/health`);
         });
     } catch (error) {
         console.error('Server startup error:', error);

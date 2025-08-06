@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .login-form {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Mobile Connection Test</h1>
+        
+        <div class="test-result info">
+            <strong>Your IP:</strong> <span id="your-ip">Detecting...</span>
+        </div>
+        
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <button onclick="testLogin()">Test Login API</button>
+        <button onclick="testAll()">Test All Connections</button>
+        
+        <div id="results"></div>
+        
+        <div class="login-form">
+            <h3>Test Login</h3>
+            <input type="email" id="email" placeholder="Email" value="test3@example.com">
+            <input type="password" id="password" placeholder="Password" value="password123">
+            <button onclick="testActualLogin()">Try Login</button>
+            <div id="login-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Detect current IP
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('your-ip').textContent = data.ip;
+            })
+            .catch(() => {
+                document.getElementById('your-ip').textContent = 'Could not detect';
+            });
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+
+        async function testHealth() {
+            addResult('Testing health endpoint...', 'info');
+            
+            const urls = [
+                'http://192.168.4.36:3000/health',
+                'http://localhost:3000/health'
+            ];
+            
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ ${url} - ${data.message}`, 'success');
+                    } else {
+                        addResult(`❌ ${url} - Status: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${url} - Error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testLogin() {
+            addResult('Testing login API...', 'info');
+            
+            const urls = [
+                'http://192.168.4.36:3000/api/auth/login',
+                'http://localhost:3000/api/auth/login'
+            ];
+            
+            const testData = {
+                email: 'test3@example.com',
+                password: 'password123'
+            };
+            
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(testData)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ ${url} - Login successful`, 'success');
+                    } else {
+                        const data = await response.json();
+                        addResult(`❌ ${url} - ${data.message}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${url} - Error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testAll() {
+            addResult('Starting comprehensive connection test...', 'info');
+            await testHealth();
+            await testLogin();
+        }
+
+        async function testActualLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            resultDiv.innerHTML = '<div class="test-result info">Attempting login...</div>';
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="test-result success">✅ Login successful! Welcome ${data.data.user.name}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="test-result error">❌ Login failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="test-result error">❌ Connection error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(testAll, 1000);
+        });
+    </script>
+</body>
+</html> 

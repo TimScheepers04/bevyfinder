@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BevyFinder Login Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .warning { background: rgba(255, 193, 7, 0.3); }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.3); }
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 15px 25px;
+        }
+        input {
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 BevyFinder Login Test</h1>
+        
+        <div class="status info">
+            <h3>🧪 Test Your Login</h3>
+            <p>This page will help you test your login credentials and see exactly what's happening.</p>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Enter your email" value="test3@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter your password" value="password123" required>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+            
+            <button type="submit" class="login-btn">🔐 Test Login</button>
+        </form>
+        
+        <div class="status info">
+            <h3>🔍 Quick Tests</h3>
+            <button onclick="testConnection()">Test API Connection</button>
+            <button onclick="testWithKnownCredentials()">Test with Known Credentials</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="status info">
+            <h3>🔗 Quick Links</h3>
+            <button onclick="window.location.href='/'">Go to Main App</button>
+            <button onclick="window.location.href='connection-test.html'">Connection Test</button>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+            
+            // Scroll to bottom
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testConnection() {
+            addResult('Testing API connection...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ API connection successful', 'success');
+                    addResult(`Server: ${data.message}`, 'info');
+                } else {
+                    addResult(`❌ API connection failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ API connection error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testWithKnownCredentials() {
+            addResult('Testing with known credentials...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123'
+                    }),
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('✅ Login successful with known credentials', 'success');
+                    addResult(`User: ${data.data.user.name}`, 'success');
+                    addResult(`Token: ${data.data.token ? 'Received' : 'Missing'}`, 'info');
+                } else {
+                    addResult(`❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function performLogin(email, password, rememberMe) {
+            addResult(`Attempting login for: ${email}`, 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        rememberMe: rememberMe
+                    }),
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('✅ Login successful!', 'success');
+                    addResult(`Welcome, ${data.data.user.name}!`, 'success');
+                    addResult(`Token received: ${data.data.token ? 'Yes' : 'No'}`, 'info');
+                    
+                    // Store token if login successful
+                    if (data.data.token) {
+                        localStorage.setItem('bevyfinder_token', data.data.token);
+                        addResult('✅ Token stored in localStorage', 'success');
+                    }
+                    
+                    // Store remember me info
+                    if (rememberMe) {
+                        localStorage.setItem('bevyfinder_remember_me', 'true');
+                        localStorage.setItem('bevyfinder_user_email', email);
+                        addResult('✅ Remember me info stored', 'success');
+                    }
+                    
+                    return true;
+                } else {
+                    addResult(`❌ Login failed: ${data.message}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                addResult(`❌ Login error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            
+            if (!email || !password) {
+                addResult('❌ Please enter both email and password', 'error');
+                return;
+            }
+            
+            const success = await performLogin(email, password, rememberMe);
+            
+            if (success) {
+                // Redirect to main app after successful login
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        });
+        
+        // Test connection on page load
+        window.addEventListener('load', () => {
+            addResult('Page loaded, testing connection...', 'info');
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html> 

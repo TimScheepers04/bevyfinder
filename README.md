@@ -199,7 +199,7 @@ In a production environment, you could enhance this application with:
 1. **Real AI Integration**: Connect to image recognition APIs (Google Vision, AWS Rekognition)
 2. **Expanded Database**: Integrate with beverage APIs or databases
 3. **User Accounts**: Save favorite beverages and search history
-4. **Social Features**: Share beverages with friends
+
 5. **Recipe Integration**: Add cocktail recipes and instructions
 6. **Nutritional Information**: Include calorie and alcohol content
 7. **Reviews and Ratings**: Community-driven beverage reviews

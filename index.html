@@ -22,7 +22,7 @@
     <meta name="target" content="all">
     <meta name="HandheldFriendly" content="true">
     <meta name="MobileOptimized" content="width">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BevyFinder">
     <meta name="application-name" content="BevyFinder">
@@ -32,12 +32,19 @@
     <meta name="color-scheme" content="light dark">
     <link rel="canonical" href="https://bevyfinder.com/">
     
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    
     <!-- Enhanced Cache Control -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta http-equiv="Last-Modified" content="Mon, 01 Jan 2024 00:00:00 GMT">
-    <meta http-equiv="ETag" content="bevyfinder-v1.0.2">
+    <meta http-equiv="ETag" content="bevyfinder-v1.0.3">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="BevyFinder - Ultimate Drink Database | Find Beer, Wine & Cocktail Info">
@@ -66,6 +73,13 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BevyFinder">
+    
     <!-- Preconnect to external domains for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,7 +87,7 @@
     <link rel="preconnect" href="https://images.unsplash.com">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css?v=1.0.2">
+    <link rel="stylesheet" href="styles.css?v=1.0.11">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -281,10 +295,11 @@
                         <i class="fas fa-home"></i>
                         Home
                     </button>
-                    <button class="sidebar-btn" id="sidebar-btn-profile">
-                        <i class="fas fa-user"></i>
-                        Profile
+                    <button class="sidebar-btn" id="sidebar-btn-dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        Dashboard
                     </button>
+
                     <button class="sidebar-btn" id="sidebar-btn-2">
                         <i class="fas fa-star"></i>
                         Favorites
@@ -293,6 +308,12 @@
                         <i class="fas fa-history"></i>
                         History
                     </button>
+                    <button class="sidebar-btn" id="sidebar-btn-tracking">
+                        <i class="fas fa-chart-line"></i>
+                        Night Tracker
+                        <span class="premium-badge">Premium</span>
+                    </button>
+
                     <button class="sidebar-btn" id="sidebar-btn-4">
                         <i class="fas fa-cog"></i>
                         Settings
@@ -310,6 +331,32 @@
         
         <!-- Overlay for sidebar (always available) -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Profile Menu Dropdown -->
+        <div class="profile-menu" id="profile-menu" style="display: none;">
+            <div class="profile-menu-header">
+                <i class="fas fa-user-circle"></i>
+                <span id="profile-menu-username">Guest</span>
+            </div>
+            <div class="profile-menu-content">
+                <button class="profile-menu-item" id="profile-menu-signin" onclick="showAuthPage()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+                <button class="profile-menu-item" id="profile-menu-signup" onclick="showAuthPage()">
+                    <i class="fas fa-user-plus"></i>
+                    Sign Up
+                </button>
+                <button class="profile-menu-item" id="profile-menu-profile" onclick="showProfilePage()" style="display: none;">
+                    <i class="fas fa-user"></i>
+                    My Profile
+                </button>
+                <button class="profile-menu-item" id="profile-menu-signout" onclick="signOut()" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sign Out
+                </button>
+            </div>
+        </div>
 
         <!-- Authentication Page -->
         <div class="auth-page" id="auth-page" style="display: none;">
@@ -343,6 +390,14 @@
                                 placeholder="Enter your password"
                                 required
                             >
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="remember-me">
+                                <span class="checkmark"></span>
+                                Remember me for 30 days
+                            </label>
                         </div>
                         
                         <button type="submit" class="auth-btn primary">
@@ -388,6 +443,53 @@
                             >
                         </div>
                         
+                        <div class="form-group">
+                            <label for="signup-age">Age</label>
+                            <input 
+                                type="number" 
+                                id="signup-age" 
+                                placeholder="Enter your age"
+                                min="18"
+                                max="120"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-weight">Weight (kg)</label>
+                            <input 
+                                type="number" 
+                                id="signup-weight" 
+                                placeholder="Enter your weight in kg"
+                                min="30"
+                                max="300"
+                                step="0.1"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-height">Height (cm)</label>
+                            <input 
+                                type="number" 
+                                id="signup-height" 
+                                placeholder="Enter your height in cm"
+                                min="100"
+                                max="250"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-gender">Gender</label>
+                            <select id="signup-gender" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
                         <button type="submit" class="auth-btn primary">
                             <i class="fas fa-user-plus"></i>
                             Create Account
@@ -418,14 +520,10 @@
                         </div>
                         <div class="feature-item">
                             <i class="fas fa-chart-line"></i>
-                            <h4>Drink Analytics</h4>
-                            <p>Track your drinking habits and preferences</p>
+                            <h4>AI Night Tracker <span class="premium-badge">Premium</span></h4>
+                            <p>Advanced intoxication tracking with personal BAC calculations</p>
                         </div>
-                        <div class="feature-item">
-                            <i class="fas fa-users"></i>
-                            <h4>Social Features</h4>
-                            <p>Share drinks with friends (coming soon)</p>
-                        </div>
+
                         <div class="feature-item">
                             <i class="fas fa-bell"></i>
                             <h4>Smart Notifications</h4>
@@ -441,6 +539,9 @@
                     <header class="header">
             <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
             <p>Enter a photo or name of your favorite alcoholic drink</p>
+            <button class="profile-btn-header" id="profile-btn-header" onclick="toggleProfileMenu()">
+                <i class="fas fa-user-circle"></i>
+            </button>
         </header>
 
             <main class="main-content">
@@ -470,8 +571,70 @@
                                 <button class="search-btn" id="search-btn">
                                     <i class="fas fa-search"></i>
                                 </button>
+                                <button class="filter-btn" id="filter-btn" onclick="toggleAdvancedFilters()">
+                                    <i class="fas fa-filter"></i>
+                                </button>
                             </div>
                             <div class="suggestions" id="suggestions"></div>
+                            
+                            <!-- Advanced Search Filters -->
+                            <div id="advanced-filters" class="advanced-filters" style="display: none;">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label for="type-filter">Type:</label>
+                                        <select id="type-filter" onchange="applyFilters()">
+                                            <option value="all">All Types</option>
+                                            <option value="Beer">Beer</option>
+                                            <option value="Wine">Wine</option>
+                                            <option value="Cocktail">Cocktail</option>
+                                            <option value="Spirit">Spirit</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label for="country-filter">Country:</label>
+                                        <select id="country-filter" onchange="applyFilters()">
+                                            <option value="all">All Countries</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="Belgium">Belgium</option>
+                                            <option value="Germany">Germany</option>
+                                            <option value="USA">USA</option>
+                                            <option value="UK">UK</option>
+                                            <option value="Netherlands">Netherlands</option>
+                                            <option value="Czech Republic">Czech Republic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>ABV Range: <span id="abv-range-display">0% - 15%</span></label>
+                                        <div class="range-slider">
+                                            <input type="range" id="abv-min" min="0" max="15" value="0" step="0.5" onchange="updateABVDisplay()">
+                                            <input type="range" id="abv-max" min="0" max="15" value="15" step="0.5" onchange="updateABVDisplay()">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label for="rating-filter">Min Rating:</label>
+                                        <select id="rating-filter" onchange="applyFilters()">
+                                            <option value="0">Any Rating</option>
+                                            <option value="4">4+ Stars</option>
+                                            <option value="4.5">4.5+ Stars</option>
+                                            <option value="4.8">4.8+ Stars</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-actions">
+                                    <button onclick="clearFilters()" class="clear-filters-btn">
+                                        <i class="fas fa-times"></i> Clear Filters
+                                    </button>
+                                    <button onclick="applyFilters()" class="apply-filters-btn">
+                                        <i class="fas fa-check"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -519,6 +682,9 @@
             <header class="header">
                 <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
                 <p>Your saved beverages</p>
+                <button class="profile-btn-header" id="profile-btn-header-favorites" onclick="toggleProfileMenu()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
             </header>
 
             <main class="main-content">
@@ -545,11 +711,118 @@
             </footer>
         </div>
 
+        <!-- Dashboard Page (initially hidden) -->
+        <div class="dashboard-page" id="dashboard-page" style="display: none;">
+            <header class="header">
+                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Feature Hub - Your BevyFinder Command Center</p>
+                <button class="profile-btn-header" id="profile-btn-header-dashboard" onclick="toggleProfileMenu()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </header>
+
+            <main class="main-content">
+                <div class="pinboard-container">
+                    <div class="pinboard-grid">
+                        <!-- Search Feature -->
+                        <div class="pinboard-item" onclick="goToHome()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Search Drinks</h3>
+                            <p>Find beers, wines & cocktails</p>
+                        </div>
+
+                        <!-- Night Tracker -->
+                        <div class="pinboard-item" onclick="showTrackingPage()">
+                            <div class="pinboard-icon premium">
+                                <i class="fas fa-chart-line"></i>
+                                <span class="premium-badge">Premium</span>
+                            </div>
+                            <h3>Night Tracker</h3>
+                            <p>Monitor your night out</p>
+                        </div>
+
+                        <!-- Favorites -->
+                        <div class="pinboard-item" onclick="showFavoritesPage()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3>Favorites</h3>
+                            <p>Your saved drinks</p>
+                        </div>
+
+                        <!-- History -->
+                        <div class="pinboard-item" onclick="showHistoryPage()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3>History</h3>
+                            <p>Recent searches</p>
+                        </div>
+
+                        <!-- Featured -->
+                        <div class="pinboard-item" onclick="showFeaturedPage()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3>Featured</h3>
+                            <p>Trending drinks</p>
+                        </div>
+
+                        <!-- Photo Recognition -->
+                        <div class="pinboard-item" onclick="goToHome()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <h3>Photo Search</h3>
+                            <p>Upload drink photos</p>
+                        </div>
+
+                        <!-- Friends -->
+                        <div class="pinboard-item" onclick="showFriendsPage()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Friends</h3>
+                            <p>Connect with friends</p>
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="pinboard-item" onclick="showSettings()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h3>Settings</h3>
+                            <p>App preferences</p>
+                        </div>
+
+                        <!-- About -->
+                        <div class="pinboard-item" onclick="showAbout()">
+                            <div class="pinboard-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h3>About</h3>
+                            <p>Learn more</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <p>Your personal beverage journey</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
+
         <!-- History Page (initially hidden) -->
         <div class="history-page" id="history-page" style="display: none;">
             <header class="header">
                 <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
                 <p>Your recent beverage searches</p>
+                <button class="profile-btn-header" id="profile-btn-header-history" onclick="toggleProfileMenu()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
             </header>
 
             <main class="main-content">
@@ -582,179 +855,1032 @@
                 <p>By Tim Scheepers</p>
             </footer>
         </div>
-    </div>
 
-    <script src="analytics.js?v=1.0.2"></script>
-    <script src="fallback-analytics.js?v=1.0.2"></script>
-    <script src="auth.js?v=1.0.2"></script>
-    <script src="script.js?v=1.0.2"></script>
-    
-    <!-- Enhanced Cache Control and Auto-Update System -->
-    <script>
-        // Version tracking for cache busting
-        const CURRENT_VERSION = '1.0.2';
-        const LAST_VERSION_KEY = 'bevyfinder_last_version';
-        
-        // Check for version updates on page load
-        function checkForUpdates() {
-            const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
-            
-            if (lastVersion && lastVersion !== CURRENT_VERSION) {
-                console.log(`Version updated from ${lastVersion} to ${CURRENT_VERSION}`);
-                
-                // Clear all caches
-                clearAllCaches();
-                
-                // Update stored version
-                localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
-                
-                // Show update notification
-                showUpdateNotification();
-            } else if (!lastVersion) {
-                // First time visitor
-                localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
-            }
-        }
-        
-        // Clear all browser caches
-        async function clearAllCaches() {
-            try {
-                // Clear browser cache
-                if ('caches' in window) {
-                    const cacheNames = await caches.keys();
-                    await Promise.all(
-                        cacheNames.map(cacheName => caches.delete(cacheName))
-                    );
-                    console.log('Browser caches cleared');
-                }
-                
-                // Clear localStorage (optional - uncomment if needed)
-                // localStorage.clear();
-                
-                // Force reload of CSS and JS files
-                const links = document.querySelectorAll('link[rel="stylesheet"], script[src]');
-                links.forEach(link => {
-                    if (link.href || link.src) {
-                        const url = new URL(link.href || link.src);
-                        url.searchParams.set('v', CURRENT_VERSION + '&t=' + Date.now());
-                        if (link.href) link.href = url.toString();
-                        if (link.src) link.src = url.toString();
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Error clearing caches:', error);
-            }
-        }
-        
-        // Show update notification
-        function showUpdateNotification() {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 16px 20px;
-                border-radius: 12px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                z-index: 10000;
-                font-family: 'Inter', sans-serif;
-                font-weight: 500;
-                animation: slideIn 0.3s ease;
-                max-width: 300px;
-            `;
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-sync-alt" style="font-size: 1.2rem;"></i>
-                    <div>
-                        <div style="font-weight: 600; margin-bottom: 4px;">Update Complete!</div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">BevyFinder has been updated to the latest version.</div>
+        <!-- Night Tracker Page (initially hidden) -->
+        <div class="tracking-page" id="tracking-page" style="display: none;">
+            <header class="header">
+                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Track your night out - Monitor alcohol and nutrition</p>
+                <button class="profile-btn-header" id="profile-btn-header-tracking" onclick="toggleProfileMenu()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </header>
+
+            <main class="main-content">
+                <!-- Session Controls -->
+                <div class="session-controls">
+                    <div class="session-info">
+                        <h3><i class="fas fa-clock"></i> Current Session</h3>
+                        <p id="session-time">Not started</p>
+                    </div>
+                    <div class="session-buttons">
+                        <button class="session-btn start-session-btn" id="start-session-btn">
+                            <i class="fas fa-play"></i> Start Night
+                        </button>
+                        <button class="session-btn end-session-btn" id="end-session-btn" style="display: none;">
+                            <i class="fas fa-stop"></i> End Night
+                        </button>
+                        <button class="session-btn reset-session-btn" id="reset-session-btn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
                     </div>
                 </div>
-            `;
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card alcohol-card">
+                        <div class="card-icon">
+                            <i class="fas fa-wine-bottle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Total Alcohol</h4>
+                            <p id="total-alcohol">0.0</p>
+                            <span class="unit">standard drinks</span>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card calories-card">
+                        <div class="card-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Total Calories</h4>
+                            <p id="total-calories">0</p>
+                            <span class="unit">kcal</span>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card sobriety-card">
+                        <div class="card-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Sobriety Status</h4>
+                            <p id="sobriety-status">Sober</p>
+                            <span class="unit" id="sobriety-details">Ready to drive</span>
+                            <p id="bac-level" class="unit" style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">BAC: 0.000%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Drink Section -->
+                <div class="add-drink-section">
+                    <h3><i class="fas fa-plus-circle"></i> Add Drink</h3>
+                    <div class="add-drink-input">
+                        <input 
+                            type="text" 
+                            id="tracking-drink-search" 
+                            placeholder="Search for a drink to add..."
+                            autocomplete="off"
+                        >
+                        <button class="add-drink-btn" id="add-drink-btn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="drink-suggestions" id="tracking-drink-suggestions"></div>
+                </div>
+
+                <!-- Drink List -->
+                <div class="drink-list-section">
+                    <h3><i class="fas fa-list"></i> Tonight's Drinks</h3>
+                    <div class="drink-list" id="drink-list">
+                        <!-- Drinks will be added here -->
+                    </div>
+                    
+                    <div class="empty-drinks" id="empty-drinks">
+                        <div class="empty-state">
+                            <i class="fas fa-glass-whiskey"></i>
+                            <h3>No Drinks Added</h3>
+                            <p>Start your night by adding your first drink!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Nutrition -->
+                <div class="nutrition-details">
+                    <h3><i class="fas fa-chart-pie"></i> Nutrition Breakdown</h3>
+                    <div class="nutrition-grid">
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Carbs:</span>
+                            <span class="nutrition-value" id="total-carbs">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Calories:</span>
+                            <span class="nutrition-value" id="total-calories-detailed">0</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Sugar:</span>
+                            <span class="nutrition-value" id="total-sugar">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Fat:</span>
+                            <span class="nutrition-value" id="total-fat">0g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Tips -->
+                <div class="safety-tips" id="safety-tips">
+                    <h3><i class="fas fa-shield-alt"></i> Safety Tips</h3>
+                    <div class="tips-content">
+                        <p>Remember to drink responsibly and never drink and drive.</p>
+                        <ul>
+                            <li>Stay hydrated with water between drinks</li>
+                            <li>Eat before and during drinking</li>
+                            <li>Know your limits</li>
+                            <li>Plan a safe way home</li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <p>Track responsibly - Drink safely</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
+
+        <!-- Featured Page (initially hidden) -->
+        <div class="featured-page" id="featured-page" style="display: none;">
+            <header class="header">
+                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Top 10 Most Liked Drinks of the Week</p>
+                <button class="profile-btn-header" id="profile-btn-header-featured" onclick="toggleProfileMenu()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </header>
+
+            <main class="main-content">
+                <div class="featured-container" id="featured-container">
+                    <!-- Featured drinks will be populated here -->
+                </div>
+            </main>
+
+            <footer class="footer">
+                <p>Discover what everyone's loving this week</p>
+                <p>By Tim Scheepers</p>
+            </footer>
+        </div>
+
+
+    </div>
+
+    <script>
+        console.log('HTML loaded - testing JavaScript execution');
+    </script>
+    <script src="analytics.js?v=1.0.3"></script>
+    <script src="fallback-analytics.js?v=1.0.3"></script>
+    
+    <!-- EMBEDDED AUTHENTICATION SYSTEM - NO EXTERNAL DEPENDENCIES -->
+    <script>
+        // ===== EMBEDDED API CLIENT =====
+        class BevyFinderAPI {
+            constructor() {
+                // Auto-detect the best API URL
+                this.baseURL = this.initializeURL();
+                console.log('🔗 API initialized with URL:', this.baseURL);
+                
+                // Test the connection and find the best working URL
+                this.testAndOptimizeConnection();
+            }
             
-            // Add animation styles
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
+            async testAndOptimizeConnection() {
+                console.log('🧪 Testing API connection...');
+                
+                // List of possible API URLs to test
+                const possibleURLs = [
+                    this.baseURL, // Current detected URL
+                    'http://192.168.4.36:3000/api', // Your specific local network
+                    'http://localhost:3000/api', // Local development
+                    'https://bevyfinder.com/api', // Production
+                    'http://127.0.0.1:3000/api', // Alternative local
+                ];
+                
+                // Remove duplicates
+                const uniqueURLs = [...new Set(possibleURLs)];
+                
+                for (const url of uniqueURLs) {
+                    try {
+                        console.log(`🔍 Testing: ${url}`);
+                        const response = await fetch(`${url.replace('/api', '')}/health`, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        
+                        if (response.ok) {
+                            console.log(`✅ Found working API: ${url}`);
+                            this.baseURL = url;
+                            return;
+                        }
+                    } catch (error) {
+                        console.log(`❌ Failed: ${url} - ${error.message}`);
+                    }
                 }
-            `;
-            document.head.appendChild(style);
+                
+                console.log('⚠️ No working API found, using fallback:', this.baseURL);
+            }
             
-            document.body.appendChild(notification);
+            initializeURL() {
+                // Smart API URL detection based on current location
+                const currentHost = window.location.hostname;
+                const currentProtocol = window.location.protocol;
+                const currentPort = window.location.port;
+                
+                console.log('🔍 Current location:', `${currentProtocol}//${currentHost}:${currentPort}`);
+                
+                // If we're on localhost or local network, use local API
+                if (currentHost === 'localhost' || currentHost === '127.0.0.1' || 
+                    currentHost.startsWith('192.168.') || currentHost.startsWith('10.') || 
+                    currentHost.startsWith('172.')) {
+                    
+                    // Try to use the same host as the frontend
+                    const localAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                    console.log('🏠 Using local API:', localAPI);
+                    return localAPI;
+                }
+                
+                // If we're on a public domain, use production API
+                if (currentHost.includes('bevyfinder.com') || currentHost.includes('netlify.app') || 
+                    currentHost.includes('vercel.app') || currentHost.includes('github.io')) {
+                    
+                    const productionAPI = 'https://bevyfinder.com/api';
+                    console.log('🌐 Using production API:', productionAPI);
+                    return productionAPI;
+                }
+                
+                // Fallback: try to detect if we're on the same network as the server
+                const fallbackAPI = `${currentProtocol}//${currentHost}:3000/api`;
+                console.log('🔄 Using fallback API:', fallbackAPI);
+                return fallbackAPI;
+            }
             
-            // Remove notification after 5 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
+            async request(endpoint, options = {}) {
+                // Smart API URL detection - works locally and in production
+                let baseURL;
+                
+                // Check if we're in development (localhost or local network)
+                if (window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname.startsWith('192.168.') ||
+                    window.location.hostname.startsWith('10.') ||
+                    window.location.hostname.startsWith('172.')) {
+                    baseURL = 'http://192.168.4.36:3000/api';
+                } else {
+                    // Production API URL (will be set after deployment)
+                    baseURL = 'https://bevyfinder-api.herokuapp.com/api';
+                }
+                
+                const url = `${baseURL}${endpoint}`;
+                
+                const defaultOptions = {
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                const finalOptions = { ...defaultOptions, ...options };
+                
+                if (options.body && typeof options.body === 'object') {
+                    finalOptions.body = JSON.stringify(options.body);
+                }
+                
+                console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
+                
+                try {
+                    const response = await fetch(url, finalOptions);
+                    const text = await response.text();
+                    
+                    console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        return { success: true, data, status: response.status };
+                    } catch (e) {
+                        console.error('❌ JSON Parse Error:', text);
+                        return { success: false, error: 'Invalid JSON response', raw: text, status: response.status };
+                    }
+                } catch (error) {
+                    console.error('❌ Network Error:', error.message);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // Auth Methods
+            async login(email, password, rememberMe = false) {
+                return this.request('/auth/login', {
+                    method: 'POST',
+                    body: { email, password, rememberMe }
+                });
+            }
+            
+            async register(name, email, password) {
+                return this.request('/auth/register', {
+                    method: 'POST',
+                    body: { name, email, password }
+                });
+            }
+            
+            async getProfile() {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'No token' };
+                
+                return this.request('/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+            
+            async logout() {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: true };
+                
+                return this.request('/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+            
+            // Drink Methods
+            async getDrinks() {
+                return this.request('/drinks');
+            }
+            
+            async searchDrinks(query) {
+                return this.request(`/drinks/search?q=${encodeURIComponent(query)}`);
+            }
+            
+            async getDrinkById(id) {
+                return this.request(`/drinks/${id}`);
+            }
+            
+            // Favorites Methods
+            async addToFavorites(drinkId) {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'Not authenticated' };
+                
+                return this.request('/favorites/add', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: { drinkId }
+                });
+            }
+            
+            async removeFromFavorites(drinkId) {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'Not authenticated' };
+                
+                return this.request('/favorites/remove', {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: { drinkId }
+                });
+            }
+            
+            // Likes Methods
+            async likeDrink(drinkId) {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'Not authenticated' };
+                
+                return this.request('/likes/add', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: { drinkId }
+                });
+            }
+            
+            async unlikeDrink(drinkId) {
+                const token = localStorage.getItem('bevyfinder_token');
+                if (!token) return { success: false, error: 'Not authenticated' };
+                
+                return this.request('/likes/remove', {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: { drinkId }
+                });
+            }
+            
+            async getTopLikedDrinks() {
+                return this.request('/likes/top');
+            }
         }
         
-        // Service Worker Registration with enhanced cache control
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js?v=' + CURRENT_VERSION)
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New version available
-                                    if (confirm('A new version of BevyFinder is available! Would you like to update?')) {
-                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                        window.location.reload();
-                                    }
-                                }
-                            });
-                        });
-                        
-                        // Handle service worker messages
-                        navigator.serviceWorker.addEventListener('message', (event) => {
-                            if (event.data && event.data.type === 'CACHE_CLEARED') {
-                                console.log('Service worker cache cleared');
-                            }
-                        });
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
+        // ===== EMBEDDED AUTHENTICATION MANAGER =====
+        class BevyFinderAuth {
+            constructor() {
+                this.api = new BevyFinderAPI();
+                this.currentUser = null;
+                this.isAuthenticated = false;
+                this.init();
+            }
+            
+            init() {
+                console.log('🔐 Auth system initialized');
+                this.checkAuthStatus();
+                this.setupEventListeners();
+            }
+            
+            async checkAuthStatus() {
+                const token = localStorage.getItem('bevyfinder_token');
+                
+                if (token) {
+                    console.log('🔍 Checking auth status with token');
+                    const result = await this.api.getProfile();
+                    
+                    if (result.success) {
+                        this.currentUser = result.data.user;
+                        this.isAuthenticated = true;
+                        console.log('✅ User authenticated:', this.currentUser.name);
+                        this.updateUI();
+                    } else {
+                        console.log('❌ Token invalid, clearing');
+                        this.clearAuth();
+                    }
+                } else {
+                    console.log('🔍 No token found');
+                    this.updateUI();
+                }
+            }
+            
+            async signIn(email, password, rememberMe = false) {
+                console.log('🔐 Attempting sign in:', email);
+                
+                try {
+                    // Smart API URL detection for login
+                    let apiUrl;
+                    if (window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' || 
+                        window.location.hostname.startsWith('192.168.') ||
+                        window.location.hostname.startsWith('10.') ||
+                        window.location.hostname.startsWith('172.')) {
+                        apiUrl = 'http://192.168.4.36:3000/api/auth/login';
+                    } else {
+                        apiUrl = 'https://bevyfinder-api.herokuapp.com/api/auth/login';
+                    }
+                    console.log(`🌐 Making request to: ${apiUrl}`);
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password,
+                            rememberMe: rememberMe
+                        })
                     });
+                    
+                    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+                    
+                    const text = await response.text();
+                    console.log(`📡 Response text: ${text.substring(0, 200)}...`);
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('✅ JSON parsed successfully');
+                        
+                        if (data.success) {
+                            console.log(`✅ Login successful for: ${data.data.user.name}`);
+                            
+                            // Store token
+                            if (data.data.token) {
+                                localStorage.setItem('bevyfinder_token', data.data.token);
+                                console.log('💾 Token stored in localStorage');
+                            }
+                            
+                            // Store remember me info
+                            if (rememberMe) {
+                                localStorage.setItem('bevyfinder_remember_me', 'true');
+                                localStorage.setItem('bevyfinder_user_email', email);
+                                console.log('💾 Remember me info stored');
+                            }
+                            
+                            this.currentUser = data.data.user;
+                            this.isAuthenticated = true;
+                            this.updateUI();
+                            
+                            return { success: true, user: this.currentUser };
+                        } else {
+                            console.error(`❌ Login failed: ${data.message}`);
+                            return { success: false, error: data.message };
+                        }
+                    } catch (e) {
+                        console.error(`❌ JSON parse error: ${e.message}`);
+                        console.error(`❌ Raw response: ${text}`);
+                        return { success: false, error: 'Invalid JSON response' };
+                    }
+                } catch (error) {
+                    console.error(`❌ Network error: ${error.message}`);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async signUp(name, email, password) {
+                console.log('📝 Attempting sign up:', email);
+                
+                try {
+                    const result = await this.api.register(name, email, password);
+                    
+                    if (result.success) {
+                        console.log('✅ Registration successful');
+                        
+                        // Store token
+                        if (result.data.token) {
+                            localStorage.setItem('bevyfinder_token', result.data.token);
+                        }
+                        
+                        this.currentUser = result.data.user;
+                        this.isAuthenticated = true;
+                        this.updateUI();
+                        
+                        return { success: true, user: this.currentUser };
+                    } else {
+                        console.error('❌ Registration failed:', result.error);
+                        return { success: false, error: result.error };
+                    }
+                } catch (error) {
+                    console.error('❌ Registration error:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async signOut() {
+                console.log('🚪 Signing out');
+                
+                try {
+                    await this.api.logout();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                
+                this.clearAuth();
+                this.updateUI();
+            }
+            
+            clearAuth() {
+                localStorage.removeItem('bevyfinder_token');
+                localStorage.removeItem('bevyfinder_remember_me');
+                localStorage.removeItem('bevyfinder_user_email');
+                this.currentUser = null;
+                this.isAuthenticated = false;
+            }
+            
+            updateUI() {
+                const authPage = document.getElementById('auth-page');
+                const mainApp = document.getElementById('main-app');
+                const profileMenu = document.getElementById('profile-menu');
+                const profileButton = document.getElementById('profile-button');
+                
+                if (this.isAuthenticated && this.currentUser) {
+                    // Show main app
+                    if (authPage) authPage.style.display = 'none';
+                    if (mainApp) mainApp.style.display = 'block';
+                    
+                    // Update profile menu
+                    if (profileMenu) {
+                        const userNameElement = profileMenu.querySelector('.user-name');
+                        const userEmailElement = profileMenu.querySelector('.user-email');
+                        
+                        if (userNameElement) userNameElement.textContent = this.currentUser.name;
+                        if (userEmailElement) userEmailElement.textContent = this.currentUser.email;
+                    }
+                    
+                    // Show profile button
+                    if (profileButton) profileButton.style.display = 'block';
+                    
+                    console.log('✅ UI updated for authenticated user');
+                } else {
+                    // Show auth page
+                    if (authPage) authPage.style.display = 'block';
+                    if (mainApp) mainApp.style.display = 'none';
+                    
+                    // Hide profile button
+                    if (profileButton) profileButton.style.display = 'none';
+                    
+                    console.log('✅ UI updated for guest user');
+                }
+            }
+            
+            setupEventListeners() {
+                // Login form
+                const signinForm = document.getElementById('signin-form');
+                if (signinForm) {
+                    signinForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        await this.handleSignIn();
+                    });
+                }
+                
+                // Register form
+                const registerForm = document.getElementById('signup-form');
+                if (registerForm) {
+                    registerForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        await this.handleSignUp();
+                    });
+                }
+                
+                // Sign out button
+                const signOutBtn = document.getElementById('signout-btn');
+                if (signOutBtn) {
+                    signOutBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        await this.signOut();
+                    });
+                }
+                
+                // Profile menu toggle
+                const profileButton = document.getElementById('profile-btn-header');
+                if (profileButton) {
+                    profileButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const profileMenu = document.getElementById('profile-menu');
+                        if (profileMenu) {
+                            profileMenu.classList.toggle('show');
+                        }
+                    });
+                }
+                
+                // Pre-fill email if remembered
+                this.preFillEmailIfRemembered();
+            }
+            
+            async handleSignIn() {
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+                const rememberMe = document.getElementById('remember-me')?.checked || false;
+                
+                if (!email || !password) {
+                    this.showError('Please enter both email and password');
+                    return;
+                }
+                
+                const result = await this.signIn(email, password, rememberMe);
+                
+                if (result.success) {
+                    this.showSuccess(`Welcome back, ${result.user.name}!`);
+                } else {
+                    this.showError(result.error || 'Login failed');
+                }
+            }
+            
+            async handleSignUp() {
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                
+                if (!name || !email || !password) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    this.showError('Password must be at least 6 characters');
+                    return;
+                }
+                
+                const result = await this.signUp(name, email, password);
+                
+                if (result.success) {
+                    this.showSuccess(`Welcome, ${result.user.name}!`);
+                } else {
+                    this.showError(result.error || 'Registration failed');
+                }
+            }
+            
+            preFillEmailIfRemembered() {
+                const rememberedEmail = localStorage.getItem('bevyfinder_user_email');
+                if (rememberedEmail) {
+                    const emailInput = document.getElementById('signin-email');
+                    if (emailInput) {
+                        emailInput.value = rememberedEmail;
+                        
+                        const rememberMeCheckbox = document.getElementById('remember-me');
+                        if (rememberMeCheckbox) {
+                            rememberMeCheckbox.checked = true;
+                        }
+                    }
+                }
+            }
+            
+            showError(message) {
+                console.error('❌ Error:', message);
+                // You can implement a toast notification here
+                alert(message);
+            }
+            
+            showSuccess(message) {
+                console.log('✅ Success:', message);
+                // You can implement a toast notification here
+                alert(message);
+            }
+        }
+        
+        // ===== GLOBAL AUTH INSTANCE =====
+        let auth;
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Initializing embedded auth system');
+            auth = new BevyFinderAuth();
+            
+            // Make auth globally available
+            window.BevyFinderAuth = auth;
+            window.BevyFinderAPI = auth.api;
+        });
+    </script>
+    
+    <!-- EMBEDDED MAIN APP SCRIPT -->
+    <script>
+        // ===== MAIN APP FUNCTIONALITY =====
+        let drinksData = [];
+        let currentTab = 'search';
+        
+        // Initialize main app when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🎯 Main app initializing');
+            
+            try {
+                // Wait for auth to be ready
+                if (!window.BevyFinderAuth) {
+                    console.log('⏳ Waiting for auth system...');
+                    await new Promise(resolve => {
+                        const checkAuth = () => {
+                            if (window.BevyFinderAuth) {
+                                resolve();
+                            } else {
+                                setTimeout(checkAuth, 100);
+                            }
+                        };
+                        checkAuth();
+                    });
+                }
+                
+                console.log('✅ Auth system ready, initializing main app');
+                
+                // Load drinks data
+                await loadDrinksData();
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Initialize UI
+                initializeUI();
+                
+                console.log('✅ Main app initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Main app initialization failed:', error);
+            }
+        });
+        
+        async function loadDrinksData() {
+            try {
+                console.log('📊 Loading drinks data...');
+                const result = await window.BevyFinderAPI.getDrinks();
+                
+                if (result.success) {
+                    drinksData = result.data.drinks || [];
+                    console.log(`✅ Loaded ${drinksData.length} drinks`);
+                } else {
+                    console.error('❌ Failed to load drinks:', result.error);
+                    drinksData = [];
+                }
+            } catch (error) {
+                console.error('❌ Error loading drinks:', error);
+                drinksData = [];
+            }
+        }
+        
+        function setupEventListeners() {
+            // Tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+            
+            // Search input
+            const beverageNameInput = document.getElementById('beverage-name');
+            if (beverageNameInput) {
+                beverageNameInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    if (query.length >= 2) {
+                        searchBeverages(query);
+                    } else {
+                        clearSearchResults();
+                    }
+                });
+            }
+            
+            // Pinboard items
+            const pinboardItems = document.querySelectorAll('.pinboard-item');
+            pinboardItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const feature = item.getAttribute('data-feature');
+                    handlePinboardClick(feature);
+                });
             });
         }
         
-        // Check for updates on page load
-        document.addEventListener('DOMContentLoaded', checkForUpdates);
+        function initializeUI() {
+            // Set initial tab
+            switchTab('search');
+            
+            // Update any UI elements that depend on auth status
+            if (window.BevyFinderAuth && window.BevyFinderAuth.isAuthenticated) {
+                console.log('✅ User is authenticated, updating UI');
+                // Add any authenticated-user-specific UI updates here
+            }
+        }
         
-        // Force refresh on page visibility change (when user returns to tab)
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                // Check if we need to refresh (every 5 minutes)
-                const lastCheck = localStorage.getItem('bevyfinder_last_check') || 0;
-                const now = Date.now();
+        function switchTab(tab) {
+            console.log('🔄 Switching to tab:', tab);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const targetSection = document.getElementById(`${tab}-section`);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            currentTab = tab;
+        }
+        
+        async function searchBeverages(query) {
+            try {
+                console.log('🔍 Searching for:', query);
+                const result = await window.BevyFinderAPI.searchDrinks(query);
                 
-                if (now - lastCheck > 5 * 60 * 1000) { // 5 minutes
-                    localStorage.setItem('bevyfinder_last_check', now);
-                    
-                    // Fetch current version from server
-                    fetch(window.location.href + '?v=' + CURRENT_VERSION, { 
-                        method: 'HEAD',
-                        cache: 'no-cache'
-                    }).then(() => {
-                        // If fetch succeeds, check for updates
-                        checkForUpdates();
-                    }).catch(() => {
-                        // If fetch fails, assume offline
-                        console.log('Offline mode - skipping update check');
-                    });
+                if (result.success) {
+                    displaySearchResults(result.data.drinks || []);
+                } else {
+                    console.error('❌ Search failed:', result.error);
+                    displaySearchResults([]);
+                }
+            } catch (error) {
+                console.error('❌ Search error:', error);
+                displaySearchResults([]);
+            }
+        }
+        
+        function displaySearchResults(drinks) {
+            const resultsContainer = document.getElementById('search-results');
+            if (!resultsContainer) return;
+            
+            if (drinks.length === 0) {
+                resultsContainer.innerHTML = '<p class="no-results">No drinks found</p>';
+                return;
+            }
+            
+            const html = drinks.map(drink => `
+                <div class="beverage-card" data-drink-id="${drink._id}">
+                    <div class="beverage-info">
+                        <h3>${drink.name}</h3>
+                        <p class="beverage-type">${drink.type}</p>
+                        <p class="beverage-abv">ABV: ${drink.abv}%</p>
+                        <p class="beverage-calories">Calories: ${drink.calories}</p>
+                    </div>
+                    <div class="beverage-actions">
+                        <button class="like-btn" onclick="likeBeverage('${drink._id}')">
+                            <i class="fas fa-heart"></i> <span class="like-count">${drink.likes || 0}</span>
+                        </button>
+                        <button class="favorite-btn" onclick="toggleFavorite('${drink._id}')">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            resultsContainer.innerHTML = html;
+        }
+        
+        function clearSearchResults() {
+            const resultsContainer = document.getElementById('search-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+            }
+        }
+        
+        function handlePinboardClick(feature) {
+            console.log('🎯 Pinboard feature clicked:', feature);
+            
+            switch (feature) {
+                case 'night-tracker':
+                    showNightTracker();
+                    break;
+                case 'favorites':
+                    showFavorites();
+                    break;
+                case 'featured':
+                    showFeaturedPage();
+                    break;
+                case 'friends':
+                    showFriendsPage();
+                    break;
+                default:
+                    console.log('Unknown feature:', feature);
+            }
+        }
+        
+        // Feature functions (implement as needed)
+        function showNightTracker() {
+            alert('Night Tracker - Coming Soon!');
+        }
+        
+        function showFavorites() {
+            alert('Favorites - Coming Soon!');
+        }
+        
+        function showFeaturedPage() {
+            alert('Featured Drinks - Coming Soon!');
+        }
+        
+        function showFriendsPage() {
+            alert('Friends - Coming Soon!');
+        }
+        
+        // Global functions for beverage actions
+        async function likeBeverage(drinkId) {
+            if (!window.BevyFinderAuth || !window.BevyFinderAuth.isAuthenticated) {
+                alert('Please log in to like drinks');
+                return;
+            }
+            
+            try {
+                const result = await window.BevyFinderAPI.likeDrink(drinkId);
+                if (result.success) {
+                    console.log('✅ Drink liked successfully');
+                    // Update UI
+                    updateLikeButton(drinkId, true);
+                } else {
+                    console.error('❌ Failed to like drink:', result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error liking drink:', error);
+            }
+        }
+        
+        async function toggleFavorite(drinkId) {
+            if (!window.BevyFinderAuth || !window.BevyFinderAuth.isAuthenticated) {
+                alert('Please log in to add favorites');
+                return;
+            }
+            
+            try {
+                const result = await window.BevyFinderAPI.addToFavorites(drinkId);
+                if (result.success) {
+                    console.log('✅ Drink added to favorites');
+                    // Update UI
+                    updateFavoriteButton(drinkId, true);
+                } else {
+                    console.error('❌ Failed to add to favorites:', result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error adding to favorites:', error);
+            }
+        }
+        
+        function updateLikeButton(drinkId, isLiked) {
+            const likeBtn = document.querySelector(`[data-drink-id="${drinkId}"] .like-btn`);
+            if (likeBtn) {
+                if (isLiked) {
+                    likeBtn.classList.add('liked');
+                    likeBtn.innerHTML = '<i class="fas fa-heart"></i> <span class="like-count">' + (parseInt(likeBtn.querySelector('.like-count').textContent) + 1) + '</span>';
                 }
             }
-        });
+        }
+        
+        function updateFavoriteButton(drinkId, isFavorited) {
+            const favoriteBtn = document.querySelector(`[data-drink-id="${drinkId}"] .favorite-btn`);
+            if (favoriteBtn) {
+                if (isFavorited) {
+                    favoriteBtn.classList.add('favorited');
+                    favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+                }
+            }
+        }
+        
+        // Make functions globally available
+        window.likeBeverage = likeBeverage;
+        window.toggleFavorite = toggleFavorite;
     </script>
 </body>
 </html> 

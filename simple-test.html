@@ -1,52 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Simple Connection Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple GA Test</title>
-    
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-ZSY199PZC4');
-    </script>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>Simple Google Analytics Test</h1>
-    <p>Open browser dev tools (F12) and check the Network tab for requests to googletagmanager.com</p>
+    <h1>🔧 Simple Connection Test</h1>
     
-    <button onclick="sendEvent()">Send Test Event</button>
-    <button onclick="checkGA()">Check if GA is loaded</button>
+    <button onclick="testConnection()">Test Connection</button>
+    <button onclick="testLogin()">Test Login</button>
     
-    <div id="status"></div>
+    <div id="results"></div>
     
     <script>
-        function sendEvent() {
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'test_event', {
-                    'event_category': 'test',
-                    'event_label': 'simple_test'
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        async function testConnection() {
+            addResult('Testing connection to 192.168.4.36:3000...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
-                document.getElementById('status').innerHTML = '<p style="color: green;">✅ Event sent!</p>';
-            } else {
-                document.getElementById('status').innerHTML = '<p style="color: red;">❌ gtag not available</p>';
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Connection successful! Server says: ${data.message}`, 'success');
+                } else {
+                    addResult(`❌ Connection failed with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Connection error: ${error.message}`, 'error');
             }
         }
         
-        function checkGA() {
-            if (typeof gtag !== 'undefined') {
-                document.getElementById('status').innerHTML = '<p style="color: green;">✅ Google Analytics is loaded!</p>';
-            } else {
-                document.getElementById('status').innerHTML = '<p style="color: red;">❌ Google Analytics is NOT loaded</p>';
+        async function testLogin() {
+            addResult('Testing login with test3@example.com...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.4.36:3000/api/auth/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test3@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Login successful! Welcome ${data.data.user.name}`, 'success');
+                } else {
+                    const data = await response.json();
+                    addResult(`❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login error: ${error.message}`, 'error');
             }
         }
         
-        // Auto-check on load
+        // Auto-test on load
         window.addEventListener('load', () => {
-            setTimeout(checkGA, 2000);
+            setTimeout(testConnection, 1000);
         });
     </script>
 </body>

@@ -1,56 +1,259 @@
-// BevyFinder API Client
-// Replace localStorage authentication with server API calls
-
+// BevyFinder API Client for Frontend
 class BevyFinderAPI {
-    constructor(baseURL = 'http://localhost:3000/api') {
-        this.baseURL = baseURL;
+    constructor(baseURL = null) {
+        this.baseURL = null;
+        this.connectionTested = false;
+        this.workingURLs = [];
+        
+        // Initialize with provided URL or auto-detect
+        if (baseURL) {
+            this.baseURL = baseURL;
+        } else {
+            this.initializeURL();
+        }
+        
         this.token = localStorage.getItem('bevyfinder_token');
+        console.log('API: Initialized with base URL:', this.baseURL);
+        
+        // Test connection in background
+        this.testConnection();
+    }
+    
+    async initializeURL() {
+        // Get current location info
+        const currentHost = window.location.hostname;
+        const currentPort = window.location.port;
+        const currentProtocol = window.location.protocol;
+        
+        console.log('API: Current location:', {
+            hostname: currentHost,
+            port: currentPort,
+            protocol: currentProtocol
+        });
+        
+        // HARDCODED FALLBACK: Always use the known working local server
+        // This ensures the app works regardless of hostname resolution issues
+        this.baseURL = 'http://192.168.4.36:3000/api';
+        console.log('API: Using hardcoded local server URL:', this.baseURL);
+        
+        // Test the connection to make sure it works
+        try {
+            const response = await fetch('http://192.168.4.36:3000/health', {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                signal: AbortSignal.timeout(5000)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Hardcoded API URL is working');
+                this.workingURLs.push(this.baseURL);
+                return;
+            } else {
+                console.warn('⚠️ Hardcoded API URL failed, trying alternatives...');
+            }
+        } catch (error) {
+            console.warn('⚠️ Hardcoded API URL failed:', error.message);
+        }
+        
+        // If hardcoded URL fails, try the original detection logic
+        const possibleURLs = this.generatePossibleURLs(currentHost, currentPort, currentProtocol);
+        
+        // Try each URL until we find one that works
+        for (const url of possibleURLs) {
+            try {
+                console.log('API: Testing URL:', url);
+                const response = await fetch(url.replace('/api', '') + '/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    // Add timeout
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Found working API URL:', url);
+                    this.baseURL = url;
+                    this.workingURLs.push(url);
+                    return;
+                }
+            } catch (error) {
+                console.log(`❌ Failed to connect to ${url}:`, error.message);
+            }
+        }
+        
+        // If no URL works, use the hardcoded one as final fallback
+        this.baseURL = 'http://192.168.4.36:3000/api';
+        console.warn('⚠️ No working API URL found, using hardcoded fallback:', this.baseURL);
+    }
+    
+    generatePossibleURLs(hostname, port, protocol) {
+        const urls = [];
+        
+        // ALWAYS prioritize local development URLs first
+        // This prevents the app from trying production URLs when running locally
+        
+        // 1. Always try the known working local network IP first
+        urls.push('http://192.168.4.36:3000/api');
+        
+        // 2. If we're on a local network (192.168.x.x, 10.x.x.x, etc.)
+        if (hostname.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/)) {
+            // Try the same hostname with port 3000
+            urls.push(`${protocol}//${hostname}:3000/api`);
+            
+            // Try common local network IPs
+            const networkPrefix = hostname.split('.').slice(0, 3).join('.');
+            for (let i = 1; i <= 10; i++) {
+                urls.push(`${protocol}//${networkPrefix}.${i}:3000/api`);
+            }
+        }
+        
+        // 3. If we're on localhost
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            urls.push('http://localhost:3000/api');
+            urls.push('http://127.0.0.1:3000/api');
+        }
+        
+        // 4. Common local development IPs
+        urls.push('http://192.168.1.1:3000/api');
+        urls.push('http://192.168.0.1:3000/api');
+        urls.push('http://10.0.0.1:3000/api');
+        
+        // 5. Only try production URLs as a last resort, and only if we're actually on the production domain
+        if (hostname === 'bevyfinder.com' || hostname === 'www.bevyfinder.com') {
+            urls.push(`https://${hostname}/api`);
+            urls.push(`https://api.${hostname}/api`);
+        }
+        
+        // Remove duplicates and return
+        return [...new Set(urls)];
+    }
+    
+    async testConnection() {
+        if (this.connectionTested) return;
+        
+        try {
+            const response = await fetch(`${this.baseURL.replace('/api', '')}/health`, {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                signal: AbortSignal.timeout(3000)
+            });
+            
+            if (response.ok) {
+                console.log('✅ API connection successful');
+                this.connectionTested = true;
+            } else {
+                console.error('❌ API connection failed:', response.status);
+                await this.tryAlternativeURLs();
+            }
+        } catch (error) {
+            console.error('❌ API connection error:', error.message);
+            await this.tryAlternativeURLs();
+        }
+    }
+    
+    async tryAlternativeURLs() {
+        if (this.workingURLs.length > 0) {
+            // Try known working URLs first
+            for (const url of this.workingURLs) {
+                if (url === this.baseURL) continue;
+                
+                try {
+                    const response = await fetch(url.replace('/api', '') + '/health', {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        signal: AbortSignal.timeout(3000)
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ Switched to working API URL: ${url}`);
+                        this.baseURL = url;
+                        this.connectionTested = true;
+                        return;
+                    }
+                } catch (error) {
+                    console.log(`❌ Failed to connect to ${url}:`, error.message);
+                }
+            }
+        }
+        
+        // If no known URLs work, try to re-initialize
+        console.log('🔄 Re-initializing API URLs...');
+        await this.initializeURL();
     }
 
-    // Set authentication token
+    // Token management
     setToken(token) {
         this.token = token;
         localStorage.setItem('bevyfinder_token', token);
     }
 
-    // Clear authentication token
     clearToken() {
         this.token = null;
         localStorage.removeItem('bevyfinder_token');
     }
 
-    // Get authorization headers
     getHeaders() {
         const headers = {
             'Content-Type': 'application/json'
         };
-        
+
         if (this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;
         }
-        
+
         return headers;
     }
 
-    // Make API request
-    async request(endpoint, options = {}) {
-        try {
-            const url = `${this.baseURL}${endpoint}`;
-            const config = {
-                headers: this.getHeaders(),
-                ...options
-            };
+    // Make API request with retry logic
+    async request(endpoint, options = {}, retryCount = 0) {
+        const maxRetries = 2;
+        const url = `${this.baseURL}${endpoint}`;
+        
+        const config = {
+            headers: this.getHeaders(),
+            mode: 'cors',
+            credentials: 'include',
+            ...options
+        };
 
+        try {
+            console.log('API: Making request to:', url);
             const response = await fetch(url, config);
+            
+            // If we get a CORS error or connection error, try alternative URLs
+            if (!response.ok && (response.status === 0 || response.status >= 500)) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'API request failed');
+                throw new Error(data.message || `HTTP ${response.status}`);
             }
 
             return data;
         } catch (error) {
             console.error('API request error:', error);
+            console.error('API: Request failed for URL:', url);
+            
+            // Retry with different URL if we haven't exceeded retry limit
+            if (retryCount < maxRetries) {
+                console.log(`🔄 Retrying request (${retryCount + 1}/${maxRetries})...`);
+                await this.tryAlternativeURLs();
+                return this.request(endpoint, options, retryCount + 1);
+            }
+            
             throw error;
         }
     }
@@ -59,6 +262,7 @@ class BevyFinderAPI {
 
     // Register new user
     async register(userData) {
+        console.log('API: Registering user:', userData);
         const response = await this.request('/auth/register', {
             method: 'POST',
             body: JSON.stringify(userData)
@@ -68,11 +272,13 @@ class BevyFinderAPI {
             this.setToken(response.data.token);
         }
 
+        console.log('API: Register response:', response);
         return response;
     }
 
     // Login user
     async login(credentials) {
+        console.log('API: Logging in user:', credentials.email, 'Remember me:', credentials.rememberMe);
         const response = await this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
@@ -80,8 +286,18 @@ class BevyFinderAPI {
 
         if (response.data.token) {
             this.setToken(response.data.token);
+            
+            // If remember me is checked, store additional info
+            if (credentials.rememberMe) {
+                localStorage.setItem('bevyfinder_remember_me', 'true');
+                localStorage.setItem('bevyfinder_user_email', credentials.email);
+            } else {
+                localStorage.removeItem('bevyfinder_remember_me');
+                localStorage.removeItem('bevyfinder_user_email');
+            }
         }
 
+        console.log('API: Login response:', response);
         return response;
     }
 
@@ -128,286 +344,72 @@ class BevyFinderAPI {
 
     // Check if user is authenticated
     isAuthenticated() {
-        return !!this.token;
+        const hasToken = !!this.token;
+        console.log('🔑 Token check:', hasToken ? 'Token exists' : 'No token');
+        return hasToken;
     }
 
     // Get token
     getToken() {
         return this.token;
     }
-}
 
-// Updated Authentication Class for Frontend
-class BevyFinderAuth {
-    constructor() {
-        this.api = new BevyFinderAPI();
-        this.currentUser = null;
-        this.isInitialized = false;
+    // Get current API URL (for debugging)
+    getCurrentURL() {
+        return this.baseURL;
     }
 
-    // Initialize authentication
-    async init() {
-        if (this.isInitialized) return;
-
-        try {
-            if (this.api.isAuthenticated()) {
-                const response = await this.api.getCurrentUser();
-                this.currentUser = response.data.user;
-            }
-        } catch (error) {
-            console.log('Token invalid, clearing...');
-            this.api.clearToken();
-        }
-
-        this.isInitialized = true;
-        this.updateUI();
+    // Favorites Methods
+    async addToFavorites(beverageKey) {
+        console.log('API: Adding to favorites:', beverageKey);
+        const response = await this.request('/favorites/add', {
+            method: 'POST',
+            body: JSON.stringify({ beverageKey })
+        });
+        console.log('API: Add to favorites response:', response);
+        return response;
     }
 
-    // Sign up user
-    async signUp(name, email, password) {
-        try {
-            const response = await this.api.register({ name, email, password });
-            this.currentUser = response.data.user;
-            this.updateUI();
-            this.showNotification('Account created successfully!', 'success');
-            return true;
-        } catch (error) {
-            this.showNotification(error.message, 'error');
-            return false;
-        }
+    async removeFromFavorites(beverageKey) {
+        console.log('API: Removing from favorites:', beverageKey);
+        const response = await this.request('/favorites/remove', {
+            method: 'DELETE',
+            body: JSON.stringify({ beverageKey })
+        });
+        console.log('API: Remove from favorites response:', response);
+        return response;
     }
 
-    // Sign in user
-    async signIn(email, password) {
-        try {
-            const response = await this.api.login({ email, password });
-            this.currentUser = response.data.user;
-            this.updateUI();
-            this.showNotification('Welcome back!', 'success');
-            return true;
-        } catch (error) {
-            this.showNotification(error.message, 'error');
-            return false;
-        }
+    // Like Methods
+    async likeDrink(beverageKey) {
+        console.log('API: Liking drink:', beverageKey);
+        const response = await this.request('/likes/add', {
+            method: 'POST',
+            body: JSON.stringify({ beverageKey })
+        });
+        console.log('API: Like drink response:', response);
+        return response;
     }
 
-    // Sign out user
-    async signOut() {
-        try {
-            await this.api.logout();
-        } catch (error) {
-            console.log('Logout error:', error);
-        } finally {
-            this.currentUser = null;
-            this.updateUI();
-            this.showNotification('Signed out successfully', 'info');
-        }
+    async unlikeDrink(beverageKey) {
+        console.log('API: Unliking drink:', beverageKey);
+        const response = await this.request('/likes/remove', {
+            method: 'DELETE',
+            body: JSON.stringify({ beverageKey })
+        });
+        console.log('API: Unlike drink response:', response);
+        return response;
     }
 
-    // Get current user
-    getCurrentUser() {
-        return this.currentUser;
-    }
-
-    // Check if user is authenticated
-    isUserAuthenticated() {
-        return !!this.currentUser;
-    }
-
-    // Add favorite drink
-    async addFavoriteDrink(drinkId) {
-        if (!this.isUserAuthenticated()) {
-            this.showNotification('Please sign in to save favorites', 'warning');
-            return false;
-        }
-
-        try {
-            // Update local state
-            if (!this.currentUser.profile.preferences.favoriteDrinks.includes(drinkId)) {
-                this.currentUser.profile.preferences.favoriteDrinks.push(drinkId);
-                this.currentUser.stats.favorites = this.currentUser.profile.preferences.favoriteDrinks.length;
-            }
-
-            // Update server (you'll need to add this endpoint)
-            // await this.api.request('/user/favorites', {
-            //     method: 'POST',
-            //     body: JSON.stringify({ drinkId })
-            // });
-
-            this.updateUI();
-            return true;
-        } catch (error) {
-            this.showNotification('Failed to add favorite', 'error');
-            return false;
-        }
-    }
-
-    // Remove favorite drink
-    async removeFavoriteDrink(drinkId) {
-        if (!this.isUserAuthenticated()) {
-            return false;
-        }
-
-        try {
-            // Update local state
-            const index = this.currentUser.profile.preferences.favoriteDrinks.indexOf(drinkId);
-            if (index > -1) {
-                this.currentUser.profile.preferences.favoriteDrinks.splice(index, 1);
-                this.currentUser.stats.favorites = this.currentUser.profile.preferences.favoriteDrinks.length;
-            }
-
-            // Update server (you'll need to add this endpoint)
-            // await this.api.request(`/user/favorites/${drinkId}`, {
-            //     method: 'DELETE'
-            // });
-
-            this.updateUI();
-            return true;
-        } catch (error) {
-            this.showNotification('Failed to remove favorite', 'error');
-            return false;
-        }
-    }
-
-    // Track search
-    async trackSearch() {
-        if (!this.isUserAuthenticated()) {
-            return;
-        }
-
-        try {
-            this.currentUser.stats.searches += 1;
-            this.currentUser.stats.lastActive = new Date();
-
-            // Update server (you'll need to add this endpoint)
-            // await this.api.request('/user/stats/search', {
-            //     method: 'POST'
-            // });
-
-            this.updateUI();
-        } catch (error) {
-            console.log('Failed to track search:', error);
-        }
-    }
-
-    // Update UI based on authentication state
-    updateUI() {
-        const authPage = document.getElementById('auth-page');
-        const signoutBtn = document.getElementById('signout-btn');
-        const profileBtn = document.getElementById('sidebar-btn-profile');
-
-        if (this.isUserAuthenticated()) {
-            // User is signed in
-            if (authPage) authPage.style.display = 'none';
-            if (signoutBtn) signoutBtn.style.display = 'block';
-            if (profileBtn) profileBtn.style.display = 'block';
-
-            // Update profile button text
-            if (profileBtn && this.currentUser) {
-                profileBtn.innerHTML = `<i class="fas fa-user"></i> ${this.currentUser.name}`;
-            }
-        } else {
-            // User is not signed in
-            if (signoutBtn) signoutBtn.style.display = 'none';
-            if (profileBtn) profileBtn.style.display = 'none';
-        }
-    }
-
-    // Show notification
-    showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `auth-notification ${type}`;
-        notification.innerHTML = `
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()">×</button>
-        `;
-
-        // Add to page
-        document.body.appendChild(notification);
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.remove();
-            }
-        }, 5000);
-    }
-
-    // Setup event listeners
-    setupEventListeners() {
-        // Sign up form
-        const signupForm = document.getElementById('signup-form');
-        if (signupForm) {
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(signupForm);
-                const name = formData.get('name');
-                const email = formData.get('email');
-                const password = formData.get('password');
-
-                const success = await this.signUp(name, email, password);
-                if (success) {
-                    // Hide auth page and show main app
-                    document.getElementById('auth-page').style.display = 'none';
-                    document.querySelector('.main-app').style.display = 'block';
-                }
-            });
-        }
-
-        // Sign in form
-        const signinForm = document.getElementById('signin-form');
-        if (signinForm) {
-            signinForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(signinForm);
-                const email = formData.get('email');
-                const password = formData.get('password');
-
-                const success = await this.signIn(email, password);
-                if (success) {
-                    // Hide auth page and show main app
-                    document.getElementById('auth-page').style.display = 'none';
-                    document.querySelector('.main-app').style.display = 'block';
-                }
-            });
-        }
-
-        // Sign out button
-        const signoutBtn = document.getElementById('signout-btn');
-        if (signoutBtn) {
-            signoutBtn.addEventListener('click', () => {
-                this.signOut();
-            });
-        }
-
-        // Auth toggle buttons
-        const showSignupBtn = document.getElementById('show-signup');
-        const showSigninBtn = document.getElementById('show-signin');
-        const signupContainer = document.getElementById('signup-container');
-        const signinContainer = document.getElementById('signin-container');
-
-        if (showSignupBtn && showSigninBtn) {
-            showSignupBtn.addEventListener('click', () => {
-                signinContainer.style.display = 'none';
-                signupContainer.style.display = 'block';
-            });
-
-            showSigninBtn.addEventListener('click', () => {
-                signupContainer.style.display = 'none';
-                signinContainer.style.display = 'block';
-            });
-        }
+    async getTopLikedDrinks() {
+        console.log('API: Getting top liked drinks');
+        const response = await this.request('/likes/top', {
+            method: 'GET'
+        });
+        console.log('API: Top liked drinks response:', response);
+        return response;
     }
 }
-
-// Initialize authentication when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.auth = new BevyFinderAuth();
-    window.auth.init();
-    window.auth.setupEventListeners();
-});
 
 // Export for use in other scripts
-window.BevyFinderAPI = BevyFinderAPI;
-window.BevyFinderAuth = BevyFinderAuth; 
+window.BevyFinderAPI = BevyFinderAPI; 

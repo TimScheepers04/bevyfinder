@@ -1,0 +1,34 @@
+{
+  "name": "BevyFinder API",
+  "description": "Backend API for BevyFinder drink database",
+  "repository": "https://github.com/yourusername/bevyfinder-api",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "express", "mongodb", "drinks", "api"],
+  "env": {
+    "MONGODB_URI": {
+      "description": "MongoDB connection string",
+      "value": "your-mongodb-uri-here"
+    },
+    "JWT_SECRET": {
+      "description": "Secret key for JWT tokens",
+      "generator": "secret"
+    },
+    "JWT_EXPIRE": {
+      "description": "JWT token expiration time",
+      "value": "7d"
+    },
+    "NODE_ENV": {
+      "description": "Environment",
+      "value": "production"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    "mongolab:sandbox"
+  ]
+} 

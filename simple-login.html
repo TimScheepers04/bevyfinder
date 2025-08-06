@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Login - BevyFinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍺 BevyFinder</h1>
+            <p>Simple & Reliable Login</p>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" value="test3@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" value="password123" required>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+            
+            <button type="submit" class="login-btn" id="login-button">
+                🔐 Sign In
+            </button>
+        </form>
+        
+        <div id="status" class="status info hidden"></div>
+        <div id="log" class="log hidden"></div>
+    </div>
+
+    <script>
+        // Simple logging function
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.classList.remove('hidden');
+            
+            // Show log for debugging
+            document.getElementById('log').classList.remove('hidden');
+            
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 3000);
+            }
+        }
+        
+        // Simple login function using the exact working code from debug page
+        async function login(email, password, rememberMe) {
+            try {
+                log('🔐 Starting login process...');
+                
+                const loginButton = document.getElementById('login-button');
+                loginButton.disabled = true;
+                loginButton.textContent = '🔄 Signing In...';
+                
+                // Use the exact working API URL from debug page
+                const apiUrl = 'http://192.168.4.36:3000/api/auth/login';
+                log(`🌐 Making request to: ${apiUrl}`);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        rememberMe: rememberMe
+                    })
+                });
+                
+                log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
+                const text = await response.text();
+                log(`📡 Response text: ${text.substring(0, 200)}...`);
+                
+                try {
+                    const data = JSON.parse(text);
+                    log('✅ JSON parsed successfully');
+                    
+                    if (data.success) {
+                        log(`✅ Login successful for: ${data.data.user.name}`);
+                        
+                        // Store token
+                        if (data.data.token) {
+                            localStorage.setItem('bevyfinder_token', data.data.token);
+                            log('💾 Token stored in localStorage');
+                        }
+                        
+                        // Store remember me info
+                        if (rememberMe) {
+                            localStorage.setItem('bevyfinder_remember_me', 'true');
+                            localStorage.setItem('bevyfinder_user_email', email);
+                            log('💾 Remember me info stored');
+                        }
+                        
+                        showStatus(`✅ Welcome back, ${data.data.user.name}!`, 'success');
+                        
+                        // Redirect to main app
+                        setTimeout(() => {
+                            log('🔄 Redirecting to main app...');
+                            window.location.href = '/';
+                        }, 2000);
+                        
+                        return true;
+                    } else {
+                        log(`❌ Login failed: ${data.message}`);
+                        showStatus(`❌ Login failed: ${data.message}`, 'error');
+                        return false;
+                    }
+                } catch (e) {
+                    log(`❌ JSON parse error: ${e.message}`);
+                    log(`❌ Raw response: ${text}`);
+                    showStatus('❌ Server returned invalid response', 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`);
+                showStatus(`❌ Network error: ${error.message}`, 'error');
+                return false;
+            } finally {
+                const loginButton = document.getElementById('login-button');
+                loginButton.disabled = false;
+                loginButton.textContent = '🔐 Sign In';
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            
+            if (!email || !password) {
+                showStatus('❌ Please enter both email and password', 'error');
+                return;
+            }
+            
+            log('🚀 Form submitted, starting login...');
+            await login(email, password, rememberMe);
+        });
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 Simple login page loaded');
+            log(`📍 Current location: ${window.location.href}`);
+            
+            // Pre-fill email if remembered
+            const rememberedEmail = localStorage.getItem('bevyfinder_user_email');
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('remember-me').checked = true;
+                log('📧 Pre-filled remembered email');
+            }
+            
+            // Test API connection
+            testConnection();
+        });
+        
+        // Test API connection
+        async function testConnection() {
+            try {
+                log('🧪 Testing API connection...');
+                const response = await fetch('http://192.168.4.36:3000/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ API connection successful: ${data.message}`);
+                } else {
+                    log(`❌ API connection failed: ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ API connection error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html> 

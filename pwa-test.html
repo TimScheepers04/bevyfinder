@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Installation Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .warning { background: rgba(255, 193, 7, 0.3); }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.3); }
+        .install-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 15px 25px;
+        }
+        .manual-steps {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .manual-steps ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .manual-steps li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 PWA Installation Test</h1>
+        
+        <div class="status info">
+            <h3>🔍 PWA Requirements Check</h3>
+            <div id="pwa-status"></div>
+        </div>
+        
+        <div class="status info">
+            <h3>⚙️ Installation Options</h3>
+            <button onclick="testInstall()" class="install-btn">Test Install Button</button>
+            <button onclick="showManualSteps()">Show Manual Steps</button>
+        </div>
+        
+        <div id="manual-install" class="manual-steps" style="display: none;">
+            <h3>📋 Manual Installation Steps</h3>
+            <p><strong>If the install button doesn't work, follow these steps:</strong></p>
+            
+            <h4>For iPhone (Safari):</h4>
+            <ol>
+                <li>Tap the <strong>Share</strong> button (square with arrow up)</li>
+                <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+                <li>Tap <strong>"Add"</strong> to confirm</li>
+                <li>The app will now appear on your home screen!</li>
+            </ol>
+            
+            <h4>For Android (Chrome):</h4>
+            <ol>
+                <li>Tap the <strong>three dots menu</strong> (⋮) in the top right</li>
+                <li>Tap <strong>"Add to Home screen"</strong></li>
+                <li>Tap <strong>"Add"</strong> to confirm</li>
+                <li>The app will now appear on your home screen!</li>
+            </ol>
+            
+            <h4>For Samsung Internet:</h4>
+            <ol>
+                <li>Tap the <strong>menu button</strong> (three lines)</li>
+                <li>Tap <strong>"Add page to"</strong></li>
+                <li>Tap <strong>"Home screen"</strong></li>
+                <li>Tap <strong>"Add"</strong> to confirm</li>
+            </ol>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="status info">
+            <h3>🔗 Quick Links</h3>
+            <button onclick="window.location.href='/'">Go to Main App</button>
+            <button onclick="window.location.href='status.html'">Check Server Status</button>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        function checkPWARequirements() {
+            const statusDiv = document.getElementById('pwa-status');
+            let statusHTML = '';
+            
+            // Check HTTPS
+            const isHTTPS = window.location.protocol === 'https:';
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isNetworkIP = window.location.hostname.includes('192.168.');
+            const httpsOK = isHTTPS || isLocalhost || isNetworkIP;
+            
+            statusHTML += `<div class="${httpsOK ? 'success' : 'error'}">${httpsOK ? '✅' : '❌'} HTTPS/Local: ${window.location.protocol}//${window.location.hostname}</div>`;
+            
+            // Check Service Worker
+            const hasServiceWorker = 'serviceWorker' in navigator;
+            statusHTML += `<div class="${hasServiceWorker ? 'success' : 'error'}">${hasServiceWorker ? '✅' : '❌'} Service Worker Support</div>`;
+            
+            // Check Manifest
+            const hasManifest = !!document.querySelector('link[rel="manifest"]');
+            statusHTML += `<div class="${hasManifest ? 'success' : 'error'}">${hasManifest ? '✅' : '❌'} Manifest File</div>`;
+            
+            // Check if already installed
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            statusHTML += `<div class="${isStandalone ? 'warning' : 'info'}">${isStandalone ? '⚠️' : 'ℹ️'} App Status: ${isStandalone ? 'Already Installed' : 'Not Installed'}</div>`;
+            
+            // Check User Agent
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            statusHTML += `<div class="${isMobile ? 'success' : 'warning'}">${isMobile ? '✅' : '⚠️'} Device: ${isMobile ? 'Mobile' : 'Desktop'}</div>`;
+            
+            statusDiv.innerHTML = statusHTML;
+            
+            // Log detailed info
+            console.log('PWA Debug Info:');
+            console.log('- HTTPS:', isHTTPS);
+            console.log('- Localhost:', isLocalhost);
+            console.log('- Network IP:', isNetworkIP);
+            console.log('- Service Worker:', hasServiceWorker);
+            console.log('- Manifest:', hasManifest);
+            console.log('- Standalone:', isStandalone);
+            console.log('- User Agent:', userAgent);
+            console.log('- Display Mode:', window.matchMedia('(display-mode: standalone)').matches);
+        }
+        
+        function testInstall() {
+            addResult('Testing PWA installation...', 'info');
+            
+            // Check if beforeinstallprompt event is available
+            if (window.deferredPrompt) {
+                addResult('✅ Install prompt is available - showing install button', 'success');
+                // Create and show install button
+                const installBtn = document.createElement('button');
+                installBtn.innerHTML = '📱 Install BevyFinder';
+                installBtn.className = 'install-btn';
+                installBtn.onclick = async () => {
+                    if (window.deferredPrompt) {
+                        window.deferredPrompt.prompt();
+                        const { outcome } = await window.deferredPrompt.userChoice;
+                        addResult(`Install outcome: ${outcome}`, outcome === 'accepted' ? 'success' : 'error');
+                        window.deferredPrompt = null;
+                    }
+                };
+                document.querySelector('.container').appendChild(installBtn);
+            } else {
+                addResult('❌ Install prompt not available - use manual installation', 'error');
+                showManualSteps();
+            }
+        }
+        
+        function showManualSteps() {
+            document.getElementById('manual-install').style.display = 'block';
+            addResult('Showing manual installation steps', 'info');
+        }
+        
+        // Listen for beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA: beforeinstallprompt event fired');
+            e.preventDefault();
+            window.deferredPrompt = e;
+            addResult('✅ Install prompt received - you can now install the app!', 'success');
+        });
+        
+        // Listen for appinstalled event
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA: App installed');
+            addResult('🎉 BevyFinder has been installed successfully!', 'success');
+        });
+        
+        // Check requirements on load
+        window.addEventListener('load', () => {
+            setTimeout(checkPWARequirements, 1000);
+        });
+    </script>
+</body>
+</html> 
