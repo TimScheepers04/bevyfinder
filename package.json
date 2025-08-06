@@ -1,27 +1,27 @@
 {
-  "name": "bevyfinder-analytics-backend",
-  "version": "1.0.20250803175539",
-  "description": "Backend analytics server for BevyFinder beverage app",
-  "main": "backend-example.js",
+  "name": "bevyfinder-api",
+  "version": "1.0.0",
+  "description": "BevyFinder API Server",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend-example.js",
-    "dev": "nodemon backend-example.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server-render.js",
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "echo \"Deploying to cloud...\" && npm start"
   },
-  "keywords": [
-    "analytics",
-    "beverage",
-    "beer",
-    "tracking",
-    "express",
-    "mongodb"
-  ],
+  "keywords": ["bevyfinder", "api", "drinks", "database"],
   "author": "Tim Scheepers",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
-    "mongoose": "^7.5.0"
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
