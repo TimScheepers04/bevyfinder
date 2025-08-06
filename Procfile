@@ -1,1 +1,1 @@
-web: node server-render.js 
+web: node server-minimal.js 
