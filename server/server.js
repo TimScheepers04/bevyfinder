@@ -270,18 +270,28 @@ process.on('uncaughtException', (err) => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
-    mongoose.connection.close(() => {
-        console.log('MongoDB connection closed');
-        process.exit(0);
-    });
+    mongoose.connection.close()
+        .then(() => {
+            console.log('MongoDB connection closed');
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error('Error closing MongoDB connection:', err);
+            process.exit(1);
+        });
 });
 
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
-    mongoose.connection.close(() => {
-        console.log('MongoDB connection closed');
-        process.exit(0);
-    });
+    mongoose.connection.close()
+        .then(() => {
+            console.log('MongoDB connection closed');
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error('Error closing MongoDB connection:', err);
+            process.exit(1);
+        });
 });
 
 // Start the server

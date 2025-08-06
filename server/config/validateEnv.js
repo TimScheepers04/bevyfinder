@@ -3,8 +3,7 @@ const validateEnv = () => {
         'MONGODB_URI',
         'JWT_SECRET',
         'JWT_EXPIRE',
-        'NODE_ENV',
-        'PORT'
+        'NODE_ENV'
     ];
 
     const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -15,6 +14,12 @@ const validateEnv = () => {
             console.error(`   - ${varName}`);
         });
         process.exit(1);
+    }
+
+    // Set default PORT if not provided (Render will override this)
+    if (!process.env.PORT) {
+        process.env.PORT = 3000;
+        console.log('📝 Using default PORT: 3000');
     }
 
     // Validate JWT_SECRET strength
