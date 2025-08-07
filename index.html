@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
     <title>BevyFinder - Your Ultimate Drink Database</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -983,68 +987,214 @@
         }
 
         @media (max-width: 768px) {
-            .welcome-title {
-                font-size: 2rem;
-            }
-            
-            .sidebar {
-                width: 100%;
-                right: -100%;
-            }
-
-            .dashboard-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-
-            .stat-card {
+            /* Mobile-specific container adjustments */
+            .container {
                 padding: 15px;
             }
 
-            .stat-value {
-                font-size: 1.5rem;
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
             }
 
-            .pinboard-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            .header p {
+                font-size: 1rem;
             }
 
-            .pinboard-item {
-                padding: 25px;
+            /* Welcome page mobile optimization */
+            .welcome-title {
+                font-size: 2rem;
+                margin-bottom: 15px;
             }
 
-            .pinboard-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
+            .welcome-content {
+                padding: 20px;
             }
 
-            /* Night Tracker Mobile */
+            .feature-list {
+                margin: 20px 0;
+            }
+
+            .feature-list li {
+                padding: 8px 0;
+                font-size: 1rem;
+            }
+
+            .primary-btn {
+                padding: 18px 30px;
+                font-size: 1.1rem;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .secondary-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .secondary-btn {
+                width: 100%;
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+
+            /* Sidebar mobile optimization */
+            .sidebar {
+                width: 100%;
+                max-width: 300px;
+                right: -100%;
+            }
+
+            /* Session controls mobile optimization */
             .session-controls {
                 flex-direction: column;
                 text-align: center;
+                padding: 20px;
+                gap: 15px;
             }
 
             .session-buttons {
                 justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
+            .session-btn {
+                padding: 15px 20px;
+                font-size: 1rem;
+                min-width: 120px;
+            }
+
+            /* Summary cards mobile layout */
             .summary-cards {
                 grid-template-columns: 1fr;
                 gap: 15px;
+                margin-bottom: 25px;
             }
 
             .summary-card {
                 padding: 20px;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+
+            .card-content h4 {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
             }
 
             .card-content p {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
+                margin-bottom: 5px;
+            }
+
+            .driving-status {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+                margin-top: 5px;
+            }
+
+            /* Add drink section mobile optimization */
+            .add-drink-section {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+
+            .add-drink-section h3 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
             }
 
             .add-drink-input {
                 flex-direction: column;
+                gap: 10px;
+            }
+
+            .add-drink-input input {
+                padding: 15px;
+                font-size: 1rem;
+                border-radius: 12px;
+            }
+
+            .add-drink-btn {
+                padding: 15px 25px;
+                font-size: 1rem;
+                border-radius: 12px;
+                width: 100%;
+            }
+
+            .drink-suggestions {
+                max-height: 150px;
+            }
+
+            .drink-suggestion {
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            /* Drink list mobile optimization */
+            .drink-list-section {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+
+            .drink-list-section h3 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .drink-list {
+                max-height: 300px;
+            }
+
+            .drink-item {
+                padding: 15px;
+                margin-bottom: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .drink-info {
+                width: 100%;
+            }
+
+            .drink-name {
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+
+            .drink-details {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+
+            .drink-time {
+                font-size: 0.8rem;
+            }
+
+            .drink-remove {
+                align-self: flex-end;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            /* Nutrition details mobile optimization */
+            .nutrition-details {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+
+            .nutrition-details h3 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
             }
 
             .nutrition-grid {
@@ -1056,8 +1206,162 @@
                 padding: 15px;
             }
 
+            .nutrition-label {
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+            }
+
             .nutrition-value {
                 font-size: 1.2rem;
+            }
+
+            /* Safety tips mobile optimization */
+            .safety-tips {
+                padding: 20px;
+            }
+
+            .safety-tips h3 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .tips-content p {
+                font-size: 1rem;
+                margin-bottom: 15px;
+            }
+
+            .tips-content li {
+                font-size: 0.9rem;
+                padding: 6px 0;
+                padding-left: 15px;
+            }
+
+            /* Dashboard mobile optimization */
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+
+            .stat-value {
+                font-size: 1.6rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .pinboard-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .pinboard-item {
+                padding: 25px;
+            }
+
+            .pinboard-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .pinboard-item h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+
+            .pinboard-item p {
+                font-size: 0.9rem;
+            }
+
+            /* Menu button mobile optimization */
+            .menu-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+                    /* General mobile improvements */
+        .btn {
+            min-height: 44px; /* Touch target minimum */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, button {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Prevent zoom on input focus */
+        input[type="text"], input[type="search"] {
+            font-size: 16px;
+        }
+
+        /* Mobile scroll improvements */
+        .page {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        /* Mobile touch improvements */
+        .drink-item, .pinboard-item, .summary-stat {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Mobile button improvements */
+        .session-btn, .add-drink-btn, .drink-remove {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .session-controls {
+                padding: 15px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .card-content p {
+                font-size: 1.2rem;
+            }
+
+            .add-drink-section, .drink-list-section, .nutrition-details, .safety-tips {
+                padding: 15px;
+            }
+
+            .welcome-title {
+                font-size: 1.8rem;
+            }
+
+            .primary-btn {
+                padding: 16px 25px;
+                font-size: 1rem;
             }
         }
     </style>
@@ -3031,6 +3335,7 @@
             const uploadArea = document.getElementById('upload-area');
             if (uploadArea) {
                 uploadArea.addEventListener('click', handlePhotoUpload);
+                uploadArea.addEventListener('touchstart', handlePhotoUpload, { passive: true });
             }
             
             console.log('✅ All event listeners set up successfully!');
