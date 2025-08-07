@@ -18,6 +18,7 @@
             top: 0;
             left: 0;
             z-index: 1;
+            overflow-y: auto;
         }
 
         .page.active {
@@ -29,7 +30,7 @@
             padding: 20px;
         }
 
-        .main-app, .favorites-page, .history-page, .tracking-page {
+        .main-app, .favorites-page, .history-page, .tracking-page, .dashboard-page {
             padding: 0;
         }
 
@@ -232,6 +233,371 @@
             line-height: 1.5;
         }
 
+        /* Night Tracker Styles */
+        .session-controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .session-info h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .session-info p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        .session-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .session-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .start-session-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .end-session-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .reset-session-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .session-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .alcohol-card .card-icon {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+        }
+
+        .calories-card .card-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .sobriety-card .card-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card-content h4 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .card-content p {
+            color: #ffd700;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .add-drink-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .add-drink-section h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .add-drink-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .add-drink-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .add-drink-input input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .add-drink-input input:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .add-drink-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-drink-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .drink-suggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .drink-suggestion {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .drink-suggestion:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .drink-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .drink-list-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .drink-list-section h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .drink-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .drink-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .drink-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .drink-info {
+            flex: 1;
+        }
+
+        .drink-name {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .drink-details {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .drink-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        .drink-remove {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drink-remove:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-drinks {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-drinks i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nutrition-details {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .nutrition-details h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .nutrition-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .nutrition-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .nutrition-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .nutrition-value {
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .safety-tips {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .safety-tips h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .tips-content p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+        }
+
+        .tips-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-content li {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tips-content li::before {
+            content: '•';
+            color: #ffd700;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .welcome-title {
                 font-size: 2rem;
@@ -268,6 +634,46 @@
                 width: 60px;
                 height: 60px;
                 font-size: 1.5rem;
+            }
+
+            /* Night Tracker Mobile */
+            .session-controls {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .session-buttons {
+                justify-content: center;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .summary-card {
+                padding: 20px;
+            }
+
+            .card-content p {
+                font-size: 1.5rem;
+            }
+
+            .add-drink-input {
+                flex-direction: column;
+            }
+
+            .nutrition-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .nutrition-item {
+                padding: 15px;
+            }
+
+            .nutrition-value {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -421,8 +827,121 @@
 
     <div class="page" id="tracking-page">
         <div class="container">
-            <h2><i class="fas fa-chart-line"></i> Night Tracker</h2>
-            <p>Track your drinking session and monitor your BAC</p>
+            <div class="header">
+                <h1><i class="fas fa-chart-line"></i> Night Tracker</h1>
+                <p>Monitor your BAC and track your drinking session</p>
+            </div>
+            
+            <!-- Session Controls -->
+            <div class="session-controls">
+                <div class="session-info">
+                    <h3><i class="fas fa-clock"></i> Session Status</h3>
+                    <p id="session-status">No active session</p>
+                </div>
+                <div class="session-buttons">
+                    <button class="session-btn start-session-btn" id="start-session-btn">
+                        <i class="fas fa-play"></i> Start Session
+                    </button>
+                    <button class="session-btn end-session-btn" id="end-session-btn" style="display: none;">
+                        <i class="fas fa-stop"></i> End Session
+                    </button>
+                    <button class="session-btn reset-session-btn" id="reset-session-btn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card alcohol-card">
+                    <div class="card-icon">
+                        <i class="fas fa-wine-glass-alt"></i>
+                    </div>
+                    <div class="card-content">
+                        <h4>Total Alcohol</h4>
+                        <p><span id="total-alcohol">0</span> <span class="unit">g</span></p>
+                    </div>
+                </div>
+                <div class="summary-card calories-card">
+                    <div class="card-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="card-content">
+                        <h4>Total Calories</h4>
+                        <p><span id="total-calories">0</span> <span class="unit">kcal</span></p>
+                    </div>
+                </div>
+                <div class="summary-card sobriety-card">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="card-content">
+                        <h4>Estimated BAC</h4>
+                        <p><span id="estimated-bac">0.000</span> <span class="unit">%</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Drink Section -->
+            <div class="add-drink-section">
+                <h3><i class="fas fa-plus-circle"></i> Add Drink</h3>
+                <div class="add-drink-input">
+                    <input type="text" id="drink-search" placeholder="Search for a drink or scan barcode...">
+                    <button class="add-drink-btn" id="add-drink-btn">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+                <div class="drink-suggestions" id="drink-suggestions"></div>
+            </div>
+            
+            <!-- Drink List -->
+            <div class="drink-list-section">
+                <h3><i class="fas fa-list"></i> Tonight's Drinks</h3>
+                <div class="drink-list" id="drink-list">
+                    <div class="empty-drinks">
+                        <i class="fas fa-glass-whiskey"></i>
+                        <h4>No drinks added yet</h4>
+                        <p>Start your session and add your first drink!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nutrition Details -->
+            <div class="nutrition-details">
+                <h3><i class="fas fa-chart-pie"></i> Nutrition Breakdown</h3>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">Standards</div>
+                        <div class="nutrition-value" id="total-standards">0</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">Carbs</div>
+                        <div class="nutrition-value" id="total-carbs">0g</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">Sugar</div>
+                        <div class="nutrition-value" id="total-sugar">0g</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">Protein</div>
+                        <div class="nutrition-value" id="total-protein">0g</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Safety Tips -->
+            <div class="safety-tips">
+                <h3><i class="fas fa-shield-alt"></i> Safety Tips</h3>
+                <div class="tips-content">
+                    <p>Remember to drink responsibly and never drink and drive.</p>
+                    <ul>
+                        <li>Pace yourself - aim for 1 drink per hour</li>
+                        <li>Alternate with water</li>
+                        <li>Eat before and during drinking</li>
+                        <li>Know your limits</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -689,6 +1208,248 @@
             }
         }
 
+        // Night Tracker Functions
+        let sessionActive = false;
+        let sessionStartTime = null;
+        let drinks = [];
+        let totalAlcohol = 0;
+        let totalCalories = 0;
+        let totalStandards = 0;
+        let totalCarbs = 0;
+        let totalSugar = 0;
+        let totalProtein = 0;
+
+        // Sample drink database
+        const drinkDatabase = {
+            'beer': {
+                name: 'Beer (330ml)',
+                alcohol: 13.2,
+                calories: 150,
+                standards: 1.3,
+                carbs: 12,
+                sugar: 0,
+                protein: 1.5
+            },
+            'wine': {
+                name: 'Wine (175ml)',
+                alcohol: 16.8,
+                calories: 125,
+                standards: 1.7,
+                carbs: 4,
+                sugar: 1,
+                protein: 0.1
+            },
+            'vodka': {
+                name: 'Vodka (25ml)',
+                alcohol: 8,
+                calories: 55,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'whiskey': {
+                name: 'Whiskey (25ml)',
+                alcohol: 8,
+                calories: 60,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'gin': {
+                name: 'Gin (25ml)',
+                alcohol: 8,
+                calories: 55,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'rum': {
+                name: 'Rum (25ml)',
+                alcohol: 8,
+                calories: 55,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'tequila': {
+                name: 'Tequila (25ml)',
+                alcohol: 8,
+                calories: 55,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            }
+        };
+
+        function startSession() {
+            sessionActive = true;
+            sessionStartTime = new Date();
+            document.getElementById('session-status').textContent = 'Session active - Started at ' + sessionStartTime.toLocaleTimeString();
+            document.getElementById('start-session-btn').style.display = 'none';
+            document.getElementById('end-session-btn').style.display = 'inline-flex';
+            console.log('Session started');
+        }
+
+        function endSession() {
+            sessionActive = false;
+            document.getElementById('session-status').textContent = 'Session ended';
+            document.getElementById('start-session-btn').style.display = 'inline-flex';
+            document.getElementById('end-session-btn').style.display = 'none';
+            console.log('Session ended');
+        }
+
+        function resetSession() {
+            sessionActive = false;
+            sessionStartTime = null;
+            drinks = [];
+            totalAlcohol = 0;
+            totalCalories = 0;
+            totalStandards = 0;
+            totalCarbs = 0;
+            totalSugar = 0;
+            totalProtein = 0;
+            
+            document.getElementById('session-status').textContent = 'No active session';
+            document.getElementById('start-session-btn').style.display = 'inline-flex';
+            document.getElementById('end-session-btn').style.display = 'none';
+            document.getElementById('total-alcohol').textContent = '0';
+            document.getElementById('total-calories').textContent = '0';
+            document.getElementById('total-standards').textContent = '0';
+            document.getElementById('total-carbs').textContent = '0g';
+            document.getElementById('total-sugar').textContent = '0g';
+            document.getElementById('total-protein').textContent = '0g';
+            document.getElementById('estimated-bac').textContent = '0.000';
+            
+            updateDrinkList();
+            console.log('Session reset');
+        }
+
+        function addDrink(drinkType) {
+            if (!sessionActive) {
+                alert('Please start a session first!');
+                return;
+            }
+
+            const drink = drinkDatabase[drinkType];
+            if (drink) {
+                const drinkEntry = {
+                    ...drink,
+                    time: new Date(),
+                    id: Date.now()
+                };
+                
+                drinks.push(drinkEntry);
+                totalAlcohol += drink.alcohol;
+                totalCalories += drink.calories;
+                totalStandards += drink.standards;
+                totalCarbs += drink.carbs;
+                totalSugar += drink.sugar;
+                totalProtein += drink.protein;
+                
+                updateDisplay();
+                updateDrinkList();
+                console.log('Drink added:', drink.name);
+            }
+        }
+
+        function removeDrink(drinkId) {
+            const drinkIndex = drinks.findIndex(d => d.id === drinkId);
+            if (drinkIndex !== -1) {
+                const drink = drinks[drinkIndex];
+                totalAlcohol -= drink.alcohol;
+                totalCalories -= drink.calories;
+                totalStandards -= drink.standards;
+                totalCarbs -= drink.carbs;
+                totalSugar -= drink.sugar;
+                totalProtein -= drink.protein;
+                
+                drinks.splice(drinkIndex, 1);
+                updateDisplay();
+                updateDrinkList();
+                console.log('Drink removed');
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('total-alcohol').textContent = totalAlcohol.toFixed(1);
+            document.getElementById('total-calories').textContent = totalCalories.toFixed(0);
+            document.getElementById('total-standards').textContent = totalStandards.toFixed(1);
+            document.getElementById('total-carbs').textContent = totalCarbs.toFixed(1) + 'g';
+            document.getElementById('total-sugar').textContent = totalSugar.toFixed(1) + 'g';
+            document.getElementById('total-protein').textContent = totalProtein.toFixed(1) + 'g';
+            
+            // Calculate estimated BAC (simplified formula)
+            const estimatedBAC = calculateBAC();
+            document.getElementById('estimated-bac').textContent = estimatedBAC.toFixed(3);
+        }
+
+        function calculateBAC() {
+            if (!sessionActive || drinks.length === 0) return 0;
+            
+            const userWeight = 70; // kg (from TEMP_USER)
+            const userGender = 'male'; // from TEMP_USER
+            const genderFactor = userGender === 'male' ? 0.68 : 0.55;
+            
+            // Simplified Widmark formula
+            const totalAlcoholGrams = totalAlcohol;
+            const timeElapsed = (new Date() - sessionStartTime) / (1000 * 60 * 60); // hours
+            const metabolismRate = 0.015; // per hour
+            
+            const bac = (totalAlcoholGrams / (userWeight * genderFactor)) - (metabolismRate * timeElapsed);
+            return Math.max(0, bac);
+        }
+
+        function updateDrinkList() {
+            const drinkList = document.getElementById('drink-list');
+            
+            if (drinks.length === 0) {
+                drinkList.innerHTML = `
+                    <div class="empty-drinks">
+                        <i class="fas fa-glass-whiskey"></i>
+                        <h4>No drinks added yet</h4>
+                        <p>Start your session and add your first drink!</p>
+                    </div>
+                `;
+            } else {
+                drinkList.innerHTML = drinks.map(drink => `
+                    <div class="drink-item">
+                        <div class="drink-info">
+                            <div class="drink-name">${drink.name}</div>
+                            <div class="drink-details">
+                                ${drink.alcohol}g alcohol • ${drink.calories} kcal • ${drink.standards} standards
+                            </div>
+                            <div class="drink-time">${drink.time.toLocaleTimeString()}</div>
+                        </div>
+                        <button class="drink-remove" onclick="removeDrink(${drink.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showDrinkSuggestions(query) {
+            const suggestions = document.getElementById('drink-suggestions');
+            const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
+                drinkDatabase[key].name.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (query.length > 0 && matchingDrinks.length > 0) {
+                suggestions.innerHTML = matchingDrinks.map(key => `
+                    <div class="drink-suggestion" onclick="addDrink('${key}'); document.getElementById('drink-search').value = ''; suggestions.innerHTML = '';">
+                        ${drinkDatabase[key].name}
+                    </div>
+                `).join('');
+            } else {
+                suggestions.innerHTML = '';
+            }
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded - initializing...');
@@ -749,6 +1510,58 @@
                 searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         searchBeverage();
+                    }
+                });
+            }
+            
+            // Night Tracker Event Listeners
+            const startSessionBtn = document.getElementById('start-session-btn');
+            if (startSessionBtn) {
+                startSessionBtn.addEventListener('click', startSession);
+            }
+            
+            const endSessionBtn = document.getElementById('end-session-btn');
+            if (endSessionBtn) {
+                endSessionBtn.addEventListener('click', endSession);
+            }
+            
+            const resetSessionBtn = document.getElementById('reset-session-btn');
+            if (resetSessionBtn) {
+                resetSessionBtn.addEventListener('click', resetSession);
+            }
+            
+            const drinkSearch = document.getElementById('drink-search');
+            if (drinkSearch) {
+                drinkSearch.addEventListener('input', function(e) {
+                    showDrinkSuggestions(e.target.value);
+                });
+                
+                drinkSearch.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        const query = e.target.value.toLowerCase();
+                        const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
+                            drinkDatabase[key].name.toLowerCase().includes(query)
+                        );
+                        if (matchingDrinks.length > 0) {
+                            addDrink(matchingDrinks[0]);
+                            e.target.value = '';
+                            document.getElementById('drink-suggestions').innerHTML = '';
+                        }
+                    }
+                });
+            }
+            
+            const addDrinkBtn = document.getElementById('add-drink-btn');
+            if (addDrinkBtn) {
+                addDrinkBtn.addEventListener('click', function() {
+                    const query = drinkSearch.value.toLowerCase();
+                    const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
+                        drinkDatabase[key].name.toLowerCase().includes(query)
+                    );
+                    if (matchingDrinks.length > 0) {
+                        addDrink(matchingDrinks[0]);
+                        drinkSearch.value = '';
+                        document.getElementById('drink-suggestions').innerHTML = '';
                     }
                 });
             }
