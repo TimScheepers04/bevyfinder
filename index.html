@@ -696,6 +696,53 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
+        .driving-status {
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .driving-status.safe {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .driving-status.caution {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .driving-status.unsafe {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .bac-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            margin-left: 5px;
+            cursor: help;
+            transition: color 0.3s ease;
+        }
+
+        .bac-info:hover {
+            color: #ffd700;
+        }
+
         .add-drink-section {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -1235,8 +1282,11 @@
                         <i class="fas fa-brain"></i>
                     </div>
                     <div class="card-content">
-                        <h4>Estimated BAC</h4>
+                        <h4>Estimated BAC <i class="fas fa-info-circle bac-info" title="Calculated using Widmark formula with Australian standard drinks (10g alcohol each)"></i></h4>
                         <p><span id="estimated-bac">0.000</span> <span class="unit">%</span></p>
+                        <div class="driving-status" id="driving-status">
+                            <span class="status-text">Safe to drive</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2508,6 +2558,9 @@
             document.getElementById('total-protein').textContent = '0g';
             document.getElementById('estimated-bac').textContent = '0.000';
             
+            // Reset driving status
+            updateDrivingStatus(0);
+            
             updateDrinkList();
             console.log('Session reset');
         }
@@ -2566,9 +2619,12 @@
             document.getElementById('total-sugar').textContent = totalSugar.toFixed(1) + 'g';
             document.getElementById('total-protein').textContent = totalProtein.toFixed(1) + 'g';
             
-            // Calculate estimated BAC (simplified formula)
+            // Calculate estimated BAC using the accurate calculator
             const estimatedBAC = calculateBAC();
             document.getElementById('estimated-bac').textContent = estimatedBAC.toFixed(3);
+            
+            // Update driving status
+            updateDrivingStatus(estimatedBAC);
         }
 
         function calculateBAC() {
@@ -2576,15 +2632,27 @@
             
             const userWeight = 70; // kg (from TEMP_USER)
             const userGender = 'male'; // from TEMP_USER
-            const genderFactor = userGender === 'male' ? 0.68 : 0.55;
-            
-            // Simplified Widmark formula
-            const totalAlcoholGrams = totalAlcohol;
             const timeElapsed = (new Date() - sessionStartTime) / (1000 * 60 * 60); // hours
-            const metabolismRate = 0.015; // per hour
             
-            const bac = (totalAlcoholGrams / (userWeight * genderFactor)) - (metabolismRate * timeElapsed);
-            return Math.max(0, bac);
+            // Use the more accurate BAC calculator
+            return parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
+        }
+
+        function estimateBAC(drinks, weightKg, sex, hours) {
+            // Set alcohol distribution ratio based on biological sex
+            let r = (sex.toLowerCase() === 'male') ? 0.68 : 0.55;
+
+            // Convert weight to grams
+            let bodyWeightGrams = weightKg * 1000;
+
+            // Each Australian standard drink = 10g of alcohol
+            let gramsAlcohol = drinks * 10;
+
+            // Widmark formula
+            let bac = ((gramsAlcohol * 100) / (bodyWeightGrams * r)) - (hours * 0.015);
+
+            // BAC can't be negative
+            return Math.max(bac, 0).toFixed(4);  // returns BAC as a string like "0.0412"
         }
 
         function updateDrinkList() {
@@ -2755,13 +2823,13 @@
                         
                         <div class="summary-safety">
                             <h3><i class="fas fa-shield-alt"></i> Safety Assessment</h3>
-                            ${finalBAC > 0.08 ? 
-                                '<p class="safety-warning">⚠️ Your BAC is above the legal driving limit. Please do not drive.</p>' :
-                                finalBAC > 0.05 ? 
-                                '<p class="safety-caution">⚠️ Your BAC is above 0.05%. Consider waiting before driving.</p>' :
-                                '<p class="safety-ok">✅ Your BAC is within safe limits.</p>'
+                            ${finalBAC > 0.05 ? 
+                                '<p class="safety-warning">⚠️ Your BAC is above the legal driving limit (0.05%). Please do not drive.</p>' :
+                                finalBAC > 0.03 ? 
+                                '<p class="safety-caution">⚠️ Your BAC is approaching the legal limit. Consider waiting before driving.</p>' :
+                                '<p class="safety-ok">✅ Your BAC is within safe limits for driving.</p>'
                             }
-                            <p class="safety-tip">Remember: It takes approximately 1 hour to metabolize 1 standard drink.</p>
+                            <p class="safety-tip">Australian legal driving limit: 0.05% BAC. It takes approximately 1 hour to metabolize 1 standard drink.</p>
                         </div>
                         
                         <div class="summary-actions">
@@ -2792,6 +2860,22 @@
                 setTimeout(() => {
                     overlay.remove();
                 }, 300);
+            }
+        }
+
+        function updateDrivingStatus(bac) {
+            const drivingStatus = document.getElementById('driving-status');
+            const statusText = drivingStatus.querySelector('.status-text');
+            
+            if (bac > 0.05) {
+                drivingStatus.className = 'driving-status unsafe';
+                statusText.textContent = 'Do not drive';
+            } else if (bac > 0.03) {
+                drivingStatus.className = 'driving-status caution';
+                statusText.textContent = 'Approaching limit';
+            } else {
+                drivingStatus.className = 'driving-status safe';
+                statusText.textContent = 'Safe to drive';
             }
         }
 
