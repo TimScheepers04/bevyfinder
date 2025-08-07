@@ -13,6 +13,7 @@
             min-height: 100vh;
             width: 100%;
             display: none;
+            visibility: hidden;
             position: fixed;
             top: 0;
             left: 0;
@@ -21,6 +22,7 @@
 
         .page.active {
             display: block;
+            visibility: visible;
         }
 
         .welcome-page {
@@ -287,10 +289,12 @@
         function showPage(pageId) {
             console.log('Showing page:', pageId);
             
-            // Hide all pages
+            // Hide all pages completely
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => {
                 page.classList.remove('active');
+                page.style.display = 'none';
+                page.style.visibility = 'hidden';
                 console.log('Hiding page:', page.id);
             });
             
@@ -298,6 +302,8 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
+                targetPage.style.display = 'block';
+                targetPage.style.visibility = 'visible';
                 console.log('✅ Page shown:', pageId);
             } else {
                 console.error('❌ Page not found:', pageId);
