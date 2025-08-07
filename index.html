@@ -11,12 +11,24 @@
         /* Override for working page system */
         .page {
             min-height: 100vh;
-            padding: 20px;
+            width: 100%;
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
         .page.active {
             display: block;
+        }
+
+        .welcome-page {
+            padding: 20px;
+        }
+
+        .main-app, .favorites-page, .history-page, .tracking-page {
+            padding: 0;
         }
 
         .welcome-page {
@@ -28,6 +40,14 @@
 
         .welcome-content {
             max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
         }
 
         .btn {
