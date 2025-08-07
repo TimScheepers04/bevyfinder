@@ -2715,18 +2715,11 @@
             const timeElapsed = sessionStartTime ? (new Date() - sessionStartTime) / (1000 * 60 * 60) : 0; // hours
             const summaryBAC = parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
             
-            // Calculate drink types
-            const drinkTypes = {};
-            drinks.forEach(drink => {
-                const type = drink.name.includes('Beer') ? 'Beer' : 
-                           drink.name.includes('Wine') ? 'Wine' : 
-                           drink.name.includes('ml)') ? 'Spirits' : 'Cocktails';
-                drinkTypes[type] = (drinkTypes[type] || 0) + 1;
-            });
-            
-            const drinkTypeBreakdown = Object.entries(drinkTypes)
-                .map(([type, count]) => `${count} ${type}${count > 1 ? 's' : ''}`)
-                .join(', ');
+            // Calculate total liquid consumed
+            const totalLiquid = drinks.reduce((total, drink) => {
+                const volume = drink.name.match(/(\d+)ml/);
+                return total + (volume ? parseInt(volume[1]) : 0);
+            }, 0);
             
             // Create summary HTML
             const summaryHTML = `
@@ -2757,17 +2750,16 @@
                                 <div class="stat-content">
                                     <h3>Total Drinks</h3>
                                     <p>${drinkCount} drinks</p>
-                                    <small>${drinkTypeBreakdown}</small>
                                 </div>
                             </div>
                             
                             <div class="summary-stat">
                                 <div class="stat-icon">
-                                    <i class="fas fa-wine-glass-alt"></i>
+                                    <i class="fas fa-tint"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <h3>Total Alcohol</h3>
-                                    <p>${totalAlcohol.toFixed(1)}g</p>
+                                    <h3>Total Liquid</h3>
+                                    <p>${totalLiquid}ml</p>
                                 </div>
                             </div>
                             
