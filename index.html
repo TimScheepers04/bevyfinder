@@ -4,21 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BevyFinder - Your Ultimate Drink Database</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-
+        /* Override for working page system */
         .page {
             min-height: 100vh;
             padding: 20px;
@@ -40,30 +30,6 @@
             max-width: 600px;
         }
 
-        .welcome-title {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #ffd700;
-        }
-
-        .feature-list {
-            list-style: none;
-            margin: 30px 0;
-            text-align: left;
-        }
-
-        .feature-list li {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-        }
-
-        .feature-list i {
-            color: #ffd700;
-            margin-right: 10px;
-        }
-
         .btn {
             background: #ffd700;
             color: #333;
@@ -79,191 +45,6 @@
 
         .btn:hover {
             transform: scale(1.05);
-        }
-
-        .menu-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 15px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            z-index: 1000;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100%;
-            background: white;
-            color: #333;
-            transition: right 0.3s;
-            z-index: 1001;
-        }
-
-        .sidebar.open {
-            right: 0;
-        }
-
-        .sidebar-header {
-            background: #667eea;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .close-menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .sidebar-content {
-            padding: 20px;
-        }
-
-        .sidebar-btn {
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 15px;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: background 0.3s;
-        }
-
-        .sidebar-btn:hover {
-            background: #f0f0f0;
-        }
-
-        .sidebar-btn i {
-            margin-right: 10px;
-            color: #667eea;
-        }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .sidebar-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #ffd700;
-        }
-
-        .input-section {
-            background: white;
-            color: #333;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .input-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 15px 25px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            border-bottom-color: #667eea;
-            color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .input-wrapper {
-            display: flex;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-        }
-
-        .search-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            cursor: pointer;
-        }
-
-        .upload-area {
-            border: 2px dashed #e0e0e0;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .upload-content i {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 20px;
         }
 
         .empty-state {
