@@ -138,6 +138,275 @@
             font-size: 1.1rem;
         }
 
+        /* Session Summary Popup Styles */
+        .session-summary-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .session-summary-overlay.show {
+            opacity: 1;
+        }
+
+        .session-summary-popup {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .session-summary-overlay.show .session-summary-popup {
+            transform: scale(1);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-header h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .close-summary-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-summary-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-stat {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-stat:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-stat .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .summary-stat .stat-content h3 {
+            color: white;
+            font-size: 0.9rem;
+            margin: 0 0 5px 0;
+            opacity: 0.8;
+        }
+
+        .summary-stat .stat-content p {
+            color: #ffd700;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .summary-stat .stat-content small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .summary-drinks {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary-drinks h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .drinks-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .summary-drink-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-drink-item:last-child {
+            border-bottom: none;
+        }
+
+        .drink-info {
+            flex: 1;
+        }
+
+        .drink-name {
+            color: white;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .drink-time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .drink-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .drink-alcohol, .drink-calories {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .summary-safety {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary-safety h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .safety-warning {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .safety-caution {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .safety-ok {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .safety-tip {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .session-summary-popup {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .summary-stat {
+                padding: 15px;
+            }
+
+            .summary-stat .stat-content p {
+                font-size: 1.2rem;
+            }
+
+            .summary-actions {
+                flex-direction: column;
+            }
+
+            .drink-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -2210,6 +2479,10 @@
             document.getElementById('session-status').textContent = 'Session ended';
             document.getElementById('start-session-btn').style.display = 'inline-flex';
             document.getElementById('end-session-btn').style.display = 'none';
+            
+            // Show session summary popup
+            showSessionSummary();
+            
             console.log('Session ended');
         }
 
@@ -2357,6 +2630,168 @@
                 `).join('');
             } else {
                 suggestions.innerHTML = '';
+            }
+        }
+
+        function showSessionSummary() {
+            const sessionDuration = sessionStartTime ? Math.round((new Date() - sessionStartTime) / (1000 * 60)) : 0; // minutes
+            const finalBAC = calculateBAC();
+            const drinkCount = drinks.length;
+            
+            // Calculate drink types
+            const drinkTypes = {};
+            drinks.forEach(drink => {
+                const type = drink.name.includes('Beer') ? 'Beer' : 
+                           drink.name.includes('Wine') ? 'Wine' : 
+                           drink.name.includes('ml)') ? 'Spirits' : 'Cocktails';
+                drinkTypes[type] = (drinkTypes[type] || 0) + 1;
+            });
+            
+            const drinkTypeBreakdown = Object.entries(drinkTypes)
+                .map(([type, count]) => `${count} ${type}${count > 1 ? 's' : ''}`)
+                .join(', ');
+            
+            // Create summary HTML
+            const summaryHTML = `
+                <div class="session-summary-overlay" id="session-summary-overlay">
+                    <div class="session-summary-popup">
+                        <div class="summary-header">
+                            <h2><i class="fas fa-chart-line"></i> Session Summary</h2>
+                            <button class="close-summary-btn" onclick="closeSessionSummary()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="summary-stats">
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Session Duration</h3>
+                                    <p>${sessionDuration} minutes</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-glass-whiskey"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Total Drinks</h3>
+                                    <p>${drinkCount} drinks</p>
+                                    <small>${drinkTypeBreakdown}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Total Alcohol</h3>
+                                    <p>${totalAlcohol.toFixed(1)}g</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Standard Drinks</h3>
+                                    <p>${totalStandards.toFixed(1)} standards</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Total Calories</h3>
+                                    <p>${totalCalories.toFixed(0)} kcal</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-bread-slice"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Total Carbs</h3>
+                                    <p>${totalCarbs.toFixed(1)}g</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Final BAC</h3>
+                                    <p>${finalBAC.toFixed(3)}%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-drinks">
+                            <h3><i class="fas fa-list"></i> Drinks Consumed</h3>
+                            <div class="drinks-list">
+                                ${drinks.map(drink => `
+                                    <div class="summary-drink-item">
+                                        <div class="drink-info">
+                                            <span class="drink-name">${drink.name}</span>
+                                            <span class="drink-time">${drink.time.toLocaleTimeString()}</span>
+                                        </div>
+                                        <div class="drink-stats">
+                                            <span class="drink-alcohol">${drink.alcohol}g</span>
+                                            <span class="drink-calories">${drink.calories} kcal</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="summary-safety">
+                            <h3><i class="fas fa-shield-alt"></i> Safety Assessment</h3>
+                            ${finalBAC > 0.08 ? 
+                                '<p class="safety-warning">⚠️ Your BAC is above the legal driving limit. Please do not drive.</p>' :
+                                finalBAC > 0.05 ? 
+                                '<p class="safety-caution">⚠️ Your BAC is above 0.05%. Consider waiting before driving.</p>' :
+                                '<p class="safety-ok">✅ Your BAC is within safe limits.</p>'
+                            }
+                            <p class="safety-tip">Remember: It takes approximately 1 hour to metabolize 1 standard drink.</p>
+                        </div>
+                        
+                        <div class="summary-actions">
+                            <button class="btn secondary-btn" onclick="closeSessionSummary()">
+                                <i class="fas fa-check"></i> Got it
+                            </button>
+                            <button class="btn primary-btn" onclick="resetSession(); closeSessionSummary()">
+                                <i class="fas fa-redo"></i> Start New Session
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add to page and show
+            document.body.insertAdjacentHTML('beforeend', summaryHTML);
+            
+            // Add fade-in animation
+            setTimeout(() => {
+                document.getElementById('session-summary-overlay').classList.add('show');
+            }, 10);
+        }
+
+        function closeSessionSummary() {
+            const overlay = document.getElementById('session-summary-overlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
             }
         }
 
