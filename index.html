@@ -14,7 +14,7 @@
             width: 100%;
             display: none;
             visibility: hidden;
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             z-index: 1;
@@ -1219,19 +1219,157 @@
         let totalSugar = 0;
         let totalProtein = 0;
 
-        // Sample drink database
+        // Comprehensive drink database
         const drinkDatabase = {
-            'beer': {
-                name: 'Beer (330ml)',
+            // Beers
+            'heineken': {
+                name: 'Heineken (330ml)',
+                alcohol: 13.2,
+                calories: 142,
+                standards: 1.3,
+                carbs: 11.4,
+                sugar: 0,
+                protein: 1.2
+            },
+            'corona': {
+                name: 'Corona Extra (330ml)',
+                alcohol: 13.2,
+                calories: 148,
+                standards: 1.3,
+                carbs: 14.1,
+                sugar: 0,
+                protein: 1.2
+            },
+            'budweiser': {
+                name: 'Budweiser (330ml)',
+                alcohol: 13.2,
+                calories: 145,
+                standards: 1.3,
+                carbs: 10.6,
+                sugar: 0,
+                protein: 1.1
+            },
+            'guinness': {
+                name: 'Guinness Draught (330ml)',
+                alcohol: 13.2,
+                calories: 125,
+                standards: 1.3,
+                carbs: 10.1,
+                sugar: 0,
+                protein: 1.6
+            },
+            'stella': {
+                name: 'Stella Artois (330ml)',
                 alcohol: 13.2,
                 calories: 150,
                 standards: 1.3,
-                carbs: 12,
+                carbs: 12.8,
+                sugar: 0,
+                protein: 1.2
+            },
+            'carlsberg': {
+                name: 'Carlsberg (330ml)',
+                alcohol: 13.2,
+                calories: 140,
+                standards: 1.3,
+                carbs: 11.2,
+                sugar: 0,
+                protein: 1.1
+            },
+            'peroni': {
+                name: 'Peroni Nastro Azzurro (330ml)',
+                alcohol: 13.2,
+                calories: 145,
+                standards: 1.3,
+                carbs: 12.1,
+                sugar: 0,
+                protein: 1.2
+            },
+            'fosters': {
+                name: 'Fosters (330ml)',
+                alcohol: 13.2,
+                calories: 138,
+                standards: 1.3,
+                carbs: 10.8,
+                sugar: 0,
+                protein: 1.1
+            },
+            'coors': {
+                name: 'Coors Light (330ml)',
+                alcohol: 10.8,
+                calories: 102,
+                standards: 1.1,
+                carbs: 5.0,
+                sugar: 0,
+                protein: 0.9
+            },
+            'miller': {
+                name: 'Miller Lite (330ml)',
+                alcohol: 10.8,
+                calories: 96,
+                standards: 1.1,
+                carbs: 3.2,
+                sugar: 0,
+                protein: 0.9
+            },
+            'blue_moon': {
+                name: 'Blue Moon (330ml)',
+                alcohol: 13.2,
+                calories: 164,
+                standards: 1.3,
+                carbs: 13.8,
+                sugar: 0,
+                protein: 1.4
+            },
+            'sierra_nevada': {
+                name: 'Sierra Nevada Pale Ale (330ml)',
+                alcohol: 15.6,
+                calories: 175,
+                standards: 1.6,
+                carbs: 14.2,
+                sugar: 0,
+                protein: 1.8
+            },
+            'sam_adams': {
+                name: 'Samuel Adams Boston Lager (330ml)',
+                alcohol: 14.4,
+                calories: 160,
+                standards: 1.4,
+                carbs: 13.2,
                 sugar: 0,
                 protein: 1.5
             },
-            'wine': {
-                name: 'Wine (175ml)',
+            'ipa': {
+                name: 'IPA (330ml)',
+                alcohol: 16.8,
+                calories: 180,
+                standards: 1.7,
+                carbs: 15.5,
+                sugar: 0,
+                protein: 1.9
+            },
+            'stout': {
+                name: 'Stout (330ml)',
+                alcohol: 14.4,
+                calories: 170,
+                standards: 1.4,
+                carbs: 14.8,
+                sugar: 0,
+                protein: 1.7
+            },
+            'wheat_beer': {
+                name: 'Wheat Beer (330ml)',
+                alcohol: 13.2,
+                calories: 155,
+                standards: 1.3,
+                carbs: 13.1,
+                sugar: 0,
+                protein: 1.4
+            },
+
+            // Wines
+            'red_wine': {
+                name: 'Red Wine (175ml)',
                 alcohol: 16.8,
                 calories: 125,
                 standards: 1.7,
@@ -1239,6 +1377,44 @@
                 sugar: 1,
                 protein: 0.1
             },
+            'white_wine': {
+                name: 'White Wine (175ml)',
+                alcohol: 16.8,
+                calories: 120,
+                standards: 1.7,
+                carbs: 3.8,
+                sugar: 0.8,
+                protein: 0.1
+            },
+            'rose_wine': {
+                name: 'Rosé Wine (175ml)',
+                alcohol: 16.8,
+                calories: 122,
+                standards: 1.7,
+                carbs: 3.9,
+                sugar: 0.9,
+                protein: 0.1
+            },
+            'champagne': {
+                name: 'Champagne (175ml)',
+                alcohol: 16.8,
+                calories: 115,
+                standards: 1.7,
+                carbs: 3.2,
+                sugar: 0.8,
+                protein: 0.1
+            },
+            'prosecco': {
+                name: 'Prosecco (175ml)',
+                alcohol: 16.8,
+                calories: 110,
+                standards: 1.7,
+                carbs: 3.0,
+                sugar: 0.7,
+                protein: 0.1
+            },
+
+            // Spirits (25ml shots)
             'vodka': {
                 name: 'Vodka (25ml)',
                 alcohol: 8,
@@ -1282,6 +1458,368 @@
                 standards: 0.8,
                 carbs: 0,
                 sugar: 0,
+                protein: 0
+            },
+            'brandy': {
+                name: 'Brandy (25ml)',
+                alcohol: 8,
+                calories: 60,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'cognac': {
+                name: 'Cognac (25ml)',
+                alcohol: 8,
+                calories: 60,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'scotch': {
+                name: 'Scotch Whisky (25ml)',
+                alcohol: 8,
+                calories: 60,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'bourbon': {
+                name: 'Bourbon (25ml)',
+                alcohol: 8,
+                calories: 60,
+                standards: 0.8,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+
+            // Cocktails (standard servings)
+            'margarita': {
+                name: 'Margarita (200ml)',
+                alcohol: 16,
+                calories: 168,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'mojito': {
+                name: 'Mojito (200ml)',
+                alcohol: 16,
+                calories: 143,
+                standards: 1.6,
+                carbs: 12,
+                sugar: 10,
+                protein: 0
+            },
+            'daiquiri': {
+                name: 'Daiquiri (150ml)',
+                alcohol: 16,
+                calories: 151,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'pina_colada': {
+                name: 'Piña Colada (200ml)',
+                alcohol: 16,
+                calories: 245,
+                standards: 1.6,
+                carbs: 22,
+                sugar: 18,
+                protein: 0
+            },
+            'cosmopolitan': {
+                name: 'Cosmopolitan (150ml)',
+                alcohol: 16,
+                calories: 146,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'manhattan': {
+                name: 'Manhattan (150ml)',
+                alcohol: 16,
+                calories: 164,
+                standards: 1.6,
+                carbs: 4,
+                sugar: 2,
+                protein: 0
+            },
+            'martini': {
+                name: 'Martini (150ml)',
+                alcohol: 16,
+                calories: 124,
+                standards: 1.6,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'negroni': {
+                name: 'Negroni (150ml)',
+                alcohol: 16,
+                calories: 140,
+                standards: 1.6,
+                carbs: 4,
+                sugar: 2,
+                protein: 0
+            },
+            'old_fashioned': {
+                name: 'Old Fashioned (150ml)',
+                alcohol: 16,
+                calories: 154,
+                standards: 1.6,
+                carbs: 4,
+                sugar: 2,
+                protein: 0
+            },
+            'gin_tonic': {
+                name: 'Gin & Tonic (200ml)',
+                alcohol: 16,
+                calories: 120,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'rum_coke': {
+                name: 'Rum & Coke (200ml)',
+                alcohol: 16,
+                calories: 185,
+                standards: 1.6,
+                carbs: 18,
+                sugar: 16,
+                protein: 0
+            },
+            'vodka_soda': {
+                name: 'Vodka Soda (200ml)',
+                alcohol: 16,
+                calories: 96,
+                standards: 1.6,
+                carbs: 0,
+                sugar: 0,
+                protein: 0
+            },
+            'whiskey_sour': {
+                name: 'Whiskey Sour (150ml)',
+                alcohol: 16,
+                calories: 160,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'screwdriver': {
+                name: 'Screwdriver (200ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 16,
+                sugar: 14,
+                protein: 0
+            },
+            'bloody_mary': {
+                name: 'Bloody Mary (200ml)',
+                alcohol: 16,
+                calories: 120,
+                standards: 1.6,
+                carbs: 6,
+                sugar: 4,
+                protein: 1
+            },
+            'moscow_mule': {
+                name: 'Moscow Mule (200ml)',
+                alcohol: 16,
+                calories: 150,
+                standards: 1.6,
+                carbs: 12,
+                sugar: 10,
+                protein: 0
+            },
+            'caipirinha': {
+                name: 'Caipirinha (200ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 14,
+                sugar: 12,
+                protein: 0
+            },
+            'mint_julep': {
+                name: 'Mint Julep (200ml)',
+                alcohol: 16,
+                calories: 165,
+                standards: 1.6,
+                carbs: 6,
+                sugar: 4,
+                protein: 0
+            },
+            'sangria': {
+                name: 'Sangria (200ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 16,
+                sugar: 14,
+                protein: 0
+            },
+            'mimosa': {
+                name: 'Mimosa (200ml)',
+                alcohol: 16,
+                calories: 140,
+                standards: 1.6,
+                carbs: 12,
+                sugar: 10,
+                protein: 0
+            },
+            'bellini': {
+                name: 'Bellini (200ml)',
+                alcohol: 16,
+                calories: 150,
+                standards: 1.6,
+                carbs: 14,
+                sugar: 12,
+                protein: 0
+            },
+            'espresso_martini': {
+                name: 'Espresso Martini (150ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'long_island': {
+                name: 'Long Island Iced Tea (200ml)',
+                alcohol: 24,
+                calories: 220,
+                standards: 2.4,
+                carbs: 12,
+                sugar: 10,
+                protein: 0
+            },
+            'sex_on_beach': {
+                name: 'Sex on the Beach (200ml)',
+                alcohol: 16,
+                calories: 200,
+                standards: 1.6,
+                carbs: 18,
+                sugar: 16,
+                protein: 0
+            },
+            'blue_lagoon': {
+                name: 'Blue Lagoon (200ml)',
+                alcohol: 16,
+                calories: 160,
+                standards: 1.6,
+                carbs: 10,
+                sugar: 8,
+                protein: 0
+            },
+            'white_russian': {
+                name: 'White Russian (200ml)',
+                alcohol: 16,
+                calories: 280,
+                standards: 1.6,
+                carbs: 12,
+                sugar: 10,
+                protein: 1
+            },
+            'black_russian': {
+                name: 'Black Russian (150ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 4,
+                sugar: 2,
+                protein: 0
+            },
+            'kamikaze': {
+                name: 'Kamikaze (100ml)',
+                alcohol: 16,
+                calories: 140,
+                standards: 1.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 0
+            },
+            'b52': {
+                name: 'B-52 (100ml)',
+                alcohol: 16,
+                calories: 200,
+                standards: 1.6,
+                carbs: 10,
+                sugar: 8,
+                protein: 0
+            },
+            'jagerbomb': {
+                name: 'Jägerbomb (200ml)',
+                alcohol: 16,
+                calories: 180,
+                standards: 1.6,
+                carbs: 16,
+                sugar: 14,
+                protein: 0
+            },
+            'fireball': {
+                name: 'Fireball Shot (25ml)',
+                alcohol: 8,
+                calories: 80,
+                standards: 0.8,
+                carbs: 4,
+                sugar: 3,
+                protein: 0
+            },
+            'jager': {
+                name: 'Jägermeister (25ml)',
+                alcohol: 8,
+                calories: 70,
+                standards: 0.8,
+                carbs: 2,
+                sugar: 1,
+                protein: 0
+            },
+            'baileys': {
+                name: 'Baileys Irish Cream (25ml)',
+                alcohol: 6,
+                calories: 120,
+                standards: 0.6,
+                carbs: 8,
+                sugar: 6,
+                protein: 1
+            },
+            'kahlua': {
+                name: 'Kahlúa (25ml)',
+                alcohol: 6,
+                calories: 90,
+                standards: 0.6,
+                carbs: 6,
+                sugar: 5,
+                protein: 0
+            },
+            'amaretto': {
+                name: 'Amaretto (25ml)',
+                alcohol: 6,
+                calories: 85,
+                standards: 0.6,
+                carbs: 5,
+                sugar: 4,
+                protein: 0
+            },
+            'triple_sec': {
+                name: 'Triple Sec (25ml)',
+                alcohol: 6,
+                calories: 80,
+                standards: 0.6,
+                carbs: 4,
+                sugar: 3,
                 protein: 0
             }
         };
