@@ -70,6 +70,74 @@
             transform: scale(1.05);
         }
 
+        .primary-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 1.2rem;
+            padding: 18px 35px;
+        }
+
+        .primary-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            padding: 12px 25px;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .secondary-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .primary-sidebar-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: 2px solid #10b981;
+        }
+
+        .primary-sidebar-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .night-tracker-cta {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-content h3 {
+            color: #10b981;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .cta-content p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -683,28 +751,39 @@
     <div class="page welcome-page active" id="welcome-page">
         <div class="welcome-content">
             <h1 class="welcome-title">
-                <i class="fas fa-wine-glass-alt"></i>
-                BevyFinder
+                <i class="fas fa-chart-line"></i>
+                Night Tracker
             </h1>
-            <p style="font-size: 1.2rem; margin-bottom: 30px;">Your Ultimate Drink Database</p>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Track Your Drinks, Monitor Your BAC, Stay Safe</p>
             
-            <p style="margin-bottom: 20px;">Discover comprehensive information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information.</p>
+            <p style="margin-bottom: 20px;">The ultimate tool for responsible drinking. Track your consumption, monitor your blood alcohol content, and stay informed about your health and safety.</p>
             
             <ul class="feature-list">
-                <li><i class="fas fa-search"></i> Search 500+ drinks by name</li>
-                <li><i class="fas fa-camera"></i> Photo recognition for instant results</li>
-                <li><i class="fas fa-heart"></i> Save your favorite drinks</li>
-                <li><i class="fas fa-chart-line"></i> Track your drinking sessions</li>
-                <li><i class="fas fa-users"></i> Connect with friends</li>
-                <li><i class="fas fa-star"></i> Rate and review drinks</li>
+                <li><i class="fas fa-chart-line"></i> Real-time BAC monitoring</li>
+                <li><i class="fas fa-plus-circle"></i> 60+ drinks with nutrition tracking</li>
+                <li><i class="fas fa-shield-alt"></i> Safety tips and guidelines</li>
+                <li><i class="fas fa-clock"></i> Session management</li>
+                <li><i class="fas fa-fire"></i> Calorie and nutrition tracking</li>
+                <li><i class="fas fa-brain"></i> Scientific BAC calculations</li>
             </ul>
             
             <p style="margin: 20px 0;">Created by <strong>Tim Scheepers</strong></p>
             
-            <button class="btn" id="start-btn">
+            <button class="btn primary-btn" id="start-btn">
                 <i class="fas fa-play"></i>
-                Start Exploring
+                Start Night Tracker
             </button>
+            
+            <div class="secondary-actions">
+                <button class="btn secondary-btn" onclick="showPage('main-app')">
+                    <i class="fas fa-search"></i>
+                    Browse Drinks
+                </button>
+                <button class="btn secondary-btn" onclick="showPage('dashboard-page')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </button>
+            </div>
         </div>
     </div>
 
@@ -722,13 +801,17 @@
             </button>
         </div>
         <div class="sidebar-content">
-            <button class="sidebar-btn" id="sidebar-btn-1">
-                <i class="fas fa-home"></i>
-                Home
+            <button class="sidebar-btn primary-sidebar-btn" id="sidebar-btn-tracking">
+                <i class="fas fa-chart-line"></i>
+                Night Tracker
             </button>
             <button class="sidebar-btn" id="sidebar-btn-dashboard">
                 <i class="fas fa-tachometer-alt"></i>
                 Dashboard
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-1">
+                <i class="fas fa-search"></i>
+                Browse Drinks
             </button>
             <button class="sidebar-btn" id="sidebar-btn-2">
                 <i class="fas fa-star"></i>
@@ -737,10 +820,6 @@
             <button class="sidebar-btn" id="sidebar-btn-3">
                 <i class="fas fa-history"></i>
                 History
-            </button>
-            <button class="sidebar-btn" id="sidebar-btn-tracking">
-                <i class="fas fa-chart-line"></i>
-                Night Tracker
             </button>
             <button class="sidebar-btn" id="sidebar-btn-4">
                 <i class="fas fa-cog"></i>
@@ -760,8 +839,8 @@
     <div class="page" id="main-app">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Find your perfect drink</p>
+                <h1><i class="fas fa-search"></i> Browse Drinks</h1>
+                <p>Search our database of 60+ drinks or upload a photo</p>
             </div>
             
             <div class="input-section">
@@ -796,6 +875,17 @@
                             <p>Take a photo or upload an image of a drink</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Night Tracker CTA -->
+            <div class="night-tracker-cta">
+                <div class="cta-content">
+                    <h3><i class="fas fa-chart-line"></i> Ready to Track Your Night?</h3>
+                    <p>Monitor your BAC, track calories, and stay safe with our comprehensive Night Tracker</p>
+                    <button class="btn primary-btn" onclick="showPage('tracking-page')">
+                        <i class="fas fa-play"></i> Start Night Tracker
+                    </button>
                 </div>
             </div>
         </div>
@@ -993,12 +1083,21 @@
             </div>
             
             <div class="pinboard-grid">
+                <div class="pinboard-item" onclick="showPage('tracking-page')">
+                    <div class="pinboard-icon premium">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <h3>Night Tracker</h3>
+                    <p>Monitor your BAC and track sessions</p>
+                </div>
+                
                 <div class="pinboard-item" onclick="showPage('main-app')">
                     <div class="pinboard-icon">
                         <i class="fas fa-search"></i>
                     </div>
-                    <h3>Search Drinks</h3>
-                    <p>Find your perfect beverage by name or photo</p>
+                    <h3>Browse Drinks</h3>
+                    <p>Search our database of 60+ drinks</p>
                 </div>
                 
                 <div class="pinboard-item" onclick="showPage('favorites-page')">
@@ -1015,15 +1114,6 @@
                     </div>
                     <h3>Search History</h3>
                     <p>See your recent drink searches</p>
-                </div>
-                
-                <div class="pinboard-item" onclick="showPage('tracking-page')">
-                    <div class="pinboard-icon premium">
-                        <i class="fas fa-chart-line"></i>
-                        <span class="premium-badge">Premium</span>
-                    </div>
-                    <h3>Night Tracker</h3>
-                    <p>Monitor your BAC and track sessions</p>
                 </div>
                 
                 <div class="pinboard-item" onclick="alert('Profile - Coming Soon!')">
@@ -2033,7 +2123,7 @@
             if (startBtn) {
                 startBtn.addEventListener('click', function() {
                     console.log('🚀 Start button clicked!');
-                    showPage('main-app');
+                    showPage('tracking-page');
                 });
             }
             
