@@ -1282,7 +1282,7 @@
                         <i class="fas fa-brain"></i>
                     </div>
                     <div class="card-content">
-                        <h4>Estimated BAC <i class="fas fa-info-circle bac-info" title="Calculated using Widmark formula with Australian standard drinks (10g alcohol each)"></i></h4>
+                        <h4>Estimated BAC <i class="fas fa-info-circle bac-info" title="Calculated using Widmark formula with Australian standard drinks (10g alcohol each). Accounts for time elapsed and metabolism rate of 0.015% per hour."></i></h4>
                         <p><span id="estimated-bac">0.000</span> <span class="unit">%</span></p>
                         <div class="driving-status" id="driving-status">
                             <span class="status-text">Safe to drive</span>
@@ -2638,7 +2638,7 @@
             return parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
         }
 
-        function estimateBAC(drinks, weightKg, sex, hours) {
+        function estimateBAC(drinks, weightKg, sex, timeElapsed) {
             // Set alcohol distribution ratio based on biological sex
             let r = (sex.toLowerCase() === 'male') ? 0.68 : 0.55;
 
@@ -2647,6 +2647,9 @@
 
             // Each Australian standard drink = 10g of alcohol
             let gramsAlcohol = drinks * 10;
+
+            // Convert time to hours (handles minutes properly)
+            let hours = timeElapsed;
 
             // Widmark formula
             let bac = ((gramsAlcohol * 100) / (bodyWeightGrams * r)) - (hours * 0.015);
@@ -2706,6 +2709,12 @@
             const finalBAC = calculateBAC();
             const drinkCount = drinks.length;
             
+            // Ensure BAC is calculated correctly for the summary
+            const userWeight = 70; // kg (from TEMP_USER)
+            const userGender = 'male'; // from TEMP_USER
+            const timeElapsed = sessionStartTime ? (new Date() - sessionStartTime) / (1000 * 60 * 60) : 0; // hours
+            const summaryBAC = parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
+            
             // Calculate drink types
             const drinkTypes = {};
             drinks.forEach(drink => {
@@ -2737,7 +2746,7 @@
                                 </div>
                                 <div class="stat-content">
                                     <h3>Session Duration</h3>
-                                    <p>${sessionDuration} minutes</p>
+                                    <p>${formatSessionDuration(sessionDuration)}</p>
                                 </div>
                             </div>
                             
@@ -2798,7 +2807,7 @@
                                 </div>
                                 <div class="stat-content">
                                     <h3>Final BAC</h3>
-                                    <p>${finalBAC.toFixed(3)}%</p>
+                                    <p>${summaryBAC.toFixed(3)}%</p>
                                 </div>
                             </div>
                         </div>
@@ -2823,9 +2832,9 @@
                         
                         <div class="summary-safety">
                             <h3><i class="fas fa-shield-alt"></i> Safety Assessment</h3>
-                            ${finalBAC > 0.05 ? 
+                            ${summaryBAC > 0.05 ? 
                                 '<p class="safety-warning">⚠️ Your BAC is above the legal driving limit (0.05%). Please do not drive.</p>' :
-                                finalBAC > 0.03 ? 
+                                summaryBAC > 0.03 ? 
                                 '<p class="safety-caution">⚠️ Your BAC is approaching the legal limit. Consider waiting before driving.</p>' :
                                 '<p class="safety-ok">✅ Your BAC is within safe limits for driving.</p>'
                             }
@@ -2876,6 +2885,20 @@
             } else {
                 drivingStatus.className = 'driving-status safe';
                 statusText.textContent = 'Safe to drive';
+            }
+        }
+
+        function formatSessionDuration(minutes) {
+            if (minutes < 60) {
+                return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                if (remainingMinutes === 0) {
+                    return `${hours} hour${hours !== 1 ? 's' : ''}`;
+                } else {
+                    return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
+                }
             }
         }
 
