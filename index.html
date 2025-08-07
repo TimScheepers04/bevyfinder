@@ -3,1884 +3,661 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BevyFinder - Ultimate Drink Database | Find Beer, Wine & Cocktail Info</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="BevyFinder: The #1 drink database for beer, wine & cocktail information. Find ABV, calories, ingredients, standard drinks & nutritional info for 500+ drinks. Perfect for Australian beers, craft beers & cocktails.">
-    <meta name="keywords" content="beer database, wine database, cocktail database, drink finder, alcohol content, ABV calculator, standard drinks, Australian beer, craft beer, beer calories, wine calories, cocktail ingredients, dan murphy's, liquor store, beer finder, wine finder, cocktail finder, bevy finder, drink database">
-    <meta name="author" content="Tim Scheepers - BevyFinder">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow">
-    <meta name="bingbot" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="geo.region" content="AU">
-    <meta name="geo.placename" content="Australia">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
-    <meta name="revisit-after" content="7 days">
-    <meta name="coverage" content="Worldwide">
-    <meta name="target" content="all">
-    <meta name="HandheldFriendly" content="true">
-    <meta name="MobileOptimized" content="width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BevyFinder">
-    <meta name="application-name" content="BevyFinder">
-    <meta name="msapplication-TileColor" content="#1a1a1a">
-    <meta name="msapplication-config" content="none">
-    <meta name="theme-color" content="#1a1a1a">
-    <meta name="color-scheme" content="light dark">
-    <link rel="canonical" href="https://bevyfinder.com/">
-    
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-    
-    <!-- Enhanced Cache Control -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Last-Modified" content="Mon, 01 Jan 2024 00:00:00 GMT">
-    <meta http-equiv="ETag" content="bevyfinder-v1.0.3">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="BevyFinder - Ultimate Drink Database | Find Beer, Wine & Cocktail Info">
-    <meta property="og:description" content="Discover 500+ beers, wines & cocktails with ABV, calories, ingredients & nutritional info. The #1 drink database for Australian beers, craft beers & cocktails.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://bevyfinder.com/">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=630&fit=crop">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="BevyFinder - Ultimate Drink Database">
-    <meta property="og:site_name" content="BevyFinder">
-    <meta property="og:locale" content="en_AU">
-    <meta property="og:locale:alternate" content="en_US">
-    <meta property="og:locale:alternate" content="en_GB">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="BevyFinder - Ultimate Drink Database | Find Beer, Wine & Cocktail Info">
-    <meta name="twitter:description" content="Discover 500+ beers, wines & cocktails with ABV, calories, ingredients & nutritional info. The #1 drink database for Australian beers, craft beers & cocktails.">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=630&fit=crop">
-    <meta name="twitter:image:alt" content="BevyFinder - Ultimate Drink Database">
-    <meta name="twitter:site" content="@bevyfinder">
-    <meta name="twitter:creator" content="@timscheepers">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BevyFinder">
-    
-    <!-- Preconnect to external domains for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://images.unsplash.com">
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css?v=1.0.11">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>BevyFinder - Your Ultimate Drink Database</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSY199PZC4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      gtag('config', 'G-ZSY199PZC4');
-    </script>
-    
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "BevyFinder",
-        "description": "The ultimate drink database with comprehensive information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information",
-        "url": "https://bevyfinder.com/",
-        "applicationCategory": "FoodAndDrinkApplication",
-        "operatingSystem": "Web Browser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "AUD"
-        },
-        "author": {
-            "@type": "Person",
-            "name": "Tim Scheepers"
-        },
-        "creator": {
-            "@type": "Person",
-            "name": "Tim Scheepers"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "BevyFinder"
-        },
-        "datePublished": "2024-01-01",
-        "dateModified": "2024-12-19",
-        "version": "1.0.2",
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "ratingCount": "150",
-            "bestRating": "5",
-            "worstRating": "1"
-        },
-        "featureList": [
-            "Beer database with ABV and nutritional information",
-            "Wine database with detailed tasting notes",
-            "Cocktail database with ingredient lists",
-            "Australian craft beer information",
-            "Standard drink calculator",
-            "Photo recognition for drink identification",
-            "Mobile-friendly interface"
-        ],
-        "screenshot": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=630&fit=crop",
-        "softwareVersion": "1.0.2",
-        "downloadUrl": "https://bevyfinder.com/",
-        "installUrl": "https://bevyfinder.com/",
-        "requirements": "Modern web browser with JavaScript enabled"
-    }
-    </script>
-    
-    <!-- Additional Structured Data for Organization -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "BevyFinder",
-        "url": "https://bevyfinder.com/",
-        "logo": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop",
-        "description": "The ultimate drink database for beer, wine, and cocktail information",
-        "foundingDate": "2024",
-        "founder": {
-            "@type": "Person",
-            "name": "Tim Scheepers"
-        },
-        "sameAs": [
-            "https://twitter.com/bevyfinder",
-            "https://facebook.com/bevyfinder"
-        ]
-    }
-    </script>
-    
-    <!-- FAQ Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "What is BevyFinder?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "BevyFinder is a comprehensive drink database that provides detailed information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How many beverages are in the BevyFinder database?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "BevyFinder contains information for over 500 different drinks including Australian beers, craft beers, wines, and cocktails."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is BevyFinder free to use?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, BevyFinder is completely free to use. You can search for beverages, view nutritional information, and use all features without any cost."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I find Australian beer information on BevyFinder?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, BevyFinder has extensive information about Australian beers including popular brands like Carlton Draught, VB, Coopers, and many craft beers."
-                }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 20px;
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .welcome-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .welcome-content {
+            max-width: 600px;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .feature-list i {
+            color: #ffd700;
+            margin-right: 10px;
+        }
+
+        .btn {
+            background: #ffd700;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            color: #333;
+            transition: right 0.3s;
+            z-index: 1001;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+        }
+
+        .sidebar-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .sidebar-btn i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .input-section {
+            background: white;
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-wrapper {
+            display: flex;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .upload-content i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
             }
-        ]
-    }
-    </script>
+            
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Welcome Page -->
-        <div class="welcome-page" id="welcome-page">
-            <div class="welcome-content">
-                <div class="welcome-header">
-                    <h1 class="welcome-title">
-                        <i class="fas fa-wine-glass-alt"></i> BevyFinder
-                    </h1>
-                    <p class="welcome-subtitle">Your Ultimate Beverage Discovery Platform</p>
-                </div>
-                
-                <div class="welcome-description">
-                    <p>Discover detailed information about your favorite alcoholic drinks including:</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-beer"></i> Alcohol content and standard drinks</li>
-                        <li><i class="fas fa-list"></i> Complete ingredient lists</li>
-                        <li><i class="fas fa-chart-bar"></i> Nutritional information</li>
-                        <li><i class="fas fa-camera"></i> Photo recognition capabilities</li>
-                        <li><i class="fas fa-search"></i> Smart search and suggestions</li>
-                    </ul>
-                    
-                    <!-- SEO Content Section -->
-                    <div class="seo-content" style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: left;">
-                        <h2 style="color: #fff; margin-bottom: 15px; font-size: 1.5em;">The Ultimate Drink Database</h2>
-                        <p style="color: #fff; line-height: 1.6; margin-bottom: 15px;">
-                            BevyFinder is your comprehensive <strong>beer database</strong>, <strong>wine database</strong>, and <strong>cocktail database</strong> all in one place. 
-                            Whether you're looking for <strong>Australian beer</strong> information, <strong>craft beer</strong> details, or classic cocktail recipes, 
-                            our extensive database has you covered.
-                        </p>
-                        
-                        <h3 style="color: #fff; margin: 20px 0 10px 0; font-size: 1.2em;">What You Can Find:</h3>
-                        <ul style="color: #fff; line-height: 1.6; margin-left: 20px;">
-                            <li><strong>ABV Calculator</strong> - Calculate alcohol content and standard drinks</li>
-                            <li><strong>Nutritional Information</strong> - Calories, carbs, protein, and sugar content</li>
-                            <li><strong>Drink Finder</strong> - Search by name or photo recognition</li>
-                            <li><strong>Australian Beer Database</strong> - Complete info on local favorites</li>
-                            <li><strong>Cocktail Recipe Database</strong> - Ingredients and preparation methods</li>
-                        </ul>
-                        
-                        <p style="color: #fff; line-height: 1.6; margin-top: 15px;">
-                            Perfect for anyone who wants to make informed decisions about their drink choices. 
-                            From <strong>Carlton Draught</strong> to <strong>Corona Extra</strong>, from <strong>Margarita</strong> to <strong>Old Fashioned</strong> - 
-                            find everything you need to know about your favorite drinks.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="welcome-creator">
-                    <p>Created by <strong>Tim Scheepers</strong></p>
-                </div>
-                
-                <button class="start-btn" id="start-btn">
-                    <i class="fas fa-play"></i>
-                    Start Exploring
-                </button>
-            </div>
-        </div>
-
-        <!-- Menu Button (always visible) -->
-        <button class="menu-btn" id="menu-btn">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <!-- Sidebar Menu (always available) -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h3><i class="fas fa-wine-glass-alt"></i> Menu</h3>
-                <button class="close-menu-btn" id="close-menu-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-                            <div class="sidebar-content">
-                    <button class="sidebar-btn" id="sidebar-btn-1">
-                        <i class="fas fa-home"></i>
-                        Home
-                    </button>
-                    <button class="sidebar-btn" id="sidebar-btn-dashboard">
-                        <i class="fas fa-chart-line"></i>
-                        Dashboard
-                    </button>
-
-                    <button class="sidebar-btn" id="sidebar-btn-2">
-                        <i class="fas fa-star"></i>
-                        Favorites
-                    </button>
-                    <button class="sidebar-btn" id="sidebar-btn-3">
-                        <i class="fas fa-history"></i>
-                        History
-                    </button>
-                    <button class="sidebar-btn" id="sidebar-btn-tracking">
-                        <i class="fas fa-chart-line"></i>
-                        Night Tracker
-                        <span class="premium-badge">Premium</span>
-                    </button>
-
-                    <button class="sidebar-btn" id="sidebar-btn-4">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </button>
-                    <button class="sidebar-btn" id="sidebar-btn-5">
-                        <i class="fas fa-info-circle"></i>
-                        About
-                    </button>
-                    <button class="sidebar-btn" id="signout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Sign Out
-                    </button>
-                </div>
-        </div>
-        
-        <!-- Overlay for sidebar (always available) -->
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-        <!-- Profile Menu Dropdown -->
-        <div class="profile-menu" id="profile-menu" style="display: none;">
-            <div class="profile-menu-header">
-                <i class="fas fa-user-circle"></i>
-                <span id="profile-menu-username">Guest</span>
-            </div>
-            <div class="profile-menu-content">
-                <button class="profile-menu-item" id="profile-menu-signin" onclick="showAuthPage()">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Sign In
-                </button>
-                <button class="profile-menu-item" id="profile-menu-signup" onclick="showAuthPage()">
-                    <i class="fas fa-user-plus"></i>
-                    Sign Up
-                </button>
-                <button class="profile-menu-item" id="profile-menu-profile" onclick="showProfilePage()" style="display: none;">
-                    <i class="fas fa-user"></i>
-                    My Profile
-                </button>
-                <button class="profile-menu-item" id="profile-menu-signout" onclick="signOut()" style="display: none;">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Sign Out
-                </button>
-            </div>
-        </div>
-
-        <!-- Authentication Page -->
-        <div class="auth-page" id="auth-page" style="display: none;">
-            <div class="auth-container">
-                <div class="auth-header">
-                    <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                    <p>Sign up to unlock premium features and save your favorites</p>
-                </div>
-
-                <!-- Sign In Container -->
-                <div class="auth-form-container" id="signin-container">
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to access your saved favorites and history</p>
-                    
-                    <form class="auth-form" id="signin-form">
-                        <div class="form-group">
-                            <label for="signin-email">Email</label>
-                            <input 
-                                type="email" 
-                                id="signin-email" 
-                                placeholder="Enter your email"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signin-password">Password</label>
-                            <input 
-                                type="password" 
-                                id="signin-password" 
-                                placeholder="Enter your password"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="remember-me">
-                                <span class="checkmark"></span>
-                                Remember me for 30 days
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="auth-btn primary">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Sign In
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Sign Up Container -->
-                <div class="auth-form-container" id="signup-container" style="display: none;">
-                    <h2>Create Account</h2>
-                    <p>Join BevyFinder to save favorites, track history, and unlock premium features</p>
-                    
-                    <form class="auth-form" id="signup-form">
-                        <div class="form-group">
-                            <label for="signup-name">Full Name</label>
-                            <input 
-                                type="text" 
-                                id="signup-name" 
-                                placeholder="Enter your full name"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-email">Email</label>
-                            <input 
-                                type="email" 
-                                id="signup-email" 
-                                placeholder="Enter your email"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-password">Password</label>
-                            <input 
-                                type="password" 
-                                id="signup-password" 
-                                placeholder="Create a password (min 6 characters)"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-age">Age</label>
-                            <input 
-                                type="number" 
-                                id="signup-age" 
-                                placeholder="Enter your age"
-                                min="18"
-                                max="120"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-weight">Weight (kg)</label>
-                            <input 
-                                type="number" 
-                                id="signup-weight" 
-                                placeholder="Enter your weight in kg"
-                                min="30"
-                                max="300"
-                                step="0.1"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-height">Height (cm)</label>
-                            <input 
-                                type="number" 
-                                id="signup-height" 
-                                placeholder="Enter your height in cm"
-                                min="100"
-                                max="250"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signup-gender">Gender</label>
-                            <select id="signup-gender" required>
-                                <option value="">Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="auth-btn primary">
-                            <i class="fas fa-user-plus"></i>
-                            Create Account
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Toggle between sign in and sign up -->
-                <div class="auth-toggle">
-                    <p id="auth-toggle-text">Don't have an account?</p>
-                    <button class="auth-toggle-btn" id="toggle-signup">Sign Up</button>
-                    <button class="auth-toggle-btn" id="toggle-signin" style="display: none;">Sign In</button>
-                </div>
-                
-                <!-- Skip sign up option -->
-                <div class="auth-skip">
-                    <p>Just want to search? <button class="skip-btn" onclick="goToHome()">Continue without account</button></p>
-                </div>
-
-                <!-- Features Preview -->
-                <div class="auth-features">
-                    <h3>Unlock Premium Features</h3>
-                    <div class="features-grid">
-                        <div class="feature-item">
-                            <i class="fas fa-heart"></i>
-                            <h4>Personal Favorites</h4>
-                            <p>Save and organize your favorite drinks</p>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-chart-line"></i>
-                            <h4>AI Night Tracker <span class="premium-badge">Premium</span></h4>
-                            <p>Advanced intoxication tracking with personal BAC calculations</p>
-                        </div>
-
-                        <div class="feature-item">
-                            <i class="fas fa-bell"></i>
-                            <h4>Smart Notifications</h4>
-                            <p>Get personalized drink recommendations</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main App (initially hidden) -->
-        <div class="main-app" id="main-app" style="display: none;">
-                    <header class="header">
-            <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-            <p>Enter a photo or name of your favorite alcoholic drink</p>
-            <button class="profile-btn-header" id="profile-btn-header" onclick="toggleProfileMenu()">
-                <i class="fas fa-user-circle"></i>
+    <!-- Welcome Page -->
+    <div class="page welcome-page active" id="welcome-page">
+        <div class="welcome-content">
+            <h1 class="welcome-title">
+                <i class="fas fa-wine-glass-alt"></i>
+                BevyFinder
+            </h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Your Ultimate Drink Database</p>
+            
+            <p style="margin-bottom: 20px;">Discover comprehensive information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information.</p>
+            
+            <ul class="feature-list">
+                <li><i class="fas fa-search"></i> Search 500+ drinks by name</li>
+                <li><i class="fas fa-camera"></i> Photo recognition for instant results</li>
+                <li><i class="fas fa-heart"></i> Save your favorite drinks</li>
+                <li><i class="fas fa-chart-line"></i> Track your drinking sessions</li>
+                <li><i class="fas fa-users"></i> Connect with friends</li>
+                <li><i class="fas fa-star"></i> Rate and review drinks</li>
+            </ul>
+            
+            <p style="margin: 20px 0;">Created by <strong>Tim Scheepers</strong></p>
+            
+            <button class="btn" id="start-btn">
+                <i class="fas fa-play"></i>
+                Start Exploring
             </button>
-        </header>
+        </div>
+    </div>
 
-            <main class="main-content">
-                <div class="input-section">
-                    <div class="input-tabs">
-                        <button class="tab-btn active" data-tab="name">
-                            <i class="fas fa-edit"></i>
-                            Name Input
-                        </button>
-                        <button class="tab-btn" data-tab="photo">
-                            <i class="fas fa-camera"></i>
-                            Photo Upload
-                        </button>
-                    </div>
+    <!-- Menu Button -->
+    <button class="menu-btn" id="menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-wine-glass-alt"></i> Menu</h3>
+            <button class="close-menu-btn" id="close-menu-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <button class="sidebar-btn" id="sidebar-btn-1">
+                <i class="fas fa-home"></i>
+                Home
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-dashboard">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-2">
+                <i class="fas fa-star"></i>
+                Favorites
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-3">
+                <i class="fas fa-history"></i>
+                History
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-tracking">
+                <i class="fas fa-chart-line"></i>
+                Night Tracker
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-4">
+                <i class="fas fa-cog"></i>
+                Settings
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-5">
+                <i class="fas fa-info-circle"></i>
+                About
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-                    <!-- Name Input Tab -->
-                    <div class="tab-content active" id="name-tab">
-                        <div class="input-group">
-                            <label for="beverage-name">Beverage Name</label>
-                            <div class="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="beverage-name" 
-                                    placeholder="e.g., Margarita, Guinness, Chardonnay..."
-                                    autocomplete="off"
-                                >
-                                <button class="search-btn" id="search-btn">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                <button class="filter-btn" id="filter-btn" onclick="toggleAdvancedFilters()">
-                                    <i class="fas fa-filter"></i>
-                                </button>
-                            </div>
-                            <div class="suggestions" id="suggestions"></div>
-                            
-                            <!-- Advanced Search Filters -->
-                            <div id="advanced-filters" class="advanced-filters" style="display: none;">
-                                <div class="filter-row">
-                                    <div class="filter-group">
-                                        <label for="type-filter">Type:</label>
-                                        <select id="type-filter" onchange="applyFilters()">
-                                            <option value="all">All Types</option>
-                                            <option value="Beer">Beer</option>
-                                            <option value="Wine">Wine</option>
-                                            <option value="Cocktail">Cocktail</option>
-                                            <option value="Spirit">Spirit</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="filter-group">
-                                        <label for="country-filter">Country:</label>
-                                        <select id="country-filter" onchange="applyFilters()">
-                                            <option value="all">All Countries</option>
-                                            <option value="Australia">Australia</option>
-                                            <option value="Belgium">Belgium</option>
-                                            <option value="Germany">Germany</option>
-                                            <option value="USA">USA</option>
-                                            <option value="UK">UK</option>
-                                            <option value="Netherlands">Netherlands</option>
-                                            <option value="Czech Republic">Czech Republic</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="filter-row">
-                                    <div class="filter-group">
-                                        <label>ABV Range: <span id="abv-range-display">0% - 15%</span></label>
-                                        <div class="range-slider">
-                                            <input type="range" id="abv-min" min="0" max="15" value="0" step="0.5" onchange="updateABVDisplay()">
-                                            <input type="range" id="abv-max" min="0" max="15" value="15" step="0.5" onchange="updateABVDisplay()">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="filter-group">
-                                        <label for="rating-filter">Min Rating:</label>
-                                        <select id="rating-filter" onchange="applyFilters()">
-                                            <option value="0">Any Rating</option>
-                                            <option value="4">4+ Stars</option>
-                                            <option value="4.5">4.5+ Stars</option>
-                                            <option value="4.8">4.8+ Stars</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="filter-actions">
-                                    <button onclick="clearFilters()" class="clear-filters-btn">
-                                        <i class="fas fa-times"></i> Clear Filters
-                                    </button>
-                                    <button onclick="applyFilters()" class="apply-filters-btn">
-                                        <i class="fas fa-check"></i> Apply Filters
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Photo Input Tab -->
-                    <div class="tab-content" id="photo-tab">
-                        <div class="upload-area" id="upload-area">
-                            <div class="upload-content">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <h3>Upload Beverage Photo</h3>
-                                <p>Drag & drop an image here or click to browse</p>
-                                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
-                                    <i class="fas fa-camera"></i> AI-powered image recognition - upload a clear photo of the beverage
-                                </p>
-                                <!-- File input will be created dynamically for better mobile compatibility -->
-                                <button class="upload-btn" id="upload-btn">
-                                    Choose File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="preview-area" id="preview-area" style="display: none;">
-                            <img id="preview-image" src="" alt="Preview">
-                            <button class="remove-btn" id="remove-btn">
-                                <i class="fas fa-times"></i>
+    <!-- Main App -->
+    <div class="page" id="main-app">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Find your perfect drink</p>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="search">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </button>
+                    <button class="tab-btn" data-tab="photo">
+                        <i class="fas fa-camera"></i>
+                        <span>Photo</span>
+                    </button>
+                </div>
+                
+                <div class="tab-content active" id="search-tab">
+                    <div class="input-group">
+                        <label for="beverage-name">Search for a drink:</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="beverage-name" placeholder="Enter drink name...">
+                            <button class="search-btn" id="search-btn">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-
-                <div class="results-section" id="results-section" style="display: none;">
-                    <h2>Beverage Information</h2>
-                    <div class="beverage-card" id="beverage-card">
-                        <!-- Results will be populated here -->
-                    </div>
-                </div>
-            </main>
-
-            <footer class="footer">
-                <p>Find your Bevy details now</p>
-                <p>By Tim Scheepers</p>
-            </footer>
-        </div>
-
-        <!-- Favorites Page (initially hidden) -->
-        <div class="favorites-page" id="favorites-page" style="display: none;">
-            <header class="header">
-                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Your saved beverages</p>
-                <button class="profile-btn-header" id="profile-btn-header-favorites" onclick="toggleProfileMenu()">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-            </header>
-
-            <main class="main-content">
-                <div class="favorites-container" id="favorites-container">
-                    <!-- Favorites will be populated here -->
-                </div>
                 
-                <div class="empty-favorites" id="empty-favorites" style="display: none;">
-                    <div class="empty-state">
-                        <i class="fas fa-star"></i>
-                        <h3>No Favorites Yet</h3>
-                        <p>Start exploring beverages and add them to your favorites!</p>
-                        <button class="start-exploring-btn" onclick="goToHome()">
-                            <i class="fas fa-search"></i>
-                            Start Exploring
-                        </button>
+                <div class="tab-content" id="photo-tab">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <i class="fas fa-camera"></i>
+                            <h3>Upload a Photo</h3>
+                            <p>Take a photo or upload an image of a drink</p>
+                        </div>
                     </div>
                 </div>
-            </main>
-
-            <footer class="footer">
-                <p>Your personal beverage collection</p>
-                <p>By Tim Scheepers</p>
-            </footer>
+            </div>
         </div>
+    </div>
 
-        <!-- Dashboard Page (initially hidden) -->
-        <div class="dashboard-page" id="dashboard-page" style="display: none;">
-            <header class="header">
-                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Feature Hub - Your BevyFinder Command Center</p>
-                <button class="profile-btn-header" id="profile-btn-header-dashboard" onclick="toggleProfileMenu()">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-            </header>
-
-            <main class="main-content">
-                <div class="pinboard-container">
-                    <div class="pinboard-grid">
-                        <!-- Search Feature -->
-                        <div class="pinboard-item" onclick="goToHome()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <h3>Search Drinks</h3>
-                            <p>Find beers, wines & cocktails</p>
-                        </div>
-
-                        <!-- Night Tracker -->
-                        <div class="pinboard-item" onclick="showTrackingPage()">
-                            <div class="pinboard-icon premium">
-                                <i class="fas fa-chart-line"></i>
-                                <span class="premium-badge">Premium</span>
-                            </div>
-                            <h3>Night Tracker</h3>
-                            <p>Monitor your night out</p>
-                        </div>
-
-                        <!-- Favorites -->
-                        <div class="pinboard-item" onclick="showFavoritesPage()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <h3>Favorites</h3>
-                            <p>Your saved drinks</p>
-                        </div>
-
-                        <!-- History -->
-                        <div class="pinboard-item" onclick="showHistoryPage()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-history"></i>
-                            </div>
-                            <h3>History</h3>
-                            <p>Recent searches</p>
-                        </div>
-
-                        <!-- Featured -->
-                        <div class="pinboard-item" onclick="showFeaturedPage()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <h3>Featured</h3>
-                            <p>Trending drinks</p>
-                        </div>
-
-                        <!-- Photo Recognition -->
-                        <div class="pinboard-item" onclick="goToHome()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <h3>Photo Search</h3>
-                            <p>Upload drink photos</p>
-                        </div>
-
-                        <!-- Friends -->
-                        <div class="pinboard-item" onclick="showFriendsPage()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h3>Friends</h3>
-                            <p>Connect with friends</p>
-                        </div>
-
-                        <!-- Settings -->
-                        <div class="pinboard-item" onclick="showSettings()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <h3>Settings</h3>
-                            <p>App preferences</p>
-                        </div>
-
-                        <!-- About -->
-                        <div class="pinboard-item" onclick="showAbout()">
-                            <div class="pinboard-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <h3>About</h3>
-                            <p>Learn more</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <footer class="footer">
-                <p>Your personal beverage journey</p>
-                <p>By Tim Scheepers</p>
-            </footer>
+    <!-- Other Pages -->
+    <div class="page" id="favorites-page">
+        <div class="container">
+            <h2><i class="fas fa-star"></i> Favorites</h2>
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <h3>No Favorites Yet</h3>
+                <p>Start exploring and add your favorite drinks!</p>
+                <button class="btn" onclick="showPage('main-app')">Start Exploring</button>
+            </div>
         </div>
+    </div>
 
-        <!-- History Page (initially hidden) -->
-        <div class="history-page" id="history-page" style="display: none;">
-            <header class="header">
-                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Your recent beverage searches</p>
-                <button class="profile-btn-header" id="profile-btn-header-history" onclick="toggleProfileMenu()">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-            </header>
-
-            <main class="main-content">
-                <div class="history-container" id="history-container">
-                    <!-- History will be populated here -->
-                </div>
-                
-                <div class="empty-history" id="empty-history" style="display: none;">
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <h3>No Search History</h3>
-                        <p>Start searching for beverages to see your history here!</p>
-                        <button class="start-exploring-btn" onclick="goToHome()">
-                            <i class="fas fa-search"></i>
-                            Start Searching
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="history-actions" id="history-actions" style="display: none;">
-                    <button class="clear-history-btn" onclick="clearHistory()">
-                        <i class="fas fa-trash"></i>
-                        Clear All History
-                    </button>
-                </div>
-            </main>
-
-            <footer class="footer">
-                <p>Track your beverage exploration journey</p>
-                <p>By Tim Scheepers</p>
-            </footer>
+    <div class="page" id="history-page">
+        <div class="container">
+            <h2><i class="fas fa-history"></i> History</h2>
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <h3>No Search History</h3>
+                <p>Your search history will appear here</p>
+            </div>
         </div>
+    </div>
 
-        <!-- Night Tracker Page (initially hidden) -->
-        <div class="tracking-page" id="tracking-page" style="display: none;">
-            <header class="header">
-                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Track your night out - Monitor alcohol and nutrition</p>
-                <button class="profile-btn-header" id="profile-btn-header-tracking" onclick="toggleProfileMenu()">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-            </header>
-
-            <main class="main-content">
-                <!-- Session Controls -->
-                <div class="session-controls">
-                    <div class="session-info">
-                        <h3><i class="fas fa-clock"></i> Current Session</h3>
-                        <p id="session-time">Not started</p>
-                    </div>
-                    <div class="session-buttons">
-                        <button class="session-btn start-session-btn" id="start-session-btn">
-                            <i class="fas fa-play"></i> Start Night
-                        </button>
-                        <button class="session-btn end-session-btn" id="end-session-btn" style="display: none;">
-                            <i class="fas fa-stop"></i> End Night
-                        </button>
-                        <button class="session-btn reset-session-btn" id="reset-session-btn">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Summary Cards -->
-                <div class="summary-cards">
-                    <div class="summary-card alcohol-card">
-                        <div class="card-icon">
-                            <i class="fas fa-wine-bottle"></i>
-                        </div>
-                        <div class="card-content">
-                            <h4>Total Alcohol</h4>
-                            <p id="total-alcohol">0.0</p>
-                            <span class="unit">standard drinks</span>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card calories-card">
-                        <div class="card-icon">
-                            <i class="fas fa-fire"></i>
-                        </div>
-                        <div class="card-content">
-                            <h4>Total Calories</h4>
-                            <p id="total-calories">0</p>
-                            <span class="unit">kcal</span>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card sobriety-card">
-                        <div class="card-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="card-content">
-                            <h4>Sobriety Status</h4>
-                            <p id="sobriety-status">Sober</p>
-                            <span class="unit" id="sobriety-details">Ready to drive</span>
-                            <p id="bac-level" class="unit" style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">BAC: 0.000%</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add Drink Section -->
-                <div class="add-drink-section">
-                    <h3><i class="fas fa-plus-circle"></i> Add Drink</h3>
-                    <div class="add-drink-input">
-                        <input 
-                            type="text" 
-                            id="tracking-drink-search" 
-                            placeholder="Search for a drink to add..."
-                            autocomplete="off"
-                        >
-                        <button class="add-drink-btn" id="add-drink-btn">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="drink-suggestions" id="tracking-drink-suggestions"></div>
-                </div>
-
-                <!-- Drink List -->
-                <div class="drink-list-section">
-                    <h3><i class="fas fa-list"></i> Tonight's Drinks</h3>
-                    <div class="drink-list" id="drink-list">
-                        <!-- Drinks will be added here -->
-                    </div>
-                    
-                    <div class="empty-drinks" id="empty-drinks">
-                        <div class="empty-state">
-                            <i class="fas fa-glass-whiskey"></i>
-                            <h3>No Drinks Added</h3>
-                            <p>Start your night by adding your first drink!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detailed Nutrition -->
-                <div class="nutrition-details">
-                    <h3><i class="fas fa-chart-pie"></i> Nutrition Breakdown</h3>
-                    <div class="nutrition-grid">
-                        <div class="nutrition-item">
-                            <span class="nutrition-label">Carbs:</span>
-                            <span class="nutrition-value" id="total-carbs">0g</span>
-                        </div>
-                        <div class="nutrition-item">
-                            <span class="nutrition-label">Calories:</span>
-                            <span class="nutrition-value" id="total-calories-detailed">0</span>
-                        </div>
-                        <div class="nutrition-item">
-                            <span class="nutrition-label">Sugar:</span>
-                            <span class="nutrition-value" id="total-sugar">0g</span>
-                        </div>
-                        <div class="nutrition-item">
-                            <span class="nutrition-label">Fat:</span>
-                            <span class="nutrition-value" id="total-fat">0g</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Safety Tips -->
-                <div class="safety-tips" id="safety-tips">
-                    <h3><i class="fas fa-shield-alt"></i> Safety Tips</h3>
-                    <div class="tips-content">
-                        <p>Remember to drink responsibly and never drink and drive.</p>
-                        <ul>
-                            <li>Stay hydrated with water between drinks</li>
-                            <li>Eat before and during drinking</li>
-                            <li>Know your limits</li>
-                            <li>Plan a safe way home</li>
-                        </ul>
-                    </div>
-                </div>
-            </main>
-
-            <footer class="footer">
-                <p>Track responsibly - Drink safely</p>
-                <p>By Tim Scheepers</p>
-            </footer>
+    <div class="page" id="tracking-page">
+        <div class="container">
+            <h2><i class="fas fa-chart-line"></i> Night Tracker</h2>
+            <p>Track your drinking session and monitor your BAC</p>
         </div>
-
-        <!-- Featured Page (initially hidden) -->
-        <div class="featured-page" id="featured-page" style="display: none;">
-            <header class="header">
-                <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
-                <p>Top 10 Most Liked Drinks of the Week</p>
-                <button class="profile-btn-header" id="profile-btn-header-featured" onclick="toggleProfileMenu()">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-            </header>
-
-            <main class="main-content">
-                <div class="featured-container" id="featured-container">
-                    <!-- Featured drinks will be populated here -->
-                </div>
-            </main>
-
-            <footer class="footer">
-                <p>Discover what everyone's loving this week</p>
-                <p>By Tim Scheepers</p>
-            </footer>
-        </div>
-
-
     </div>
 
     <script>
-        console.log('HTML loaded - testing JavaScript execution');
-    </script>
-    <script src="analytics.js?v=1.0.3"></script>
-    <script src="fallback-analytics.js?v=1.0.3"></script>
-    
-    <!-- EMBEDDED AUTHENTICATION SYSTEM - NO EXTERNAL DEPENDENCIES -->
-    <script>
-        // ===== EMBEDDED API CLIENT =====
-        class BevyFinderAPI {
-            constructor() {
-                // Auto-detect the best API URL
-                this.baseURL = this.initializeURL();
-                console.log('🔗 API initialized with URL:', this.baseURL);
-                
-                // Test the connection and find the best working URL
-                this.testAndOptimizeConnection();
-            }
-            
-            async testAndOptimizeConnection() {
-                console.log('🧪 Testing API connection...');
-                
-                // List of possible API URLs to test
-                const possibleURLs = [
-                    this.baseURL, // Current detected URL
-                    'http://192.168.4.36:3000/api', // Your specific local network
-                    'http://localhost:3000/api', // Local development
-                    'https://bevyfinder.com/api', // Production
-                    'http://127.0.0.1:3000/api', // Alternative local
-                ];
-                
-                // Remove duplicates
-                const uniqueURLs = [...new Set(possibleURLs)];
-                
-                for (const url of uniqueURLs) {
-                    try {
-                        console.log(`🔍 Testing: ${url}`);
-                        const response = await fetch(`${url.replace('/api', '')}/health`, {
-                            method: 'GET',
-                            mode: 'cors',
-                            headers: { 'Accept': 'application/json' }
-                        });
-                        
-                        if (response.ok) {
-                            console.log(`✅ Found working API: ${url}`);
-                            this.baseURL = url;
-                            return;
-                        }
-                    } catch (error) {
-                        console.log(`❌ Failed: ${url} - ${error.message}`);
-                    }
-                }
-                
-                console.log('⚠️ No working API found, using fallback:', this.baseURL);
-            }
-            
-            initializeURL() {
-                // Smart API URL detection based on current location
-                const currentHost = window.location.hostname;
-                const currentProtocol = window.location.protocol;
-                const currentPort = window.location.port;
-                
-                console.log('🔍 Current location:', `${currentProtocol}//${currentHost}:${currentPort}`);
-                
-                // If we're on localhost or local network, use local API
-                if (currentHost === 'localhost' || currentHost === '127.0.0.1' || 
-                    currentHost.startsWith('192.168.') || currentHost.startsWith('10.') || 
-                    currentHost.startsWith('172.')) {
-                    
-                    // Try to use the same host as the frontend
-                    const localAPI = `${currentProtocol}//${currentHost}:3000/api`;
-                    console.log('🏠 Using local API:', localAPI);
-                    return localAPI;
-                }
-                
-                // If we're on a public domain, use production API
-                if (currentHost.includes('bevyfinder.com') || currentHost.includes('netlify.app') || 
-                    currentHost.includes('vercel.app') || currentHost.includes('github.io')) {
-                    
-                    const productionAPI = 'https://bevyfinder.com/api';
-                    console.log('🌐 Using production API:', productionAPI);
-                    return productionAPI;
-                }
-                
-                // Fallback: try to detect if we're on the same network as the server
-                const fallbackAPI = `${currentProtocol}//${currentHost}:3000/api`;
-                console.log('🔄 Using fallback API:', fallbackAPI);
-                return fallbackAPI;
-            }
-            
-            async request(endpoint, options = {}) {
-                // Smart API URL detection - works locally and in production
-                let baseURL;
-                
-                // Check if we're in development (localhost or local network)
-                if (window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1' || 
-                    window.location.hostname.startsWith('192.168.') ||
-                    window.location.hostname.startsWith('10.') ||
-                    window.location.hostname.startsWith('172.')) {
-                    baseURL = 'http://192.168.4.36:3000/api';
-                } else {
-                    // Production API URL (will be set after deployment)
-                    baseURL = 'https://bevyfinder-api.herokuapp.com/api';
-                }
-                
-                const url = `${baseURL}${endpoint}`;
-                
-                const defaultOptions = {
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                };
-                
-                const finalOptions = { ...defaultOptions, ...options };
-                
-                if (options.body && typeof options.body === 'object') {
-                    finalOptions.body = JSON.stringify(options.body);
-                }
-                
-                console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
-                
-                try {
-                    const response = await fetch(url, finalOptions);
-                    const text = await response.text();
-                    
-                    console.log(`📡 API Response: ${response.status} ${response.statusText}`);
-                    
-                    try {
-                        const data = JSON.parse(text);
-                        return { success: true, data, status: response.status };
-                    } catch (e) {
-                        console.error('❌ JSON Parse Error:', text);
-                        return { success: false, error: 'Invalid JSON response', raw: text, status: response.status };
-                    }
-                } catch (error) {
-                    console.error('❌ Network Error:', error.message);
-                    return { success: false, error: error.message };
+        // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
+        const TEMP_AUTH_BYPASS = true;
+        const TEMP_USER = {
+            id: 'temp-user-123',
+            name: 'Test User',
+            email: 'test@bevyfinder.com',
+            age: 25,
+            weight: 70,
+            height: 175,
+            gender: 'male',
+            stats: {
+                searches: 15,
+                favorites: 8
+            },
+            profile: {
+                preferences: {
+                    favoriteDrinks: [],
+                    searchHistory: []
                 }
             }
-            
-            // Auth Methods
-            async login(email, password, rememberMe = false) {
-                return this.request('/auth/login', {
-                    method: 'POST',
-                    body: { email, password, rememberMe }
-                });
-            }
-            
-            async register(name, email, password) {
-                return this.request('/auth/register', {
-                    method: 'POST',
-                    body: { name, email, password }
-                });
-            }
-            
-            async getProfile() {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: false, error: 'No token' };
-                
-                return this.request('/auth/me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            }
-            
-            async logout() {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: true };
-                
-                return this.request('/auth/logout', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            }
-            
-            // Drink Methods
-            async getDrinks() {
-                return this.request('/drinks');
-            }
-            
-            async searchDrinks(query) {
-                return this.request(`/drinks/search?q=${encodeURIComponent(query)}`);
-            }
-            
-            async getDrinkById(id) {
-                return this.request(`/drinks/${id}`);
-            }
-            
-            // Favorites Methods
-            async addToFavorites(drinkId) {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: false, error: 'Not authenticated' };
-                
-                return this.request('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: { drinkId }
-                });
-            }
-            
-            async removeFromFavorites(drinkId) {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: false, error: 'Not authenticated' };
-                
-                return this.request('/favorites/remove', {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: { drinkId }
-                });
-            }
-            
-            // Likes Methods
-            async likeDrink(drinkId) {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: false, error: 'Not authenticated' };
-                
-                return this.request('/likes/add', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: { drinkId }
-                });
-            }
-            
-            async unlikeDrink(drinkId) {
-                const token = localStorage.getItem('bevyfinder_token');
-                if (!token) return { success: false, error: 'Not authenticated' };
-                
-                return this.request('/likes/remove', {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: { drinkId }
-                });
-            }
-            
-            async getTopLikedDrinks() {
-                return this.request('/likes/top');
-            }
+        };
+
+        // Mock authentication functions
+        function isAuthenticated() {
+            return TEMP_AUTH_BYPASS;
         }
-        
-        // ===== EMBEDDED AUTHENTICATION MANAGER =====
-        class BevyFinderAuth {
-            constructor() {
-                this.api = new BevyFinderAPI();
-                this.currentUser = null;
-                this.isAuthenticated = false;
-                this.init();
-            }
-            
-            init() {
-                console.log('🔐 Auth system initialized');
-                this.checkAuthStatus();
-                this.setupEventListeners();
-            }
-            
-            async checkAuthStatus() {
-                const token = localStorage.getItem('bevyfinder_token');
-                
-                if (token) {
-                    console.log('🔍 Checking auth status with token');
-                    const result = await this.api.getProfile();
-                    
-                    if (result.success) {
-                        this.currentUser = result.data.user;
-                        this.isAuthenticated = true;
-                        console.log('✅ User authenticated:', this.currentUser.name);
-                        this.updateUI();
-                    } else {
-                        console.log('❌ Token invalid, clearing');
-                        this.clearAuth();
-                    }
-                } else {
-                    console.log('🔍 No token found');
-                    this.updateUI();
-                }
-            }
-            
-            async signIn(email, password, rememberMe = false) {
-                console.log('🔐 Attempting sign in:', email);
-                
-                try {
-                    // Smart API URL detection for login
-                    let apiUrl;
-                    if (window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1' || 
-                        window.location.hostname.startsWith('192.168.') ||
-                        window.location.hostname.startsWith('10.') ||
-                        window.location.hostname.startsWith('172.')) {
-                        apiUrl = 'http://192.168.4.36:3000/api/auth/login';
-                    } else {
-                        apiUrl = 'https://bevyfinder-api.herokuapp.com/api/auth/login';
-                    }
-                    console.log(`🌐 Making request to: ${apiUrl}`);
-                    
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            email: email,
-                            password: password,
-                            rememberMe: rememberMe
-                        })
-                    });
-                    
-                    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-                    
-                    const text = await response.text();
-                    console.log(`📡 Response text: ${text.substring(0, 200)}...`);
-                    
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('✅ JSON parsed successfully');
-                        
-                        if (data.success) {
-                            console.log(`✅ Login successful for: ${data.data.user.name}`);
-                            
-                            // Store token
-                            if (data.data.token) {
-                                localStorage.setItem('bevyfinder_token', data.data.token);
-                                console.log('💾 Token stored in localStorage');
-                            }
-                            
-                            // Store remember me info
-                            if (rememberMe) {
-                                localStorage.setItem('bevyfinder_remember_me', 'true');
-                                localStorage.setItem('bevyfinder_user_email', email);
-                                console.log('💾 Remember me info stored');
-                            }
-                            
-                            this.currentUser = data.data.user;
-                            this.isAuthenticated = true;
-                            this.updateUI();
-                            
-                            return { success: true, user: this.currentUser };
-                        } else {
-                            console.error(`❌ Login failed: ${data.message}`);
-                            return { success: false, error: data.message };
-                        }
-                    } catch (e) {
-                        console.error(`❌ JSON parse error: ${e.message}`);
-                        console.error(`❌ Raw response: ${text}`);
-                        return { success: false, error: 'Invalid JSON response' };
-                    }
-                } catch (error) {
-                    console.error(`❌ Network error: ${error.message}`);
-                    return { success: false, error: error.message };
-                }
-            }
-            
-            async signUp(name, email, password) {
-                console.log('📝 Attempting sign up:', email);
-                
-                try {
-                    const result = await this.api.register(name, email, password);
-                    
-                    if (result.success) {
-                        console.log('✅ Registration successful');
-                        
-                        // Store token
-                        if (result.data.token) {
-                            localStorage.setItem('bevyfinder_token', result.data.token);
-                        }
-                        
-                        this.currentUser = result.data.user;
-                        this.isAuthenticated = true;
-                        this.updateUI();
-                        
-                        return { success: true, user: this.currentUser };
-                    } else {
-                        console.error('❌ Registration failed:', result.error);
-                        return { success: false, error: result.error };
-                    }
-                } catch (error) {
-                    console.error('❌ Registration error:', error);
-                    return { success: false, error: error.message };
-                }
-            }
-            
-            async signOut() {
-                console.log('🚪 Signing out');
-                
-                try {
-                    await this.api.logout();
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
-                
-                this.clearAuth();
-                this.updateUI();
-            }
-            
-            clearAuth() {
-                localStorage.removeItem('bevyfinder_token');
-                localStorage.removeItem('bevyfinder_remember_me');
-                localStorage.removeItem('bevyfinder_user_email');
-                this.currentUser = null;
-                this.isAuthenticated = false;
-            }
-            
-            updateUI() {
-                const authPage = document.getElementById('auth-page');
-                const mainApp = document.getElementById('main-app');
-                const profileMenu = document.getElementById('profile-menu');
-                const profileButton = document.getElementById('profile-button');
-                
-                if (this.isAuthenticated && this.currentUser) {
-                    // Show main app
-                    if (authPage) authPage.style.display = 'none';
-                    if (mainApp) mainApp.style.display = 'block';
-                    
-                    // Update profile menu
-                    if (profileMenu) {
-                        const userNameElement = profileMenu.querySelector('.user-name');
-                        const userEmailElement = profileMenu.querySelector('.user-email');
-                        
-                        if (userNameElement) userNameElement.textContent = this.currentUser.name;
-                        if (userEmailElement) userEmailElement.textContent = this.currentUser.email;
-                    }
-                    
-                    // Show profile button
-                    if (profileButton) profileButton.style.display = 'block';
-                    
-                    console.log('✅ UI updated for authenticated user');
-                } else {
-                    // Show auth page
-                    if (authPage) authPage.style.display = 'block';
-                    if (mainApp) mainApp.style.display = 'none';
-                    
-                    // Hide profile button
-                    if (profileButton) profileButton.style.display = 'none';
-                    
-                    console.log('✅ UI updated for guest user');
-                }
-            }
-            
-            setupEventListeners() {
-                // Login form
-                const signinForm = document.getElementById('signin-form');
-                if (signinForm) {
-                    signinForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        await this.handleSignIn();
-                    });
-                }
-                
-                // Register form
-                const registerForm = document.getElementById('signup-form');
-                if (registerForm) {
-                    registerForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        await this.handleSignUp();
-                    });
-                }
-                
-                // Sign out button
-                const signOutBtn = document.getElementById('signout-btn');
-                if (signOutBtn) {
-                    signOutBtn.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        await this.signOut();
-                    });
-                }
-                
-                // Profile menu toggle
-                const profileButton = document.getElementById('profile-btn-header');
-                if (profileButton) {
-                    profileButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const profileMenu = document.getElementById('profile-menu');
-                        if (profileMenu) {
-                            profileMenu.classList.toggle('show');
-                        }
-                    });
-                }
-                
-                // Pre-fill email if remembered
-                this.preFillEmailIfRemembered();
-            }
-            
-            async handleSignIn() {
-                const email = document.getElementById('signin-email').value;
-                const password = document.getElementById('signin-password').value;
-                const rememberMe = document.getElementById('remember-me')?.checked || false;
-                
-                if (!email || !password) {
-                    this.showError('Please enter both email and password');
-                    return;
-                }
-                
-                const result = await this.signIn(email, password, rememberMe);
-                
-                if (result.success) {
-                    this.showSuccess(`Welcome back, ${result.user.name}!`);
-                } else {
-                    this.showError(result.error || 'Login failed');
-                }
-            }
-            
-            async handleSignUp() {
-                const name = document.getElementById('signup-name').value;
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                
-                if (!name || !email || !password) {
-                    this.showError('Please fill in all fields');
-                    return;
-                }
-                
-                if (password.length < 6) {
-                    this.showError('Password must be at least 6 characters');
-                    return;
-                }
-                
-                const result = await this.signUp(name, email, password);
-                
-                if (result.success) {
-                    this.showSuccess(`Welcome, ${result.user.name}!`);
-                } else {
-                    this.showError(result.error || 'Registration failed');
-                }
-            }
-            
-            preFillEmailIfRemembered() {
-                const rememberedEmail = localStorage.getItem('bevyfinder_user_email');
-                if (rememberedEmail) {
-                    const emailInput = document.getElementById('signin-email');
-                    if (emailInput) {
-                        emailInput.value = rememberedEmail;
-                        
-                        const rememberMeCheckbox = document.getElementById('remember-me');
-                        if (rememberMeCheckbox) {
-                            rememberMeCheckbox.checked = true;
-                        }
-                    }
-                }
-            }
-            
-            showError(message) {
-                console.error('❌ Error:', message);
-                // You can implement a toast notification here
-                alert(message);
-            }
-            
-            showSuccess(message) {
-                console.log('✅ Success:', message);
-                // You can implement a toast notification here
-                alert(message);
-            }
+
+        function getCurrentUser() {
+            return TEMP_AUTH_BYPASS ? TEMP_USER : null;
         }
-        
-        // ===== GLOBAL AUTH INSTANCE =====
-        let auth;
-        
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Initializing embedded auth system');
-            auth = new BevyFinderAuth();
+
+        console.log('🔓 Authentication bypass enabled - all features available for testing');
+
+        // Simple page management
+        function showPage(pageId) {
+            console.log('Showing page:', pageId);
             
-            // Make auth globally available
-            window.BevyFinderAuth = auth;
-            window.BevyFinderAPI = auth.api;
-        });
-    </script>
-    
-    <!-- EMBEDDED MAIN APP SCRIPT -->
-    <script>
-        // ===== MAIN APP FUNCTIONALITY =====
-        let drinksData = [];
-        let currentTab = 'search';
-        
-        // Initialize main app when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🎯 Main app initializing');
-            
-            try {
-                // Wait for auth to be ready
-                if (!window.BevyFinderAuth) {
-                    console.log('⏳ Waiting for auth system...');
-                    await new Promise(resolve => {
-                        const checkAuth = () => {
-                            if (window.BevyFinderAuth) {
-                                resolve();
-                            } else {
-                                setTimeout(checkAuth, 100);
-                            }
-                        };
-                        checkAuth();
-                    });
-                }
-                
-                console.log('✅ Auth system ready, initializing main app');
-                
-                // Load drinks data
-                await loadDrinksData();
-                
-                // Setup event listeners
-                setupEventListeners();
-                
-                // Initialize UI
-                initializeUI();
-                
-                console.log('✅ Main app initialized successfully');
-                
-            } catch (error) {
-                console.error('❌ Main app initialization failed:', error);
-            }
-        });
-        
-        async function loadDrinksData() {
-            try {
-                console.log('📊 Loading drinks data...');
-                const result = await window.BevyFinderAPI.getDrinks();
-                
-                if (result.success) {
-                    drinksData = result.data.drinks || [];
-                    console.log(`✅ Loaded ${drinksData.length} drinks`);
-                } else {
-                    console.error('❌ Failed to load drinks:', result.error);
-                    drinksData = [];
-                }
-            } catch (error) {
-                console.error('❌ Error loading drinks:', error);
-                drinksData = [];
-            }
-        }
-        
-        function setupEventListeners() {
-            // Tab buttons
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tab = btn.getAttribute('data-tab');
-                    switchTab(tab);
-                });
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+                console.log('Hiding page:', page.id);
             });
             
-            // Search input
-            const beverageNameInput = document.getElementById('beverage-name');
-            if (beverageNameInput) {
-                beverageNameInput.addEventListener('input', (e) => {
-                    const query = e.target.value.trim();
-                    if (query.length >= 2) {
-                        searchBeverages(query);
-                    } else {
-                        clearSearchResults();
-                    }
-                });
-            }
-            
-            // Pinboard items
-            const pinboardItems = document.querySelectorAll('.pinboard-item');
-            pinboardItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const feature = item.getAttribute('data-feature');
-                    handlePinboardClick(feature);
-                });
-            });
-        }
-        
-        function initializeUI() {
-            // Set initial tab
-            switchTab('search');
-            
-            // Update any UI elements that depend on auth status
-            if (window.BevyFinderAuth && window.BevyFinderAuth.isAuthenticated) {
-                console.log('✅ User is authenticated, updating UI');
-                // Add any authenticated-user-specific UI updates here
+            // Show target page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('✅ Page shown:', pageId);
+            } else {
+                console.error('❌ Page not found:', pageId);
             }
         }
-        
+
+        // Menu functions
+        function openMenu() {
+            console.log('Opening menu...');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                console.log('✅ Menu opened');
+            }
+        }
+
+        function closeMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function handleSidebarClick(buttonId) {
+            console.log('Sidebar button clicked:', buttonId);
+            closeMenu();
+            
+            switch(buttonId) {
+                case 'sidebar-btn-1':
+                    showPage('main-app');
+                    break;
+                case 'sidebar-btn-dashboard':
+                    alert('Dashboard - Coming Soon!');
+                    break;
+                case 'sidebar-btn-2':
+                    showPage('favorites-page');
+                    break;
+                case 'sidebar-btn-3':
+                    showPage('history-page');
+                    break;
+                case 'sidebar-btn-tracking':
+                    showPage('tracking-page');
+                    break;
+                case 'sidebar-btn-4':
+                    alert('Settings - Coming Soon!');
+                    break;
+                case 'sidebar-btn-5':
+                    alert('About - Coming Soon!');
+                    break;
+            }
+        }
+
+        // Tab switching
         function switchTab(tab) {
-            console.log('🔄 Switching to tab:', tab);
+            console.log('Switching to tab:', tab);
             
             // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-tab') === tab) {
                     btn.classList.add('active');
                 }
             });
             
-            // Show/hide content sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.style.display = 'none';
+            // Show/hide content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
             });
             
-            const targetSection = document.getElementById(`${tab}-section`);
-            if (targetSection) {
-                targetSection.style.display = 'block';
+            const targetContent = document.getElementById(`${tab}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                console.log('✅ Tab switched to:', tab);
+            }
+        }
+
+        // Search function
+        function searchBeverage() {
+            const input = document.getElementById('beverage-name');
+            const query = input.value.trim();
+            if (query) {
+                console.log('Searching for:', query);
+                alert(`Searching for: ${query}\n\nThis is a demo - real search functionality would be implemented here.`);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded - initializing...');
+            
+            // Start button
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    console.log('🚀 Start button clicked!');
+                    showPage('main-app');
+                });
             }
             
-            currentTab = tab;
-        }
-        
-        async function searchBeverages(query) {
-            try {
-                console.log('🔍 Searching for:', query);
-                const result = await window.BevyFinderAPI.searchDrinks(query);
-                
-                if (result.success) {
-                    displaySearchResults(result.data.drinks || []);
-                } else {
-                    console.error('❌ Search failed:', result.error);
-                    displaySearchResults([]);
-                }
-            } catch (error) {
-                console.error('❌ Search error:', error);
-                displaySearchResults([]);
-            }
-        }
-        
-        function displaySearchResults(drinks) {
-            const resultsContainer = document.getElementById('search-results');
-            if (!resultsContainer) return;
-            
-            if (drinks.length === 0) {
-                resultsContainer.innerHTML = '<p class="no-results">No drinks found</p>';
-                return;
+            // Menu button
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', openMenu);
             }
             
-            const html = drinks.map(drink => `
-                <div class="beverage-card" data-drink-id="${drink._id}">
-                    <div class="beverage-info">
-                        <h3>${drink.name}</h3>
-                        <p class="beverage-type">${drink.type}</p>
-                        <p class="beverage-abv">ABV: ${drink.abv}%</p>
-                        <p class="beverage-calories">Calories: ${drink.calories}</p>
-                    </div>
-                    <div class="beverage-actions">
-                        <button class="like-btn" onclick="likeBeverage('${drink._id}')">
-                            <i class="fas fa-heart"></i> <span class="like-count">${drink.likes || 0}</span>
-                        </button>
-                        <button class="favorite-btn" onclick="toggleFavorite('${drink._id}')">
-                            <i class="fas fa-star"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-            resultsContainer.innerHTML = html;
-        }
-        
-        function clearSearchResults() {
-            const resultsContainer = document.getElementById('search-results');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-            }
-        }
-        
-        function handlePinboardClick(feature) {
-            console.log('🎯 Pinboard feature clicked:', feature);
-            
-            switch (feature) {
-                case 'night-tracker':
-                    showNightTracker();
-                    break;
-                case 'favorites':
-                    showFavorites();
-                    break;
-                case 'featured':
-                    showFeaturedPage();
-                    break;
-                case 'friends':
-                    showFriendsPage();
-                    break;
-                default:
-                    console.log('Unknown feature:', feature);
-            }
-        }
-        
-        // Feature functions (implement as needed)
-        function showNightTracker() {
-            alert('Night Tracker - Coming Soon!');
-        }
-        
-        function showFavorites() {
-            alert('Favorites - Coming Soon!');
-        }
-        
-        function showFeaturedPage() {
-            alert('Featured Drinks - Coming Soon!');
-        }
-        
-        function showFriendsPage() {
-            alert('Friends - Coming Soon!');
-        }
-        
-        // Global functions for beverage actions
-        async function likeBeverage(drinkId) {
-            if (!window.BevyFinderAuth || !window.BevyFinderAuth.isAuthenticated) {
-                alert('Please log in to like drinks');
-                return;
+            // Close menu button
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            if (closeMenuBtn) {
+                closeMenuBtn.addEventListener('click', closeMenu);
             }
             
-            try {
-                const result = await window.BevyFinderAPI.likeDrink(drinkId);
-                if (result.success) {
-                    console.log('✅ Drink liked successfully');
-                    // Update UI
-                    updateLikeButton(drinkId, true);
-                } else {
-                    console.error('❌ Failed to like drink:', result.error);
-                }
-            } catch (error) {
-                console.error('❌ Error liking drink:', error);
-            }
-        }
-        
-        async function toggleFavorite(drinkId) {
-            if (!window.BevyFinderAuth || !window.BevyFinderAuth.isAuthenticated) {
-                alert('Please log in to add favorites');
-                return;
+            // Sidebar overlay
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeMenu);
             }
             
-            try {
-                const result = await window.BevyFinderAPI.addToFavorites(drinkId);
-                if (result.success) {
-                    console.log('✅ Drink added to favorites');
-                    // Update UI
-                    updateFavoriteButton(drinkId, true);
-                } else {
-                    console.error('❌ Failed to add to favorites:', result.error);
-                }
-            } catch (error) {
-                console.error('❌ Error adding to favorites:', error);
+            // Sidebar buttons
+            const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+            sidebarBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleSidebarClick(btn.id);
+                });
+            });
+            
+            // Tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = btn.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+            
+            // Search button
+            const searchBtn = document.getElementById('search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', searchBeverage);
             }
-        }
-        
-        function updateLikeButton(drinkId, isLiked) {
-            const likeBtn = document.querySelector(`[data-drink-id="${drinkId}"] .like-btn`);
-            if (likeBtn) {
-                if (isLiked) {
-                    likeBtn.classList.add('liked');
-                    likeBtn.innerHTML = '<i class="fas fa-heart"></i> <span class="like-count">' + (parseInt(likeBtn.querySelector('.like-count').textContent) + 1) + '</span>';
-                }
+            
+            // Search input
+            const searchInput = document.getElementById('beverage-name');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        searchBeverage();
+                    }
+                });
             }
-        }
-        
-        function updateFavoriteButton(drinkId, isFavorited) {
-            const favoriteBtn = document.querySelector(`[data-drink-id="${drinkId}"] .favorite-btn`);
-            if (favoriteBtn) {
-                if (isFavorited) {
-                    favoriteBtn.classList.add('favorited');
-                    favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
-                }
-            }
-        }
-        
-        // Make functions globally available
-        window.likeBeverage = likeBeverage;
-        window.toggleFavorite = toggleFavorite;
+            
+            console.log('✅ All event listeners set up successfully!');
+            console.log('Current page:', document.querySelector('.page.active').id);
+        });
     </script>
 </body>
 </html> 
