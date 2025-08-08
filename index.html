@@ -619,11 +619,15 @@
             }
         }
 
-        /* Profile Button and Modal Styles */
-        .profile-btn {
+        /* Profile Button and Dropdown Styles */
+        .profile-container {
             position: fixed;
             top: 20px;
             right: 20px;
+            z-index: 1000;
+        }
+
+        .profile-btn {
             background: linear-gradient(135deg, #ffd700, #f59e0b);
             color: #333;
             border: none;
@@ -635,7 +639,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            z-index: 1000;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
 
@@ -646,6 +649,128 @@
 
         .profile-btn i {
             font-size: 1.1rem;
+        }
+
+        .profile-btn .fa-chevron-down {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-btn.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            min-width: 280px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .dropdown-user-info {
+            flex: 1;
+        }
+
+        .dropdown-username {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .dropdown-email {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0;
+        }
+
+        .dropdown-menu {
+            padding: 8px 0;
+        }
+
+        .dropdown-item {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dropdown-item:hover i {
+            color: white;
+        }
+
+        .logout-item {
+            color: #ef4444;
+        }
+
+        .logout-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .logout-item i {
+            color: #ef4444;
         }
 
         .profile-modal {
@@ -2251,11 +2376,55 @@
     </style>
 </head>
 <body>
-    <!-- Profile Button -->
-    <button class="profile-btn" id="profile-btn" onclick="openProfileModal()">
-        <i class="fas fa-user"></i>
-        <span id="profile-btn-text">Profile</span>
-    </button>
+            <!-- Profile Button -->
+        <div class="profile-container" id="profile-container">
+            <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
+                <i class="fas fa-user"></i>
+                <span id="profile-btn-text">Profile</span>
+                <i class="fas fa-chevron-down" id="profile-chevron"></i>
+            </button>
+            
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profile-dropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-avatar" id="dropdown-avatar">U</div>
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-username" id="dropdown-username">User</div>
+                        <div class="dropdown-email" id="dropdown-email">user@example.com</div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-divider"></div>
+                
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" onclick="openProfileModal()">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Edit Profile</span>
+                    </button>
+                    <button class="dropdown-item" onclick="showPage('saved-nights-page')">
+                        <i class="fas fa-save"></i>
+                        <span>Saved Nights</span>
+                    </button>
+                    <button class="dropdown-item" onclick="showPage('favorites-page')">
+                        <i class="fas fa-heart"></i>
+                        <span>Favorites</span>
+                    </button>
+                    <button class="dropdown-item" onclick="showPage('history-page')">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </button>
+                </div>
+                
+                <div class="dropdown-divider"></div>
+                
+                <div class="dropdown-menu">
+                    <button class="dropdown-item logout-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
     <!-- Profile Modal -->
     <div class="profile-modal" id="profile-modal">
@@ -5672,6 +5841,63 @@
         let currentUser = null;
         const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your deployed backend URL
 
+        function toggleProfileDropdown() {
+            const user = getCurrentUser();
+            if (user && user._id) {
+                // User is logged in - toggle dropdown
+                const dropdown = document.getElementById('profile-dropdown');
+                const btn = document.getElementById('profile-btn');
+                const chevron = document.getElementById('profile-chevron');
+                
+                if (dropdown.classList.contains('show')) {
+                    hideProfileDropdown();
+                } else {
+                    showProfileDropdown(user);
+                }
+            } else {
+                // User is not logged in - open modal
+                openProfileModal();
+            }
+        }
+
+        function showProfileDropdown(user) {
+            const dropdown = document.getElementById('profile-dropdown');
+            const btn = document.getElementById('profile-btn');
+            const chevron = document.getElementById('profile-chevron');
+            
+            // Update dropdown content
+            document.getElementById('dropdown-avatar').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('dropdown-username').textContent = user.name;
+            document.getElementById('dropdown-email').textContent = user.email;
+            
+            // Show dropdown
+            dropdown.classList.add('show');
+            btn.classList.add('active');
+            
+            // Add click outside listener
+            setTimeout(() => {
+                document.addEventListener('click', handleClickOutside);
+            }, 100);
+        }
+
+        function hideProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            const btn = document.getElementById('profile-btn');
+            
+            dropdown.classList.remove('show');
+            btn.classList.remove('active');
+            
+            // Remove click outside listener
+            document.removeEventListener('click', handleClickOutside);
+        }
+
+        function handleClickOutside(event) {
+            const container = document.getElementById('profile-container');
+            if (!container.contains(event.target)) {
+                hideProfileDropdown();
+            }
+        }
+
         function openProfileModal() {
             const modal = document.getElementById('profile-modal');
             modal.classList.add('show');
@@ -5866,6 +6092,7 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
+            hideProfileDropdown();
             updateProfileButton();
             closeProfileModal();
             alert('Logged out successfully!');
@@ -5875,8 +6102,18 @@
             const btnText = document.getElementById('profile-btn-text');
             if (currentUser) {
                 btnText.textContent = currentUser.name;
+                // Update dropdown content if it exists
+                const dropdownAvatar = document.getElementById('dropdown-avatar');
+                const dropdownUsername = document.getElementById('dropdown-username');
+                const dropdownEmail = document.getElementById('dropdown-email');
+                
+                if (dropdownAvatar) dropdownAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+                if (dropdownUsername) dropdownUsername.textContent = currentUser.name;
+                if (dropdownEmail) dropdownEmail.textContent = currentUser.email;
             } else {
                 btnText.textContent = 'Profile';
+                // Hide dropdown if it's open
+                hideProfileDropdown();
             }
         }
 
