@@ -36,6 +36,13 @@
 
         .main-app, .favorites-page, .history-page, .tracking-page, .dashboard-page {
             padding: 0;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
+
+        .main-app .container {
+            padding: 20px;
+            min-height: 100vh;
         }
 
         .welcome-page {
@@ -1844,17 +1851,6 @@
                             <p>Take a photo or upload an image of a drink</p>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Night Tracker CTA -->
-            <div class="night-tracker-cta">
-                <div class="cta-content">
-                    <h3><i class="fas fa-chart-line"></i> Ready to Track Your Night?</h3>
-                    <p>Monitor your BAC, track calories, and stay safe with our comprehensive Night Tracker</p>
-                    <button class="btn primary-btn" onclick="showPage('tracking-page')">
-                        <i class="fas fa-play"></i> Start Night Tracker
-                    </button>
                 </div>
             </div>
         </div>
