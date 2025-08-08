@@ -5183,13 +5183,11 @@
             if (!sessionActive || drinks.length === 0) return 0;
             
             // Get current user data
-            const user = getCurrentUser();
-            const userWeight = user.weight || 70; // Use user's weight or default
-            const userGender = user.gender || 'male'; // Use user's gender or default
+            const userData = getUserData();
             const timeElapsed = (new Date() - sessionStartTime) / (1000 * 60 * 60); // hours
             
             // Use the more accurate BAC calculator
-            return parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
+            return parseFloat(estimateBAC(totalStandards, userData.weight, userData.gender, timeElapsed));
         }
 
         function estimateBAC(drinks, weightKg, sex, timeElapsed) {
@@ -5457,11 +5455,9 @@
             const sessionDuration = sessionStartTime ? Math.round((new Date() - sessionStartTime) / (1000 * 60)) : 0;
             
             // Get current user data
-            const user = getCurrentUser();
-            const userWeight = user.weight || 70; // Use user's weight or default
-            const userGender = user.gender || 'male'; // Use user's gender or default
+            const userData = getUserData();
             const timeElapsed = sessionStartTime ? (new Date() - sessionStartTime) / (1000 * 60 * 60) : 0; // hours
-            const finalBAC = parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
+            const finalBAC = parseFloat(estimateBAC(totalStandards, userData.weight, userData.gender, timeElapsed));
             
             // Calculate total liquid consumed
             const totalLiquid = drinks.reduce((total, drink) => {
@@ -5616,6 +5612,7 @@
         // Profile Functions
         let isSignUpMode = true;
         let currentUser = null;
+        const API_BASE_URL = 'http://localhost:5000/api'; // Update this to your deployed backend URL
 
         function openProfileModal() {
             const modal = document.getElementById('profile-modal');
@@ -5623,7 +5620,7 @@
             
             // Check if user is logged in
             const user = getCurrentUser();
-            if (user && user.id !== 'temp-user-123') {
+            if (user && user._id) { // MongoDB users have _id, temp user doesn't
                 showUserInfo(user);
             } else {
                 showSignUpForm();
@@ -5672,8 +5669,8 @@
             document.getElementById('profile-form').style.display = 'none';
             
             // Update user info
-            document.getElementById('user-avatar').textContent = user.username.charAt(0).toUpperCase();
-            document.getElementById('user-name').textContent = user.username;
+            document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = user.name;
             document.getElementById('user-email').textContent = user.email;
         }
 
@@ -5683,57 +5680,84 @@
             document.getElementById('user-info').classList.remove('show');
         }
 
-        function signUp(userData) {
-            // Check if user already exists
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const existingUser = users.find(user => user.email === userData.email);
-            
-            if (existingUser) {
-                alert('User with this email already exists. Please sign in instead.');
+        async function signUp(userData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: userData.username,
+                        email: userData.email,
+                        password: userData.password,
+                        personalDetails: {
+                            age: userData.age,
+                            weight: userData.weight,
+                            gender: userData.gender
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Store token and user data
+                    localStorage.setItem('token', result.data.token);
+                    currentUser = result.data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                    
+                    // Update UI
+                    updateProfileButton();
+                    showUserInfo(result.data.user);
+                    
+                    alert('Account created successfully!');
+                    return true;
+                } else {
+                    alert(result.message || 'Registration failed');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Network error. Please try again.');
                 return false;
             }
-            
-            // Create new user
-            const newUser = {
-                id: Date.now().toString(),
-                username: userData.username,
-                email: userData.email,
-                password: userData.password, // In a real app, this would be hashed
-                age: userData.age,
-                weight: userData.weight,
-                gender: userData.gender,
-                createdAt: new Date().toISOString()
-            };
-            
-            // Add to users array
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            // Set as current user
-            currentUser = newUser;
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-            
-            // Update UI
-            updateProfileButton();
-            showUserInfo(newUser);
-            
-            alert('Account created successfully!');
-            return true;
         }
 
-        function signIn(email, password) {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                updateProfileButton();
-                showUserInfo(user);
-                alert('Signed in successfully!');
-                return true;
-            } else {
-                alert('Invalid email or password.');
+        async function signIn(email, password) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Store token and user data
+                    localStorage.setItem('token', result.data.token);
+                    currentUser = result.data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                    
+                    // Update UI
+                    updateProfileButton();
+                    showUserInfo(result.data.user);
+                    
+                    alert('Signed in successfully!');
+                    return true;
+                } else {
+                    alert(result.message || 'Invalid credentials');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Network error. Please try again.');
                 return false;
             }
         }
@@ -5741,6 +5765,7 @@
         function logout() {
             currentUser = null;
             localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
             updateProfileButton();
             closeProfileModal();
             alert('Logged out successfully!');
@@ -5749,7 +5774,7 @@
         function updateProfileButton() {
             const btnText = document.getElementById('profile-btn-text');
             if (currentUser) {
-                btnText.textContent = currentUser.username;
+                btnText.textContent = currentUser.name;
             } else {
                 btnText.textContent = 'Profile';
             }
@@ -5767,6 +5792,60 @@
             }
             
             return TEMP_USER; // Fallback to temp user
+        }
+
+        // Helper function to get user data for BAC calculations
+        function getUserData() {
+            const user = getCurrentUser();
+            if (user && user.personalDetails) {
+                return {
+                    weight: user.personalDetails.weight || 70,
+                    gender: user.personalDetails.gender || 'male',
+                    age: user.personalDetails.age || 25
+                };
+            }
+            return {
+                weight: 70,
+                gender: 'male',
+                age: 25
+            };
+        }
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        currentUser = result.data.user;
+                        localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                        updateProfileButton();
+                    } else {
+                        // Token is invalid, clear it
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('currentUser');
+                        currentUser = null;
+                        updateProfileButton();
+                    }
+                } catch (error) {
+                    console.error('Auth check error:', error);
+                    // Clear invalid token
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('currentUser');
+                    currentUser = null;
+                    updateProfileButton();
+                }
+            }
         }
 
         // Initialize when page loads
@@ -5927,6 +6006,9 @@
             
             // Initialize profile button
             updateProfileButton();
+            
+            // Check if user is already logged in
+            checkAuthStatus();
             
             // Photo upload event listener
             const uploadArea = document.getElementById('upload-area');
