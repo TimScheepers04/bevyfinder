@@ -703,6 +703,49 @@
             font-size: 0.9rem;
         }
 
+        /* Profile Mode Tabs */
+        .profile-mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .profile-tab-btn {
+            flex: 1;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .profile-tab-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-tab-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .profile-tab-btn.active:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
         .close-profile-btn {
             position: absolute;
             top: 15px;
@@ -2226,6 +2269,16 @@
                 <p id="profile-modal-subtitle">Create your account to save your data</p>
             </div>
             
+            <!-- Profile Mode Tabs -->
+            <div class="profile-mode-tabs">
+                <button class="profile-tab-btn" id="signin-tab-btn" onclick="showSignInForm()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                <button class="profile-tab-btn active" id="signup-tab-btn" onclick="showSignUpForm()">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+            </div>
+            
             <div class="user-info" id="user-info">
                 <div class="user-avatar" id="user-avatar">
                     U
@@ -2240,11 +2293,35 @@
             </div>
             
             <form class="profile-form" id="profile-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter username" required>
+                <!-- Sign Up Fields -->
+                <div class="signup-fields" id="signup-fields">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Enter username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" placeholder="Enter age" min="18" max="120" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" placeholder="Enter weight" min="30" max="300" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" required>
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
                 
+                <!-- Common Fields (both sign up and sign in) -->
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" placeholder="Enter email" required>
@@ -2253,26 +2330,6 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" placeholder="Enter password" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input type="number" id="age" placeholder="Enter age" min="18" max="120" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="weight">Weight (kg)</label>
-                    <input type="number" id="weight" placeholder="Enter weight" min="30" max="300" step="0.1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="gender">Gender</label>
-                    <select id="gender" required>
-                        <option value="">Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
                 </div>
                 
                 <div class="profile-actions">
@@ -2285,7 +2342,8 @@
                 </div>
             </form>
             
-            <div class="profile-toggle">
+            <!-- Hidden toggle button (replaced by tabs) -->
+            <div class="profile-toggle" style="display: none;">
                 <button type="button" id="profile-toggle-btn" onclick="toggleProfileMode()">
                     Already have an account? Sign In
                 </button>
@@ -5623,7 +5681,8 @@
             if (user && user._id) { // MongoDB users have _id, temp user doesn't
                 showUserInfo(user);
             } else {
-                showSignUpForm();
+                // Show sign-in form by default for better UX
+                showSignInForm();
             }
         }
 
@@ -5648,6 +5707,14 @@
             document.getElementById('profile-modal-subtitle').textContent = 'Create your account to save your data';
             document.getElementById('profile-submit-btn').innerHTML = '<i class="fas fa-user-plus"></i> Sign Up';
             document.getElementById('profile-toggle-btn').textContent = 'Already have an account? Sign In';
+            
+            // Update tab button states
+            document.getElementById('signup-tab-btn').classList.add('active');
+            document.getElementById('signin-tab-btn').classList.remove('active');
+            
+            // Show signup fields
+            document.getElementById('signup-fields').style.display = 'block';
+            
             document.getElementById('user-info').classList.remove('show');
             document.getElementById('profile-form').style.display = 'flex';
         }
@@ -5658,6 +5725,14 @@
             document.getElementById('profile-modal-subtitle').textContent = 'Welcome back! Sign in to your account';
             document.getElementById('profile-submit-btn').innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
             document.getElementById('profile-toggle-btn').textContent = 'Don\'t have an account? Sign Up';
+            
+            // Update tab button states
+            document.getElementById('signin-tab-btn').classList.add('active');
+            document.getElementById('signup-tab-btn').classList.remove('active');
+            
+            // Hide signup fields
+            document.getElementById('signup-fields').style.display = 'none';
+            
             document.getElementById('user-info').classList.remove('show');
             document.getElementById('profile-form').style.display = 'flex';
         }
