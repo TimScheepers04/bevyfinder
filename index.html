@@ -619,6 +619,267 @@
             }
         }
 
+        /* Profile Button and Modal Styles */
+        .profile-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #333;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .profile-btn i {
+            font-size: 1.1rem;
+        }
+
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .profile-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .profile-modal-content {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-modal.show .profile-modal-content {
+            transform: scale(1);
+        }
+
+        .profile-modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-modal-header h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-modal-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .close-profile-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-profile-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .profile-btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .profile-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .profile-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .profile-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-toggle {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-toggle button {
+            background: none;
+            border: none;
+            color: #ffd700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
+
+        .profile-toggle button:hover {
+            color: #f59e0b;
+        }
+
+        .user-info {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info.show {
+            display: block;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .user-details {
+            color: white;
+        }
+
+        .user-details h3 {
+            margin: 0 0 5px 0;
+            color: #ffd700;
+        }
+
+        .user-details p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
         @media (max-width: 768px) {
             .session-summary-popup {
                 padding: 20px;
@@ -1947,6 +2208,91 @@
     </style>
 </head>
 <body>
+    <!-- Profile Button -->
+    <button class="profile-btn" id="profile-btn" onclick="openProfileModal()">
+        <i class="fas fa-user"></i>
+        <span id="profile-btn-text">Profile</span>
+    </button>
+
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profile-modal">
+        <div class="profile-modal-content">
+            <button class="close-profile-btn" onclick="closeProfileModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="profile-modal-header">
+                <h2 id="profile-modal-title">Sign Up</h2>
+                <p id="profile-modal-subtitle">Create your account to save your data</p>
+            </div>
+            
+            <div class="user-info" id="user-info">
+                <div class="user-avatar" id="user-avatar">
+                    U
+                </div>
+                <div class="user-details">
+                    <h3 id="user-name">User</h3>
+                    <p id="user-email">user@example.com</p>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            
+            <form class="profile-form" id="profile-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="Enter age" min="18" max="120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="Enter weight" min="30" max="300" step="0.1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" required>
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="profile-actions">
+                    <button type="submit" class="profile-btn-primary" id="profile-submit-btn">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </button>
+                    <button type="button" class="profile-btn-secondary" onclick="closeProfileModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+            
+            <div class="profile-toggle">
+                <button type="button" id="profile-toggle-btn" onclick="toggleProfileMode()">
+                    Already have an account? Sign In
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Welcome Page -->
     <div class="page welcome-page active" id="welcome-page">
         <div class="welcome-content">
@@ -4836,8 +5182,10 @@
         function calculateBAC() {
             if (!sessionActive || drinks.length === 0) return 0;
             
-            const userWeight = 70; // kg (from TEMP_USER)
-            const userGender = 'male'; // from TEMP_USER
+            // Get current user data
+            const user = getCurrentUser();
+            const userWeight = user.weight || 70; // Use user's weight or default
+            const userGender = user.gender || 'male'; // Use user's gender or default
             const timeElapsed = (new Date() - sessionStartTime) / (1000 * 60 * 60); // hours
             
             // Use the more accurate BAC calculator
@@ -5107,8 +5455,11 @@
         function saveNightSession() {
             // Get current session data
             const sessionDuration = sessionStartTime ? Math.round((new Date() - sessionStartTime) / (1000 * 60)) : 0;
-            const userWeight = 70; // kg (from TEMP_USER)
-            const userGender = 'male'; // from TEMP_USER
+            
+            // Get current user data
+            const user = getCurrentUser();
+            const userWeight = user.weight || 70; // Use user's weight or default
+            const userGender = user.gender || 'male'; // Use user's gender or default
             const timeElapsed = sessionStartTime ? (new Date() - sessionStartTime) / (1000 * 60 * 60) : 0; // hours
             const finalBAC = parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
             
@@ -5262,6 +5613,162 @@
             }
         }
 
+        // Profile Functions
+        let isSignUpMode = true;
+        let currentUser = null;
+
+        function openProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.add('show');
+            
+            // Check if user is logged in
+            const user = getCurrentUser();
+            if (user && user.id !== 'temp-user-123') {
+                showUserInfo(user);
+            } else {
+                showSignUpForm();
+            }
+        }
+
+        function closeProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.remove('show');
+            resetProfileForm();
+        }
+
+        function toggleProfileMode() {
+            isSignUpMode = !isSignUpMode;
+            if (isSignUpMode) {
+                showSignUpForm();
+            } else {
+                showSignInForm();
+            }
+        }
+
+        function showSignUpForm() {
+            isSignUpMode = true;
+            document.getElementById('profile-modal-title').textContent = 'Sign Up';
+            document.getElementById('profile-modal-subtitle').textContent = 'Create your account to save your data';
+            document.getElementById('profile-submit-btn').innerHTML = '<i class="fas fa-user-plus"></i> Sign Up';
+            document.getElementById('profile-toggle-btn').textContent = 'Already have an account? Sign In';
+            document.getElementById('user-info').classList.remove('show');
+            document.getElementById('profile-form').style.display = 'flex';
+        }
+
+        function showSignInForm() {
+            isSignUpMode = false;
+            document.getElementById('profile-modal-title').textContent = 'Sign In';
+            document.getElementById('profile-modal-subtitle').textContent = 'Welcome back! Sign in to your account';
+            document.getElementById('profile-submit-btn').innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            document.getElementById('profile-toggle-btn').textContent = 'Don\'t have an account? Sign Up';
+            document.getElementById('user-info').classList.remove('show');
+            document.getElementById('profile-form').style.display = 'flex';
+        }
+
+        function showUserInfo(user) {
+            document.getElementById('profile-modal-title').textContent = 'Profile';
+            document.getElementById('profile-modal-subtitle').textContent = 'Your account information';
+            document.getElementById('user-info').classList.add('show');
+            document.getElementById('profile-form').style.display = 'none';
+            
+            // Update user info
+            document.getElementById('user-avatar').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = user.username;
+            document.getElementById('user-email').textContent = user.email;
+        }
+
+        function resetProfileForm() {
+            document.getElementById('profile-form').reset();
+            document.getElementById('profile-form').style.display = 'flex';
+            document.getElementById('user-info').classList.remove('show');
+        }
+
+        function signUp(userData) {
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const existingUser = users.find(user => user.email === userData.email);
+            
+            if (existingUser) {
+                alert('User with this email already exists. Please sign in instead.');
+                return false;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                username: userData.username,
+                email: userData.email,
+                password: userData.password, // In a real app, this would be hashed
+                age: userData.age,
+                weight: userData.weight,
+                gender: userData.gender,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add to users array
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Set as current user
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            // Update UI
+            updateProfileButton();
+            showUserInfo(newUser);
+            
+            alert('Account created successfully!');
+            return true;
+        }
+
+        function signIn(email, password) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                updateProfileButton();
+                showUserInfo(user);
+                alert('Signed in successfully!');
+                return true;
+            } else {
+                alert('Invalid email or password.');
+                return false;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateProfileButton();
+            closeProfileModal();
+            alert('Logged out successfully!');
+        }
+
+        function updateProfileButton() {
+            const btnText = document.getElementById('profile-btn-text');
+            if (currentUser) {
+                btnText.textContent = currentUser.username;
+            } else {
+                btnText.textContent = 'Profile';
+            }
+        }
+
+        function getCurrentUser() {
+            if (currentUser) {
+                return currentUser;
+            }
+            
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                return currentUser;
+            }
+            
+            return TEMP_USER; // Fallback to temp user
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded - initializing...');
@@ -5394,6 +5901,32 @@
                     }
                 });
             }
+            
+            // Profile Form Event Listener
+            const profileForm = document.getElementById('profile-form');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        username: document.getElementById('username').value,
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value,
+                        age: parseInt(document.getElementById('age').value),
+                        weight: parseFloat(document.getElementById('weight').value),
+                        gender: document.getElementById('gender').value
+                    };
+                    
+                    if (isSignUpMode) {
+                        signUp(formData);
+                    } else {
+                        signIn(formData.email, formData.password);
+                    }
+                });
+            }
+            
+            // Initialize profile button
+            updateProfileButton();
             
             // Photo upload event listener
             const uploadArea = document.getElementById('upload-area');
