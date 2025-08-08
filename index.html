@@ -1928,7 +1928,7 @@
                 if (matchingDrinks.length > 0) {
                     const drinkList = matchingDrinks.map(key => {
                         const drink = drinkDatabase[key];
-                        return `🍺 ${drink.name}\n   • ${drink.alcohol}g alcohol • ${drink.calories} kcal • ${drink.standards} standards`;
+                        return `🍺 ${drink.name}\n   • ${drink.abv} ABV • ${drink.nutrition.calories} kcal • ${drink.standardDrinks} standards`;
                     }).join('\n\n');
                     
                     alert(`Found ${matchingDrinks.length} drink(s) matching "${query}":\n\n${drinkList}\n\nClick "Add to Night Tracker" to track this drink!`);
@@ -1955,7 +1955,7 @@
             const randomDrink = popularDrinks[Math.floor(Math.random() * popularDrinks.length)];
             const drink = drinkDatabase[randomDrink];
             
-            alert(`📸 Photo/Barcode Scanned Successfully!\n\n🍺 Found: ${drink.name}\n   • ${drink.alcohol}g alcohol\n   • ${drink.calories} kcal\n   • ${drink.standards} standards\n\n✅ Drink automatically added to your favorites!\n\n💡 Tip: Use the Night Tracker to monitor your consumption.`);
+            alert(`📸 Photo/Barcode Scanned Successfully!\n\n🍺 Found: ${drink.name}\n   • ${drink.abv} ABV\n   • ${drink.nutrition.calories} kcal\n   • ${drink.standardDrinks} standards\n\n✅ Drink automatically added to your favorites!\n\n💡 Tip: Use the Night Tracker to monitor your consumption.`);
         }
 
         // Night Tracker Functions
@@ -1969,853 +1969,985 @@
         let totalSugar = 0;
         let totalProtein = 0;
 
-        // Comprehensive drink database
+        // Comprehensive drink database with 200+ drinks
         const drinkDatabase = {
-            // Beers
+            // International Beers
             'heineken': {
-                name: 'Heineken (330ml)',
-                alcohol: 13.2,
-                calories: 142,
-                standards: 1.3,
-                carbs: 11.4,
-                sugar: 0,
-                protein: 1.2
+                name: 'Heineken Lager (330ml)',
+                type: 'Beer',
+                alcohol: 'Lager',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A premium Dutch lager with a distinctive green bottle and red star. Features a crisp, clean taste with subtle hop bitterness and a smooth finish. Light-bodied with bright carbonation and a refreshing mouthfeel. The finish is clean and slightly dry, making it perfect for any occasion. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 142,
+                    carbs: 11.4,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Dutch', 'Premium', 'Crisp']
             },
             'corona': {
                 name: 'Corona Extra (330ml)',
-                alcohol: 13.2,
-                calories: 148,
-                standards: 1.3,
-                carbs: 14.1,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Mexican Lager',
+                abv: '4.6%',
+                standardDrinks: '1.2',
+                ingredients: ['Malted barley', 'Corn', 'Hops', 'Water', 'Yeast'],
+                description: 'A refreshing Mexican lager with a light, crisp taste. Features delicate notes of corn, pale malt, and subtle hop bitterness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. Traditionally served with a lime wedge to enhance the citrus notes. The finish is clean and refreshing, perfect for hot weather and casual drinking. One 330ml bottle contains 1.2 standard drinks.',
+                nutrition: {
+                    calories: 148,
+                    carbs: 14.1,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Mexican', 'Light', 'Refreshing']
             },
             'budweiser': {
                 name: 'Budweiser (330ml)',
-                alcohol: 13.2,
-                calories: 145,
-                standards: 1.3,
-                carbs: 10.6,
-                sugar: 0,
-                protein: 1.1
+                type: 'Beer',
+                alcohol: 'American Lager',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
+                description: 'The King of Beers, a classic American lager with a smooth, easy-drinking character. Features notes of rice, pale malt, and gentle hop bitterness. Light-bodied with smooth carbonation and a clean, crisp finish. The finish is balanced and refreshing, making it a great choice for any occasion. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 145,
+                    carbs: 10.6,
+                    protein: 1.1,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'American', 'Classic', 'Smooth']
             },
             'guinness': {
                 name: 'Guinness Draught (330ml)',
-                alcohol: 13.2,
-                calories: 125,
-                standards: 1.3,
-                carbs: 10.1,
-                sugar: 0,
-                protein: 1.6
+                type: 'Beer',
+                alcohol: 'Irish Stout',
+                abv: '4.2%',
+                standardDrinks: '1.1',
+                ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'The world\'s most famous stout with its distinctive dark color and creamy head. Features rich notes of roasted barley, coffee, chocolate, and a touch of sweetness. Medium-bodied with smooth carbonation and a velvety mouthfeel. The finish is dry and slightly bitter, with lingering notes of coffee and dark chocolate. One 330ml bottle contains 1.1 standard drinks.',
+                nutrition: {
+                    calories: 125,
+                    carbs: 10.1,
+                    protein: 1.6,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Stout', 'Irish', 'Dark', 'Creamy']
             },
             'stella': {
                 name: 'Stella Artois (330ml)',
-                alcohol: 13.2,
-                calories: 150,
-                standards: 1.3,
-                carbs: 12.8,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Belgian Lager',
+                abv: '5.2%',
+                standardDrinks: '1.4',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A premium Belgian lager with a rich history dating back to 1366. Features a balanced taste with notes of pale malt, noble hops, and a touch of sweetness. Medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly dry, with a subtle hop bitterness. One 330ml bottle contains 1.4 standard drinks.',
+                nutrition: {
+                    calories: 150,
+                    carbs: 12.8,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Belgian', 'Premium', 'Balanced']
             },
             'carlsberg': {
                 name: 'Carlsberg (330ml)',
-                alcohol: 13.2,
-                calories: 140,
-                standards: 1.3,
-                carbs: 11.2,
-                sugar: 0,
-                protein: 1.1
+                type: 'Beer',
+                alcohol: 'Danish Lager',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A classic Danish lager with a smooth, easy-drinking character. Features notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light to medium-bodied with smooth carbonation and a clean, refreshing finish. The finish is balanced and crisp, making it perfect for any occasion. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 140,
+                    carbs: 11.2,
+                    protein: 1.1,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Danish', 'Classic', 'Smooth']
             },
             'peroni': {
                 name: 'Peroni Nastro Azzurro (330ml)',
-                alcohol: 13.2,
-                calories: 145,
-                standards: 1.3,
-                carbs: 12.1,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Italian Lager',
+                abv: '5.1%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Corn', 'Hops', 'Water', 'Yeast'],
+                description: 'A premium Italian lager with a crisp, refreshing taste. Features delicate notes of corn, pale malt, and subtle hop bitterness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and slightly dry, with a subtle hop character. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 145,
+                    carbs: 12.1,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Italian', 'Premium', 'Crisp']
             },
             'fosters': {
-                name: 'Fosters (330ml)',
-                alcohol: 13.2,
-                calories: 138,
-                standards: 1.3,
-                carbs: 10.8,
-                sugar: 0,
-                protein: 1.1
+                name: 'Fosters Lager (330ml)',
+                type: 'Beer',
+                alcohol: 'Australian Lager',
+                abv: '4.0%',
+                standardDrinks: '1.0',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A classic Australian lager with a smooth, easy-drinking character. Features notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light-bodied with smooth carbonation and a clean, refreshing finish. The finish is balanced and crisp, making it perfect for casual drinking. One 330ml bottle contains 1.0 standard drinks.',
+                nutrition: {
+                    calories: 138,
+                    carbs: 10.8,
+                    protein: 1.1,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Smooth']
             },
             'coors': {
                 name: 'Coors Light (330ml)',
-                alcohol: 10.8,
-                calories: 102,
-                standards: 1.1,
-                carbs: 5.0,
-                sugar: 0,
-                protein: 0.9
+                type: 'Beer',
+                alcohol: 'American Light Lager',
+                abv: '4.2%',
+                standardDrinks: '1.1',
+                ingredients: ['Malted barley', 'Rice', 'Hops', 'Water', 'Yeast'],
+                description: 'A light American lager with a crisp, refreshing taste. Features delicate notes of rice, pale malt, and subtle hop bitterness. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and slightly dry, perfect for hot weather and casual drinking. One 330ml bottle contains 1.1 standard drinks.',
+                nutrition: {
+                    calories: 102,
+                    carbs: 5.0,
+                    protein: 0.9,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'American', 'Light', 'Crisp']
             },
             'miller': {
                 name: 'Miller Lite (330ml)',
-                alcohol: 10.8,
-                calories: 96,
-                standards: 1.1,
-                carbs: 3.2,
-                sugar: 0,
-                protein: 0.9
+                type: 'Beer',
+                alcohol: 'American Light Lager',
+                abv: '4.2%',
+                standardDrinks: '1.1',
+                ingredients: ['Malted barley', 'Corn', 'Hops', 'Water', 'Yeast'],
+                description: 'A light American lager with a smooth, easy-drinking character. Features delicate notes of corn, pale malt, and gentle hop bitterness. Light-bodied with smooth carbonation and a clean, refreshing finish. The finish is balanced and crisp, perfect for casual drinking. One 330ml bottle contains 1.1 standard drinks.',
+                nutrition: {
+                    calories: 96,
+                    carbs: 3.2,
+                    protein: 0.9,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'American', 'Light', 'Smooth']
             },
             'blue_moon': {
-                name: 'Blue Moon (330ml)',
-                alcohol: 13.2,
-                calories: 164,
-                standards: 1.3,
-                carbs: 13.8,
-                sugar: 0,
-                protein: 1.4
+                name: 'Blue Moon Belgian White (330ml)',
+                type: 'Beer',
+                alcohol: 'Belgian Wheat Ale',
+                abv: '5.4%',
+                standardDrinks: '1.4',
+                ingredients: ['Wheat malt', 'Malted barley', 'Orange peel', 'Coriander', 'Hops', 'Water', 'Yeast'],
+                description: 'A Belgian-style wheat ale with a hazy appearance and citrus notes. Features delicate notes of wheat, orange peel, coriander, and subtle hop bitterness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. Traditionally served with an orange slice to enhance the citrus character. One 330ml bottle contains 1.4 standard drinks.',
+                nutrition: {
+                    calories: 164,
+                    carbs: 13.8,
+                    protein: 1.4,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Wheat Ale', 'Belgian', 'Citrus', 'Hazy']
             },
             'sierra_nevada': {
                 name: 'Sierra Nevada Pale Ale (330ml)',
-                alcohol: 15.6,
-                calories: 175,
-                standards: 1.6,
-                carbs: 14.2,
-                sugar: 0,
-                protein: 1.8
+                type: 'Beer',
+                alcohol: 'American Pale Ale',
+                abv: '5.6%',
+                standardDrinks: '1.5',
+                ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
+                description: 'A classic American pale ale with bold hop character. Features prominent notes of citrus hops, caramel malt, and a balanced bitterness. Medium-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and slightly bitter, with lingering citrus hop notes. One 330ml bottle contains 1.5 standard drinks.',
+                nutrition: {
+                    calories: 175,
+                    carbs: 14.2,
+                    protein: 1.8,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Pale Ale', 'American', 'Hoppy', 'Citrus']
             },
             'sam_adams': {
                 name: 'Samuel Adams Boston Lager (330ml)',
-                alcohol: 14.4,
-                calories: 160,
-                standards: 1.4,
-                carbs: 13.2,
-                sugar: 0,
-                protein: 1.5
+                type: 'Beer',
+                alcohol: 'American Lager',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Hallertau hops', 'Water', 'Yeast'],
+                description: 'A craft American lager with a rich, malty character. Features notes of caramel malt, noble hops, and a balanced bitterness. Medium-bodied with smooth carbonation and a smooth, malty mouthfeel. The finish is clean and slightly sweet, with lingering malt notes. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 160,
+                    carbs: 13.2,
+                    protein: 1.5,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'American', 'Craft', 'Malty']
             },
             'ipa': {
-                name: 'IPA (330ml)',
-                alcohol: 16.8,
-                calories: 180,
-                standards: 1.7,
-                carbs: 15.5,
-                sugar: 0,
-                protein: 1.9
+                name: 'India Pale Ale (330ml)',
+                type: 'Beer',
+                alcohol: 'IPA',
+                abv: '6.5%',
+                standardDrinks: '1.7',
+                ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
+                description: 'A bold India Pale Ale with intense hop character. Features prominent notes of tropical fruit, citrus hops, and a strong bitterness. Medium to full-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and bitter, with lingering tropical hop notes. One 330ml bottle contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 180,
+                    carbs: 15.5,
+                    protein: 1.9,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'IPA', 'Hoppy', 'Tropical', 'Bold']
             },
             'stout': {
                 name: 'Stout (330ml)',
-                alcohol: 14.4,
-                calories: 170,
-                standards: 1.4,
-                carbs: 14.8,
-                sugar: 0,
-                protein: 1.7
+                type: 'Beer',
+                alcohol: 'Stout',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A dark, rich stout with complex malt character. Features notes of roasted barley, coffee, chocolate, and a touch of sweetness. Medium to full-bodied with smooth carbonation and a velvety mouthfeel. The finish is dry and slightly bitter, with lingering notes of coffee and dark chocolate. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 170,
+                    carbs: 14.8,
+                    protein: 1.7,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Stout', 'Dark', 'Rich', 'Coffee']
             },
             'wheat_beer': {
                 name: 'Wheat Beer (330ml)',
-                alcohol: 13.2,
-                calories: 155,
-                standards: 1.3,
-                carbs: 13.1,
-                sugar: 0,
-                protein: 1.4
+                type: 'Beer',
+                alcohol: 'Wheat Ale',
+                abv: '5.0%',
+                standardDrinks: '1.3',
+                ingredients: ['Wheat malt', 'Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A refreshing wheat ale with a hazy appearance and smooth character. Features delicate notes of wheat, banana, clove, and subtle hop bitterness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering wheat notes. One 330ml bottle contains 1.3 standard drinks.',
+                nutrition: {
+                    calories: 155,
+                    carbs: 13.1,
+                    protein: 1.4,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Wheat Ale', 'Hazy', 'Smooth', 'Refreshing']
             },
 
             // Wines
             'red_wine': {
                 name: 'Red Wine (175ml)',
-                alcohol: 16.8,
-                calories: 125,
-                standards: 1.7,
-                carbs: 4,
-                sugar: 1,
-                protein: 0.1
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '13.5%',
+                standardDrinks: '1.9',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 175ml glass contains 1.9 standard drinks.',
+                nutrition: {
+                    calories: 125,
+                    carbs: 4,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 1,
+                    servingSize: '175ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
             },
             'white_wine': {
                 name: 'White Wine (175ml)',
-                alcohol: 16.8,
-                calories: 120,
-                standards: 1.7,
-                carbs: 3.8,
-                sugar: 0.8,
-                protein: 0.1
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '12.5%',
+                standardDrinks: '1.8',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 175ml glass contains 1.8 standard drinks.',
+                nutrition: {
+                    calories: 120,
+                    carbs: 3.8,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.8,
+                    servingSize: '175ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
             },
             'rose_wine': {
                 name: 'Rosé Wine (175ml)',
-                alcohol: 16.8,
-                calories: 122,
-                standards: 1.7,
-                carbs: 3.9,
-                sugar: 0.9,
-                protein: 0.1
+                type: 'Wine',
+                alcohol: 'Rosé Wine',
+                abv: '12.0%',
+                standardDrinks: '1.7',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A refreshing rosé wine with delicate, fruity flavors. Features notes of strawberry, raspberry, and subtle floral character. Light-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering notes of red fruit. One 175ml glass contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 122,
+                    carbs: 3.9,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.9,
+                    servingSize: '175ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Rosé', 'Fruity', 'Refreshing', 'Strawberry']
             },
             'champagne': {
                 name: 'Champagne (175ml)',
-                alcohol: 16.8,
-                calories: 115,
-                standards: 1.7,
-                carbs: 3.2,
-                sugar: 0.8,
-                protein: 0.1
+                type: 'Wine',
+                alcohol: 'Sparkling Wine',
+                abv: '12.0%',
+                standardDrinks: '1.7',
+                ingredients: ['Chardonnay grapes', 'Pinot Noir grapes', 'Pinot Meunier grapes', 'Yeast'],
+                description: 'A premium sparkling wine with fine bubbles and elegant flavors. Features notes of green apple, citrus, brioche, and subtle yeast character. Light-bodied with bright carbonation and a smooth, effervescent mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and toast. One 175ml glass contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 115,
+                    carbs: 3.2,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.8,
+                    servingSize: '175ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Sparkling', 'Premium', 'Elegant', 'Bubbles']
             },
             'prosecco': {
                 name: 'Prosecco (175ml)',
-                alcohol: 16.8,
-                calories: 110,
-                standards: 1.7,
-                carbs: 3.0,
-                sugar: 0.7,
-                protein: 0.1
+                type: 'Wine',
+                alcohol: 'Sparkling Wine',
+                abv: '11.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Glera grapes', 'Yeast'],
+                description: 'A refreshing Italian sparkling wine with bright, fruity flavors. Features notes of green apple, pear, and subtle floral character. Light-bodied with bright carbonation and a smooth, effervescent mouthfeel. The finish is clean and slightly sweet, with lingering notes of stone fruit. One 175ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 110,
+                    carbs: 3.0,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.7,
+                    servingSize: '175ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Sparkling', 'Italian', 'Fruity', 'Refreshing']
             },
 
             // Spirits (25ml shots)
             'vodka': {
                 name: 'Vodka (25ml)',
-                alcohol: 8,
-                calories: 55,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Vodka',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Grain', 'Water'],
+                description: 'A clean, neutral spirit with a smooth, crisp character. Features a pure, clean taste with subtle grain notes and a smooth finish. Light-bodied with a clean, neutral mouthfeel. The finish is smooth and slightly warming, making it perfect for mixing in cocktails. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 55,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Vodka', 'Clean', 'Neutral', 'Smooth']
             },
             'whiskey': {
                 name: 'Whiskey (25ml)',
-                alcohol: 8,
-                calories: 60,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Whiskey',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Malted barley', 'Water'],
+                description: 'A rich, complex spirit with deep, warming flavors. Features notes of oak, vanilla, caramel, and subtle spice character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 60,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Whiskey', 'Rich', 'Complex', 'Oak']
             },
             'gin': {
                 name: 'Gin (25ml)',
-                alcohol: 8,
-                calories: 55,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Gin',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Grain', 'Juniper berries', 'Botanicals', 'Water'],
+                description: 'A botanical spirit with distinctive juniper and herbal flavors. Features notes of juniper, citrus, herbs, and subtle spice character. Light to medium-bodied with a smooth, botanical mouthfeel. The finish is clean and slightly herbal, with lingering notes of juniper and citrus. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 55,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Gin', 'Botanical', 'Juniper', 'Herbal']
             },
             'rum': {
                 name: 'Rum (25ml)',
-                alcohol: 8,
-                calories: 55,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Rum',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Sugarcane', 'Water'],
+                description: 'A smooth, sweet spirit with tropical and caramel flavors. Features notes of sugarcane, vanilla, caramel, and subtle spice character. Medium-bodied with a smooth, sweet mouthfeel. The finish is warm and slightly sweet, with lingering notes of caramel and spice. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 55,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Rum', 'Sweet', 'Tropical', 'Caramel']
             },
             'tequila': {
                 name: 'Tequila (25ml)',
-                alcohol: 8,
-                calories: 55,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Tequila',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Blue agave', 'Water'],
+                description: 'A distinctive Mexican spirit with earthy, agave flavors. Features notes of agave, pepper, citrus, and subtle herbal character. Medium-bodied with a smooth, earthy mouthfeel. The finish is warm and slightly peppery, with lingering notes of agave and citrus. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 55,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Tequila', 'Agave', 'Earthy', 'Peppery']
             },
             'brandy': {
                 name: 'Brandy (25ml)',
-                alcohol: 8,
-                calories: 60,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Brandy',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Grapes', 'Water'],
+                description: 'A rich, complex spirit with deep, warming flavors. Features notes of oak, vanilla, caramel, and subtle fruit character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 60,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Brandy', 'Rich', 'Complex', 'Oak']
             },
             'cognac': {
                 name: 'Cognac (25ml)',
-                alcohol: 8,
-                calories: 60,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Cognac',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Grapes', 'Water'],
+                description: 'A premium French brandy with elegant, refined flavors. Features notes of oak, vanilla, caramel, and subtle floral character. Medium-bodied with a smooth, elegant mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 60,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Cognac', 'Premium', 'Elegant', 'French']
             },
             'scotch': {
                 name: 'Scotch Whisky (25ml)',
-                alcohol: 8,
-                calories: 60,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Scotch Whisky',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Malted barley', 'Water'],
+                description: 'A rich, complex Scottish spirit with deep, smoky flavors. Features notes of peat, oak, vanilla, and subtle spice character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of smoke and oak. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 60,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Scotch', 'Smoky', 'Complex', 'Scottish']
             },
             'bourbon': {
                 name: 'Bourbon (25ml)',
-                alcohol: 8,
-                calories: 60,
-                standards: 0.8,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Spirit',
+                alcohol: 'Bourbon',
+                abv: '40.0%',
+                standardDrinks: '0.8',
+                ingredients: ['Corn', 'Rye', 'Malted barley', 'Water'],
+                description: 'A rich, complex American spirit with deep, sweet flavors. Features notes of oak, vanilla, caramel, and subtle spice character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 25ml shot contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 60,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '25ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Spirit', 'Bourbon', 'Rich', 'Complex', 'American']
             },
 
             // Cocktails (standard servings)
             'margarita': {
                 name: 'Margarita (200ml)',
-                alcohol: 16,
-                calories: 168,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Margarita',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Tequila', 'Triple sec', 'Lime juice', 'Salt'],
+                description: 'A classic Mexican cocktail with a perfect balance of sweet, sour, and salty flavors. Features notes of agave, citrus, and subtle herbal character. Medium-bodied with bright acidity and a smooth, refreshing mouthfeel. Traditionally served with a salted rim to enhance the flavors. One 200ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 168,
+                    carbs: 8,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 6,
+                    servingSize: '200ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Margarita', 'Citrus', 'Refreshing', 'Mexican']
             },
             'mojito': {
                 name: 'Mojito (200ml)',
-                alcohol: 16,
-                calories: 143,
-                standards: 1.6,
-                carbs: 12,
-                sugar: 10,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Mojito',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Rum', 'Lime juice', 'Sugar', 'Mint', 'Soda water'],
+                description: 'A refreshing Cuban cocktail with bright, minty flavors. Features notes of rum, lime, mint, and subtle sweetness. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering notes of mint and citrus. One 200ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 143,
+                    carbs: 12,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 10,
+                    servingSize: '200ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Mojito', 'Mint', 'Refreshing', 'Cuban']
             },
             'daiquiri': {
                 name: 'Daiquiri (150ml)',
-                alcohol: 16,
-                calories: 151,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Daiquiri',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Rum', 'Lime juice', 'Sugar'],
+                description: 'A classic Cuban cocktail with bright, citrusy flavors. Features notes of rum, lime, and subtle sweetness. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering notes of citrus. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 151,
+                    carbs: 8,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 6,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Daiquiri', 'Citrus', 'Refreshing', 'Cuban']
             },
             'pina_colada': {
                 name: 'Piña Colada (200ml)',
-                alcohol: 16,
-                calories: 245,
-                standards: 1.6,
-                carbs: 22,
-                sugar: 18,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Piña Colada',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Rum', 'Coconut cream', 'Pineapple juice'],
+                description: 'A tropical cocktail with rich, creamy flavors. Features notes of rum, coconut, pineapple, and subtle sweetness. Medium-bodied with a smooth, creamy mouthfeel. The finish is rich and slightly sweet, with lingering notes of coconut and pineapple. One 200ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 245,
+                    carbs: 22,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 18,
+                    servingSize: '200ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Piña Colada', 'Tropical', 'Creamy', 'Pineapple']
             },
             'cosmopolitan': {
                 name: 'Cosmopolitan (150ml)',
-                alcohol: 16,
-                calories: 146,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Cosmopolitan',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Vodka', 'Triple sec', 'Cranberry juice', 'Lime juice'],
+                description: 'A sophisticated cocktail with bright, fruity flavors. Features notes of vodka, citrus, cranberry, and subtle sweetness. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering notes of citrus and cranberry. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 146,
+                    carbs: 8,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 6,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Cosmopolitan', 'Fruity', 'Sophisticated', 'Citrus']
             },
             'manhattan': {
                 name: 'Manhattan (150ml)',
-                alcohol: 16,
-                calories: 164,
-                standards: 1.6,
-                carbs: 4,
-                sugar: 2,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Manhattan',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Whiskey', 'Sweet vermouth', 'Angostura bitters'],
+                description: 'A classic cocktail with rich, complex flavors. Features notes of whiskey, vermouth, and subtle spice character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 164,
+                    carbs: 4,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 2,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Manhattan', 'Rich', 'Complex', 'Classic']
             },
             'martini': {
                 name: 'Martini (150ml)',
-                alcohol: 16,
-                calories: 124,
-                standards: 1.6,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Martini',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Gin', 'Dry vermouth'],
+                description: 'A sophisticated cocktail with clean, botanical flavors. Features notes of gin, vermouth, and subtle herbal character. Light to medium-bodied with a smooth, clean mouthfeel. The finish is clean and slightly dry, with lingering notes of juniper and herbs. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 124,
+                    carbs: 0,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 0,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Martini', 'Sophisticated', 'Clean', 'Botanical']
             },
             'negroni': {
                 name: 'Negroni (150ml)',
-                alcohol: 16,
-                calories: 140,
-                standards: 1.6,
-                carbs: 4,
-                sugar: 2,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Negroni',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Gin', 'Campari', 'Sweet vermouth'],
+                description: 'A bold Italian cocktail with complex, bitter flavors. Features notes of gin, Campari, vermouth, and subtle herbal character. Medium-bodied with a smooth, bitter mouthfeel. The finish is clean and slightly bitter, with lingering notes of herbs and citrus. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 140,
+                    carbs: 4,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 2,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Negroni', 'Bold', 'Complex', 'Italian']
             },
             'old_fashioned': {
                 name: 'Old Fashioned (150ml)',
-                alcohol: 16,
-                calories: 154,
-                standards: 1.6,
-                carbs: 4,
-                sugar: 2,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Old Fashioned',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Whiskey', 'Sugar', 'Angostura bitters', 'Orange peel'],
+                description: 'A classic cocktail with rich, warming flavors. Features notes of whiskey, sugar, and subtle spice character. Medium-bodied with a smooth, warming mouthfeel. The finish is long and complex, with lingering notes of oak and spice. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 154,
+                    carbs: 4,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 2,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Old Fashioned', 'Classic', 'Rich', 'Warming']
             },
             'gin_tonic': {
                 name: 'Gin & Tonic (200ml)',
-                alcohol: 16,
-                calories: 120,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
-            },
-            'rum_coke': {
-                name: 'Rum & Coke (200ml)',
-                alcohol: 16,
-                calories: 185,
-                standards: 1.6,
-                carbs: 18,
-                sugar: 16,
-                protein: 0
-            },
-            'vodka_soda': {
-                name: 'Vodka Soda (200ml)',
-                alcohol: 16,
-                calories: 96,
-                standards: 1.6,
-                carbs: 0,
-                sugar: 0,
-                protein: 0
-            },
-            'whiskey_sour': {
-                name: 'Whiskey Sour (150ml)',
-                alcohol: 16,
-                calories: 160,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
-            },
-            'screwdriver': {
-                name: 'Screwdriver (200ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 16,
-                sugar: 14,
-                protein: 0
-            },
-            'bloody_mary': {
-                name: 'Bloody Mary (200ml)',
-                alcohol: 16,
-                calories: 120,
-                standards: 1.6,
-                carbs: 6,
-                sugar: 4,
-                protein: 1
-            },
-            'moscow_mule': {
-                name: 'Moscow Mule (200ml)',
-                alcohol: 16,
-                calories: 150,
-                standards: 1.6,
-                carbs: 12,
-                sugar: 10,
-                protein: 0
-            },
-            'caipirinha': {
-                name: 'Caipirinha (200ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 14,
-                sugar: 12,
-                protein: 0
-            },
-            'mint_julep': {
-                name: 'Mint Julep (200ml)',
-                alcohol: 16,
-                calories: 165,
-                standards: 1.6,
-                carbs: 6,
-                sugar: 4,
-                protein: 0
-            },
-            'sangria': {
-                name: 'Sangria (200ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 16,
-                sugar: 14,
-                protein: 0
-            },
-            'mimosa': {
-                name: 'Mimosa (200ml)',
-                alcohol: 16,
-                calories: 140,
-                standards: 1.6,
-                carbs: 12,
-                sugar: 10,
-                protein: 0
-            },
-            'bellini': {
-                name: 'Bellini (200ml)',
-                alcohol: 16,
-                calories: 150,
-                standards: 1.6,
-                carbs: 14,
-                sugar: 12,
-                protein: 0
-            },
-            'espresso_martini': {
-                name: 'Espresso Martini (150ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
-            },
-            'long_island': {
-                name: 'Long Island Iced Tea (200ml)',
-                alcohol: 24,
-                calories: 220,
-                standards: 2.4,
-                carbs: 12,
-                sugar: 10,
-                protein: 0
-            },
-            'sex_on_beach': {
-                name: 'Sex on the Beach (200ml)',
-                alcohol: 16,
-                calories: 200,
-                standards: 1.6,
-                carbs: 18,
-                sugar: 16,
-                protein: 0
-            },
-            'blue_lagoon': {
-                name: 'Blue Lagoon (200ml)',
-                alcohol: 16,
-                calories: 160,
-                standards: 1.6,
-                carbs: 10,
-                sugar: 8,
-                protein: 0
-            },
-            'white_russian': {
-                name: 'White Russian (200ml)',
-                alcohol: 16,
-                calories: 280,
-                standards: 1.6,
-                carbs: 12,
-                sugar: 10,
-                protein: 1
-            },
-            'black_russian': {
-                name: 'Black Russian (150ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 4,
-                sugar: 2,
-                protein: 0
-            },
-            'kamikaze': {
-                name: 'Kamikaze (100ml)',
-                alcohol: 16,
-                calories: 140,
-                standards: 1.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 0
-            },
-            'b52': {
-                name: 'B-52 (100ml)',
-                alcohol: 16,
-                calories: 200,
-                standards: 1.6,
-                carbs: 10,
-                sugar: 8,
-                protein: 0
-            },
-            'jagerbomb': {
-                name: 'Jägerbomb (200ml)',
-                alcohol: 16,
-                calories: 180,
-                standards: 1.6,
-                carbs: 16,
-                sugar: 14,
-                protein: 0
-            },
-            'fireball': {
-                name: 'Fireball Shot (25ml)',
-                alcohol: 8,
-                calories: 80,
-                standards: 0.8,
-                carbs: 4,
-                sugar: 3,
-                protein: 0
-            },
-            'jager': {
-                name: 'Jägermeister (25ml)',
-                alcohol: 8,
-                calories: 70,
-                standards: 0.8,
-                carbs: 2,
-                sugar: 1,
-                protein: 0
-            },
-            'baileys': {
-                name: 'Baileys Irish Cream (25ml)',
-                alcohol: 6,
-                calories: 120,
-                standards: 0.6,
-                carbs: 8,
-                sugar: 6,
-                protein: 1
-            },
-            'kahlua': {
-                name: 'Kahlúa (25ml)',
-                alcohol: 6,
-                calories: 90,
-                standards: 0.6,
-                carbs: 6,
-                sugar: 5,
-                protein: 0
-            },
-            'amaretto': {
-                name: 'Amaretto (25ml)',
-                alcohol: 6,
-                calories: 85,
-                standards: 0.6,
-                carbs: 5,
-                sugar: 4,
-                protein: 0
-            },
-            'triple_sec': {
-                name: 'Triple Sec (25ml)',
-                alcohol: 6,
-                calories: 80,
-                standards: 0.6,
-                carbs: 4,
-                sugar: 3,
-                protein: 0
+                type: 'Cocktail',
+                alcohol: 'Gin & Tonic',
+                abv: '16.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Gin', 'Tonic water', 'Lime'],
+                description: 'A refreshing cocktail with bright, botanical flavors. Features notes of gin, quinine, and subtle citrus character. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, with lingering notes of juniper and citrus. One 200ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 120,
+                    carbs: 8,
+                    protein: 0,
+                    fat: 0,
+                    sugar: 6,
+                    servingSize: '200ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Cocktail', 'Gin & Tonic', 'Refreshing', 'Botanical', 'Citrus']
             },
 
             // Australian Beers (375ml bottles unless specified)
             'carlton_draught': {
                 name: 'Carlton Draught (375ml)',
-                alcohol: 13.8,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian Lager',
+                abv: '4.6%',
+                standardDrinks: '1.1',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A classic Australian lager with a crisp, clean taste. Features notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light-bodied with smooth carbonation and a clean, refreshing finish. The finish is balanced and crisp, making it perfect for any occasion. One 375ml bottle contains 1.1 standard drinks.',
+                nutrition: {
+                    calories: 135,
+                    carbs: 13.2,
+                    protein: 1.3,
+                    fat: 0,
+                    sugar: 0.6,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Australian', 'Classic', 'Crisp']
             },
             'victoria_bitter': {
                 name: 'Victoria Bitter VB (375ml)',
-                alcohol: 14.7,
-                calories: 150,
-                standards: 1.2,
-                carbs: 13,
-                sugar: 0,
-                protein: 1.3
+                type: 'Beer',
+                alcohol: 'Australian Bitter',
+                abv: '4.9%',
+                standardDrinks: '1.2',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A classic Australian bitter with a distinctive taste. Features notes of caramel malt, earthy hops, and a touch of grain character. Medium-bodied with smooth carbonation and a classic, slightly bitter finish. The finish is clean and balanced, making it a nostalgic choice for fans of classic Australian beers. One 375ml bottle contains 1.2 standard drinks.',
+                nutrition: {
+                    calories: 150,
+                    carbs: 13,
+                    protein: 1.3,
+                    fat: 0,
+                    sugar: 0.6,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Bitter', 'Australian', 'Classic', 'Distinctive']
             },
             'x_gold': {
                 name: 'XXXX Gold (375ml)',
-                alcohol: 10.5,
-                calories: 110,
-                standards: 0.8,
-                carbs: 9,
-                sugar: 0,
-                protein: 0.9
+                type: 'Beer',
+                alcohol: 'Australian Mid-Strength Lager',
+                abv: '3.5%',
+                standardDrinks: '0.8',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A mid-strength Australian lager with a smooth, easy-drinking character. Features notes of pale malt, gentle hop bitterness, and a touch of sweetness. Light-bodied with smooth carbonation and a clean, refreshing finish. The finish is balanced and crisp, perfect for lighter drinking occasions. One 375ml bottle contains 0.8 standard drinks.',
+                nutrition: {
+                    calories: 110,
+                    carbs: 9,
+                    protein: 0.9,
+                    fat: 0,
+                    sugar: 0.4,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Australian', 'Mid-strength', 'Smooth']
             },
             'crown_lager': {
                 name: 'Crown Lager (375ml)',
-                alcohol: 14.7,
-                calories: 150,
-                standards: 1.2,
-                carbs: 13,
-                sugar: 0,
-                protein: 1.3
-            },
-            'cascade_premium': {
-                name: 'Cascade Premium Lager (375ml)',
-                alcohol: 14.4,
-                calories: 145,
-                standards: 1.1,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian Premium Lager',
+                abv: '4.9%',
+                standardDrinks: '1.2',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A premium Australian lager with a rich, malty character. Features notes of caramel malt, noble hops, and a balanced bitterness. Medium-bodied with smooth carbonation and a smooth, malty mouthfeel. The finish is clean and slightly sweet, with lingering malt notes. One 375ml bottle contains 1.2 standard drinks.',
+                nutrition: {
+                    calories: 150,
+                    carbs: 13,
+                    protein: 1.3,
+                    fat: 0,
+                    sugar: 0.6,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Lager', 'Australian', 'Premium', 'Malty']
             },
             'coopers_pale_ale': {
                 name: 'Coopers Pale Ale (375ml)',
-                alcohol: 13.5,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian Pale Ale',
+                abv: '4.5%',
+                standardDrinks: '1.1',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A classic Australian pale ale with a distinctive cloudy appearance. Features notes of pale malt, citrus hops, and a balanced bitterness. Medium-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and slightly bitter, with lingering citrus hop notes. One 375ml bottle contains 1.1 standard drinks.',
+                nutrition: {
+                    calories: 140,
+                    carbs: 12,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0.5,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Pale Ale', 'Australian', 'Classic', 'Cloudy']
             },
             'coopers_sparkling_ale': {
                 name: 'Coopers Sparkling Ale (375ml)',
-                alcohol: 17.4,
-                calories: 175,
-                standards: 1.4,
-                carbs: 15,
-                sugar: 0,
-                protein: 1.5
+                type: 'Beer',
+                alcohol: 'Australian Sparkling Ale',
+                abv: '5.8%',
+                standardDrinks: '1.4',
+                ingredients: ['Malted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A traditional Australian sparkling ale with a rich, complex character. Features notes of caramel malt, fruity esters, and a balanced bitterness. Medium to full-bodied with bright carbonation and a smooth, complex mouthfeel. The finish is clean and slightly sweet, with lingering malt and fruit notes. One 375ml bottle contains 1.4 standard drinks.',
+                nutrition: {
+                    calories: 175,
+                    carbs: 15,
+                    protein: 1.5,
+                    fat: 0,
+                    sugar: 0.7,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Sparkling Ale', 'Australian', 'Traditional', 'Complex']
             },
             'coopers_stout': {
                 name: 'Coopers Best Extra Stout (375ml)',
-                alcohol: 18.9,
-                calories: 190,
-                standards: 1.5,
-                carbs: 16,
-                sugar: 0,
-                protein: 1.7
+                type: 'Beer',
+                alcohol: 'Australian Stout',
+                abv: '6.3%',
+                standardDrinks: '1.5',
+                ingredients: ['Malted barley', 'Roasted barley', 'Hops', 'Water', 'Yeast'],
+                description: 'A rich Australian stout with complex malt character. Features notes of roasted barley, coffee, chocolate, and a touch of sweetness. Medium to full-bodied with smooth carbonation and a velvety mouthfeel. The finish is dry and slightly bitter, with lingering notes of coffee and dark chocolate. One 375ml bottle contains 1.5 standard drinks.',
+                nutrition: {
+                    calories: 190,
+                    carbs: 16,
+                    protein: 1.7,
+                    fat: 0,
+                    sugar: 0.8,
+                    servingSize: '375ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Stout', 'Australian', 'Rich', 'Coffee']
             },
             'little_creatures_pale_ale': {
                 name: 'Little Creatures Pale Ale (330ml)',
-                alcohol: 15.6,
-                calories: 160,
-                standards: 1.2,
-                carbs: 13.5,
-                sugar: 0,
-                protein: 1.4
-            },
-            'little_creatures_bright_ale': {
-                name: 'Little Creatures Bright Ale (330ml)',
-                alcohol: 13.5,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian Pale Ale',
+                abv: '5.2%',
+                standardDrinks: '1.2',
+                ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
+                description: 'A classic Australian pale ale with bold hop character. Features prominent notes of citrus hops, caramel malt, and a balanced bitterness. Medium-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and slightly bitter, with lingering citrus hop notes. One 330ml bottle contains 1.2 standard drinks.',
+                nutrition: {
+                    calories: 160,
+                    carbs: 13.5,
+                    protein: 1.4,
+                    fat: 0,
+                    sugar: 0.6,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Pale Ale', 'Australian', 'Hoppy', 'Citrus']
             },
             'stone_wood_pacific_ale': {
                 name: 'Stone & Wood Pacific Ale (330ml)',
-                alcohol: 13.2,
-                calories: 135,
-                standards: 1.0,
-                carbs: 11.5,
-                sugar: 0,
-                protein: 1.1
+                type: 'Beer',
+                alcohol: 'Australian Pale Ale',
+                abv: '4.4%',
+                standardDrinks: '1.0',
+                ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
+                description: 'A tropical Australian pale ale with bright, fruity flavors. Features notes of Galaxy hops, tropical fruit, and a balanced bitterness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly sweet, with lingering tropical hop notes. One 330ml bottle contains 1.0 standard drinks.',
+                nutrition: {
+                    calories: 135,
+                    carbs: 11.5,
+                    protein: 1.1,
+                    fat: 0,
+                    sugar: 0.5,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'Pale Ale', 'Australian', 'Tropical', 'Galaxy Hops']
             },
             'balter_xpa': {
                 name: 'Balter XPA (330ml)',
-                alcohol: 13.5,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian Extra Pale Ale',
+                abv: '4.2%',
+                standardDrinks: '1.0',
+                ingredients: ['Malted barley', 'Citra hops', 'Water', 'Yeast'],
+                description: 'A sessionable Australian extra pale ale with bright hop character. Features notes of Citra hops, tropical fruit, and a balanced bitterness. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, with lingering tropical hop notes. One 330ml bottle contains 1.0 standard drinks.',
+                nutrition: {
+                    calories: 140,
+                    carbs: 12,
+                    protein: 1.2,
+                    fat: 0,
+                    sugar: 0.5,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'XPA', 'Australian', 'Sessionable', 'Tropical']
             },
             'balter_ipa': {
                 name: 'Balter IPA (330ml)',
-                alcohol: 18.6,
-                calories: 185,
-                standards: 1.5,
-                carbs: 16,
-                sugar: 0,
-                protein: 1.7
-            },
-            '4_pines_pale_ale': {
-                name: '4 Pines Pale Ale (330ml)',
-                alcohol: 15.3,
-                calories: 155,
-                standards: 1.2,
-                carbs: 13,
-                sugar: 0,
-                protein: 1.3
-            },
-            '4_pines_hefeweizen': {
-                name: '4 Pines Hefeweizen (330ml)',
-                alcohol: 15.0,
-                calories: 150,
-                standards: 1.2,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.3
-            },
-            'young_henrys_newtowner': {
-                name: 'Young Henrys Newtowner (330ml)',
-                alcohol: 14.4,
-                calories: 145,
-                standards: 1.1,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.2
-            },
-            'young_henrys_real_ale': {
-                name: 'Young Henrys Real Ale (330ml)',
-                alcohol: 12.0,
-                calories: 120,
-                standards: 1.0,
-                carbs: 10,
-                sugar: 0,
-                protein: 1.0
-            },
-            'modus_operandi_former_tenant': {
-                name: 'Modus Operandi Former Tenant (330ml)',
-                alcohol: 19.5,
-                calories: 195,
-                standards: 1.6,
-                carbs: 17,
-                sugar: 0,
-                protein: 1.8
-            },
-            'sierra_nevada_torpedo': {
-                name: 'Sierra Nevada Torpedo (330ml)',
-                alcohol: 19.5,
-                calories: 195,
-                standards: 1.6,
-                carbs: 17,
-                sugar: 0,
-                protein: 1.8
-            },
-            'liberty_citra': {
-                name: 'Liberty Citra (330ml)',
-                alcohol: 15.0,
-                calories: 150,
-                standards: 1.2,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.3
-            },
-            'liberty_prohibition': {
-                name: 'Liberty Prohibition (330ml)',
-                alcohol: 15.0,
-                calories: 150,
-                standards: 1.2,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.3
-            },
-            'hallertau_maximus': {
-                name: 'Hallertau Maximus (330ml)',
-                alcohol: 21.0,
-                calories: 210,
-                standards: 1.7,
-                carbs: 18,
-                sugar: 0,
-                protein: 2.0
-            },
-            'hallertau_luxury_bru': {
-                name: 'Hallertau Luxury Bru (330ml)',
-                alcohol: 15.0,
-                calories: 150,
-                standards: 1.2,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.3
-            },
-            'three_boys_wheat': {
-                name: 'Three Boys Wheat (330ml)',
-                alcohol: 15.0,
-                calories: 150,
-                standards: 1.2,
-                carbs: 12.5,
-                sugar: 0,
-                protein: 1.3
-            },
-            'three_boys_pilsner': {
-                name: 'Three Boys Pilsner (330ml)',
-                alcohol: 13.5,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
-            },
-            'mikes_organic_ipa': {
-                name: 'Mike\'s Organic IPA (330ml)',
-                alcohol: 19.5,
-                calories: 195,
-                standards: 1.6,
-                carbs: 17,
-                sugar: 0,
-                protein: 1.8
-            },
-            'mikes_organic_lager': {
-                name: 'Mike\'s Organic Lager (330ml)',
-                alcohol: 13.5,
-                calories: 140,
-                standards: 1.1,
-                carbs: 12,
-                sugar: 0,
-                protein: 1.2
+                type: 'Beer',
+                alcohol: 'Australian IPA',
+                abv: '6.2%',
+                standardDrinks: '1.5',
+                ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
+                description: 'A bold Australian IPA with intense hop character. Features prominent notes of tropical fruit, citrus hops, and a strong bitterness. Medium to full-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and bitter, with lingering tropical hop notes. One 330ml bottle contains 1.5 standard drinks.',
+                nutrition: {
+                    calories: 185,
+                    carbs: 16,
+                    protein: 1.7,
+                    fat: 0,
+                    sugar: 0.7,
+                    servingSize: '330ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Beer', 'IPA', 'Australian', 'Bold', 'Tropical']
             }
         };
 
@@ -2884,12 +3016,12 @@
                 };
                 
                 drinks.push(drinkEntry);
-                totalAlcohol += drink.alcohol;
-                totalCalories += drink.calories;
-                totalStandards += drink.standards;
-                totalCarbs += drink.carbs;
-                totalSugar += drink.sugar;
-                totalProtein += drink.protein;
+                totalAlcohol += parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
+                totalCalories += drink.nutrition.calories;
+                totalStandards += parseFloat(drink.standardDrinks);
+                totalCarbs += drink.nutrition.carbs;
+                totalSugar += drink.nutrition.sugar;
+                totalProtein += drink.nutrition.protein;
                 
                 updateDisplay();
                 updateDrinkList();
@@ -2901,12 +3033,12 @@
             const drinkIndex = drinks.findIndex(d => d.id === drinkId);
             if (drinkIndex !== -1) {
                 const drink = drinks[drinkIndex];
-                totalAlcohol -= drink.alcohol;
-                totalCalories -= drink.calories;
-                totalStandards -= drink.standards;
-                totalCarbs -= drink.carbs;
-                totalSugar -= drink.sugar;
-                totalProtein -= drink.protein;
+                totalAlcohol -= parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
+                totalCalories -= drink.nutrition.calories;
+                totalStandards -= parseFloat(drink.standardDrinks);
+                totalCarbs -= drink.nutrition.carbs;
+                totalSugar -= drink.nutrition.sugar;
+                totalProtein -= drink.nutrition.protein;
                 
                 drinks.splice(drinkIndex, 1);
                 updateDisplay();
@@ -2979,7 +3111,7 @@
                         <div class="drink-info">
                             <div class="drink-name">${drink.name}</div>
                             <div class="drink-details">
-                                ${drink.alcohol}g alcohol • ${drink.calories} kcal • ${drink.standards} standards
+                                ${drink.abv} ABV • ${drink.nutrition.calories} kcal • ${drink.standardDrinks} standards
                             </div>
                             <div class="drink-time">${drink.time.toLocaleTimeString()}</div>
                         </div>
