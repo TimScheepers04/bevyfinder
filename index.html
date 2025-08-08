@@ -5801,6 +5801,8 @@
 
         async function signIn(email, password) {
             try {
+                console.log('Attempting to sign in with:', { email, password: '***' });
+                
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -5813,6 +5815,7 @@
                 });
 
                 const result = await response.json();
+                console.log('Sign-in response:', result);
 
                 if (result.success) {
                     // Store token and user data
@@ -5827,6 +5830,7 @@
                     alert('Signed in successfully!');
                     return true;
                 } else {
+                    console.error('Sign-in failed:', result.message);
                     alert(result.message || 'Invalid credentials');
                     return false;
                 }
@@ -6062,19 +6066,27 @@
                 profileForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     
-                    const formData = {
-                        username: document.getElementById('username').value,
-                        email: document.getElementById('email').value,
-                        password: document.getElementById('password').value,
-                        age: parseInt(document.getElementById('age').value),
-                        weight: parseFloat(document.getElementById('weight').value),
-                        gender: document.getElementById('gender').value
-                    };
+                    const email = document.getElementById('email').value.trim();
+                    const password = document.getElementById('password').value;
+                    
+                    // Basic validation
+                    if (!email || !password) {
+                        alert('Please enter both email and password');
+                        return;
+                    }
                     
                     if (isSignUpMode) {
+                        const formData = {
+                            username: document.getElementById('username').value,
+                            email: email,
+                            password: password,
+                            age: parseInt(document.getElementById('age').value),
+                            weight: parseFloat(document.getElementById('weight').value),
+                            gender: document.getElementById('gender').value
+                        };
                         signUp(formData);
                     } else {
-                        signIn(formData.email, formData.password);
+                        signIn(email, password);
                     }
                 });
             }
