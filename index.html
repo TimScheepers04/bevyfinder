@@ -5712,8 +5712,12 @@
             document.getElementById('signup-tab-btn').classList.add('active');
             document.getElementById('signin-tab-btn').classList.remove('active');
             
-            // Show signup fields
+            // Show signup fields and make them required
             document.getElementById('signup-fields').style.display = 'block';
+            document.getElementById('username').required = true;
+            document.getElementById('age').required = true;
+            document.getElementById('weight').required = true;
+            document.getElementById('gender').required = true;
             
             document.getElementById('user-info').classList.remove('show');
             document.getElementById('profile-form').style.display = 'flex';
@@ -5730,8 +5734,12 @@
             document.getElementById('signin-tab-btn').classList.add('active');
             document.getElementById('signup-tab-btn').classList.remove('active');
             
-            // Hide signup fields
+            // Hide signup fields and remove required attribute
             document.getElementById('signup-fields').style.display = 'none';
+            document.getElementById('username').required = false;
+            document.getElementById('age').required = false;
+            document.getElementById('weight').required = false;
+            document.getElementById('gender').required = false;
             
             document.getElementById('user-info').classList.remove('show');
             document.getElementById('profile-form').style.display = 'flex';
@@ -5753,6 +5761,19 @@
             document.getElementById('profile-form').reset();
             document.getElementById('profile-form').style.display = 'flex';
             document.getElementById('user-info').classList.remove('show');
+            
+            // Reset required attributes based on current mode
+            if (isSignUpMode) {
+                document.getElementById('username').required = true;
+                document.getElementById('age').required = true;
+                document.getElementById('weight').required = true;
+                document.getElementById('gender').required = true;
+            } else {
+                document.getElementById('username').required = false;
+                document.getElementById('age').required = false;
+                document.getElementById('weight').required = false;
+                document.getElementById('gender').required = false;
+            }
         }
 
         async function signUp(userData) {
@@ -6076,13 +6097,24 @@
                     }
                     
                     if (isSignUpMode) {
+                        // Validate sign-up fields
+                        const username = document.getElementById('username').value.trim();
+                        const age = document.getElementById('age').value;
+                        const weight = document.getElementById('weight').value;
+                        const gender = document.getElementById('gender').value;
+                        
+                        if (!username || !age || !weight || !gender) {
+                            alert('Please fill in all required fields');
+                            return;
+                        }
+                        
                         const formData = {
-                            username: document.getElementById('username').value,
+                            username: username,
                             email: email,
                             password: password,
-                            age: parseInt(document.getElementById('age').value),
-                            weight: parseFloat(document.getElementById('weight').value),
-                            gender: document.getElementById('gender').value
+                            age: parseInt(age),
+                            weight: parseFloat(weight),
+                            gender: gender
                         };
                         signUp(formData);
                     } else {
