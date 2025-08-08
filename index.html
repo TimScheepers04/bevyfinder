@@ -5105,11 +5105,28 @@
 
         // Saved Nights Functions
         function saveNightSession() {
+            // Get current session data
+            const sessionDuration = sessionStartTime ? Math.round((new Date() - sessionStartTime) / (1000 * 60)) : 0;
+            const userWeight = 70; // kg (from TEMP_USER)
+            const userGender = 'male'; // from TEMP_USER
+            const timeElapsed = sessionStartTime ? (new Date() - sessionStartTime) / (1000 * 60 * 60) : 0; // hours
+            const finalBAC = parseFloat(estimateBAC(totalStandards, userWeight, userGender, timeElapsed));
+            
+            // Calculate total liquid consumed
+            const totalLiquid = drinks.reduce((total, drink) => {
+                const volume = drink.name.match(/(\d+)ml/);
+                return total + (volume ? parseInt(volume[1]) : 0);
+            }, 0);
+            
+            // Calculate total calories and carbs
+            const totalCalories = drinks.reduce((total, drink) => total + drink.nutrition.calories, 0);
+            const totalCarbs = drinks.reduce((total, drink) => total + drink.nutrition.carbs, 0);
+            
             const savedNight = {
                 id: Date.now().toString(),
                 date: new Date().toISOString(),
                 sessionData: {
-                    sessionStart: sessionStart,
+                    sessionStart: sessionStartTime,
                     sessionEnd: new Date(),
                     sessionDuration: sessionDuration,
                     drinks: [...drinks],
@@ -5117,7 +5134,7 @@
                     totalCalories: totalCalories,
                     totalCarbs: totalCarbs,
                     totalLiquid: totalLiquid,
-                    finalBAC: summaryBAC
+                    finalBAC: finalBAC
                 }
             };
 
