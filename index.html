@@ -2970,13 +2970,15 @@
         // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
         const TEMP_AUTH_BYPASS = true;
         const TEMP_USER = {
-            id: 'temp-user-123',
+            _id: 'temp-user-123',
             name: 'Test User',
             email: 'test@bevyfinder.com',
-            age: 25,
-            weight: 70,
-            height: 175,
-            gender: 'male',
+            personalDetails: {
+                age: 25,
+                weight: 70,
+                height: 175,
+                gender: 'male'
+            },
             stats: {
                 searches: 15,
                 favorites: 8
@@ -2994,9 +2996,7 @@
             return TEMP_AUTH_BYPASS;
         }
 
-        function getCurrentUser() {
-            return TEMP_AUTH_BYPASS ? TEMP_USER : null;
-        }
+        // Note: getCurrentUser function is defined later in the file
 
         console.log('🔓 Authentication bypass enabled - all features available for testing');
 
@@ -5840,43 +5840,64 @@
         let isSignUpMode = true;
         let currentUser = null;
         const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your deployed backend URL
+        
+        // Initialize currentUser with TEMP_USER if bypass is enabled
+        if (TEMP_AUTH_BYPASS) {
+            currentUser = TEMP_USER;
+            console.log('🚀 TEMP_AUTH_BYPASS enabled, setting currentUser to:', currentUser);
+        }
 
         function toggleProfileDropdown() {
+            console.log('🔍 toggleProfileDropdown called');
             const user = getCurrentUser();
+            console.log('👤 Current user:', user);
+            
             if (user && user._id) {
+                console.log('✅ User is logged in, toggling dropdown');
                 // User is logged in - toggle dropdown
                 const dropdown = document.getElementById('profile-dropdown');
                 const btn = document.getElementById('profile-btn');
                 const chevron = document.getElementById('profile-chevron');
                 
                 if (dropdown.classList.contains('show')) {
+                    console.log('📥 Hiding dropdown');
                     hideProfileDropdown();
                 } else {
+                    console.log('📤 Showing dropdown');
                     showProfileDropdown(user);
                 }
             } else {
+                console.log('❌ User not logged in, opening modal');
                 // User is not logged in - open modal
                 openProfileModal();
             }
         }
 
         function showProfileDropdown(user) {
+            console.log('🎯 showProfileDropdown called with user:', user);
             const dropdown = document.getElementById('profile-dropdown');
             const btn = document.getElementById('profile-btn');
             const chevron = document.getElementById('profile-chevron');
+            
+            console.log('🔍 Found elements:', { dropdown, btn, chevron });
             
             // Update dropdown content
             document.getElementById('dropdown-avatar').textContent = user.name.charAt(0).toUpperCase();
             document.getElementById('dropdown-username').textContent = user.name;
             document.getElementById('dropdown-email').textContent = user.email;
             
+            console.log('📝 Updated dropdown content');
+            
             // Show dropdown
             dropdown.classList.add('show');
             btn.classList.add('active');
             
+            console.log('✨ Added show and active classes');
+            
             // Add click outside listener
             setTimeout(() => {
                 document.addEventListener('click', handleClickOutside);
+                console.log('👆 Added click outside listener');
             }, 100);
         }
 
@@ -6099,8 +6120,12 @@
         }
 
         function updateProfileButton() {
+            console.log('🔄 updateProfileButton called');
+            console.log('👤 currentUser:', currentUser);
+            
             const btnText = document.getElementById('profile-btn-text');
             if (currentUser) {
+                console.log('✅ User logged in, updating button to:', currentUser.name);
                 btnText.textContent = currentUser.name;
                 // Update dropdown content if it exists
                 const dropdownAvatar = document.getElementById('dropdown-avatar');
@@ -6110,7 +6135,10 @@
                 if (dropdownAvatar) dropdownAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
                 if (dropdownUsername) dropdownUsername.textContent = currentUser.name;
                 if (dropdownEmail) dropdownEmail.textContent = currentUser.email;
+                
+                console.log('📝 Updated dropdown content');
             } else {
+                console.log('❌ No user, setting button to Profile');
                 btnText.textContent = 'Profile';
                 // Hide dropdown if it's open
                 hideProfileDropdown();
@@ -6188,6 +6216,9 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded - initializing...');
+            
+            // Initialize profile button
+            updateProfileButton();
             
             // Start button
             const startBtn = document.getElementById('start-btn');
