@@ -666,17 +666,18 @@
             top: 100%;
             right: 0;
             margin-top: 10px;
-            background: rgba(15, 23, 42, 0.95);
+            background: #ff0000 !important; /* TEMPORARY: Bright red background for debugging */
             backdrop-filter: blur(20px);
-            border: 2px solid red; /* Temporary debug border */
+            border: 5px solid yellow !important; /* TEMPORARY: Thick yellow border for debugging */
             border-radius: 15px;
-            min-width: 280px;
+            min-width: 300px !important; /* TEMPORARY: Larger size for debugging */
+            min-height: 200px !important; /* TEMPORARY: Force height for debugging */
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            opacity: 1; /* TEMPORARY: Always visible for debugging */
-            visibility: visible; /* TEMPORARY: Always visible for debugging */
-            transform: translateY(0); /* TEMPORARY: No transform for debugging */
+            opacity: 1 !important; /* TEMPORARY: Always visible for debugging */
+            visibility: visible !important; /* TEMPORARY: Always visible for debugging */
+            transform: translateY(0) !important; /* TEMPORARY: No transform for debugging */
             transition: all 0.3s ease;
-            z-index: 1001; /* Ensure it's above other elements */
+            z-index: 9999 !important; /* TEMPORARY: Very high z-index for debugging */
         }
 
         .profile-dropdown.show {
@@ -5857,6 +5858,22 @@
             console.log('🔍 currentUser variable:', currentUser);
             console.log('🔍 TEMP_AUTH_BYPASS:', TEMP_AUTH_BYPASS);
             
+            // Test if dropdown element exists
+            const dropdown = document.getElementById('profile-dropdown');
+            console.log('🔍 Dropdown element found:', dropdown);
+            if (dropdown) {
+                console.log('🔍 Dropdown HTML:', dropdown.outerHTML);
+                console.log('🔍 Dropdown position:', dropdown.getBoundingClientRect());
+            } else {
+                console.error('❌ Dropdown element not found!');
+                // Create a test element to see if positioning works
+                const testDiv = document.createElement('div');
+                testDiv.style.cssText = 'position: fixed; top: 100px; right: 100px; width: 200px; height: 200px; background: lime; border: 5px solid blue; z-index: 10000;';
+                testDiv.textContent = 'TEST DROPDOWN';
+                document.body.appendChild(testDiv);
+                console.log('🔧 Created test element for debugging');
+            }
+            
             const user = getCurrentUser();
             console.log('👤 getCurrentUser() returned:', user);
             console.log('👤 User properties:', user ? Object.keys(user) : 'null');
@@ -5865,13 +5882,12 @@
             if (user && (user._id || user.id) && user.name && user.email) {
                 console.log('✅ User is logged in, toggling dropdown');
                 // User is logged in - toggle dropdown
-                const dropdown = document.getElementById('profile-dropdown');
                 const btn = document.getElementById('profile-btn');
                 const chevron = document.getElementById('profile-chevron');
                 
                 console.log('🔍 Found elements:', { dropdown, btn, chevron });
                 
-                if (dropdown.classList.contains('show')) {
+                if (dropdown && dropdown.classList.contains('show')) {
                     console.log('📥 Hiding dropdown');
                     hideProfileDropdown();
                 } else {
