@@ -672,9 +672,9 @@
             border-radius: 15px;
             min-width: 280px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
+            opacity: 1; /* TEMPORARY: Always visible for debugging */
+            visibility: visible; /* TEMPORARY: Always visible for debugging */
+            transform: translateY(0); /* TEMPORARY: No transform for debugging */
             transition: all 0.3s ease;
             z-index: 1001; /* Ensure it's above other elements */
         }
@@ -5852,6 +5852,7 @@
         }
 
         function toggleProfileDropdown() {
+            alert('Function called!'); // Simple test alert
             console.log('🔍 toggleProfileDropdown called');
             console.log('🔍 currentUser variable:', currentUser);
             console.log('🔍 TEMP_AUTH_BYPASS:', TEMP_AUTH_BYPASS);
