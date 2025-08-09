@@ -5846,12 +5846,19 @@
         if (TEMP_AUTH_BYPASS) {
             currentUser = TEMP_USER;
             console.log('🚀 TEMP_AUTH_BYPASS enabled, setting currentUser to:', currentUser);
+            // Also store in localStorage to ensure consistency
+            localStorage.setItem('currentUser', JSON.stringify(TEMP_USER));
+            console.log('💾 Stored TEMP_USER in localStorage');
         }
 
         function toggleProfileDropdown() {
             console.log('🔍 toggleProfileDropdown called');
+            console.log('🔍 currentUser variable:', currentUser);
+            console.log('🔍 TEMP_AUTH_BYPASS:', TEMP_AUTH_BYPASS);
+            
             const user = getCurrentUser();
-            console.log('👤 Current user:', user);
+            console.log('👤 getCurrentUser() returned:', user);
+            console.log('👤 User properties:', user ? Object.keys(user) : 'null');
             
             // Check if user is logged in (has any form of ID and name/email)
             if (user && (user._id || user.id) && user.name && user.email) {
@@ -5860,6 +5867,8 @@
                 const dropdown = document.getElementById('profile-dropdown');
                 const btn = document.getElementById('profile-btn');
                 const chevron = document.getElementById('profile-chevron');
+                
+                console.log('🔍 Found elements:', { dropdown, btn, chevron });
                 
                 if (dropdown.classList.contains('show')) {
                     console.log('📥 Hiding dropdown');
@@ -5870,6 +5879,12 @@
                 }
             } else {
                 console.log('❌ User not logged in, opening modal');
+                console.log('❌ User check failed:', {
+                    hasUser: !!user,
+                    hasId: !!(user && (user._id || user.id)),
+                    hasName: !!(user && user.name),
+                    hasEmail: !!(user && user.email)
+                });
                 // User is not logged in - open modal
                 openProfileModal();
             }
@@ -5883,10 +5898,20 @@
             
             console.log('🔍 Found elements:', { dropdown, btn, chevron });
             
+            // Check if all required elements exist
+            if (!dropdown || !btn || !chevron) {
+                console.error('❌ Missing required elements for dropdown');
+                return;
+            }
+            
             // Update dropdown content
-            document.getElementById('dropdown-avatar').textContent = user.name.charAt(0).toUpperCase();
-            document.getElementById('dropdown-username').textContent = user.name;
-            document.getElementById('dropdown-email').textContent = user.email;
+            const avatar = document.getElementById('dropdown-avatar');
+            const username = document.getElementById('dropdown-username');
+            const email = document.getElementById('dropdown-email');
+            
+            if (avatar) avatar.textContent = user.name.charAt(0).toUpperCase();
+            if (username) username.textContent = user.name;
+            if (email) email.textContent = user.email;
             
             console.log('📝 Updated dropdown content');
             
@@ -5897,6 +5922,9 @@
             console.log('✨ Added show and active classes');
             console.log('🔍 Dropdown classes after show:', dropdown.className);
             console.log('🔍 Dropdown computed styles:', window.getComputedStyle(dropdown));
+            
+            // Force a repaint to ensure visibility
+            dropdown.offsetHeight;
             
             // Add click outside listener
             setTimeout(() => {
