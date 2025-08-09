@@ -668,7 +668,7 @@
             margin-top: 10px;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid red; /* Temporary debug border */
             border-radius: 15px;
             min-width: 280px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -676,6 +676,7 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
+            z-index: 1001; /* Ensure it's above other elements */
         }
 
         .profile-dropdown.show {
@@ -5848,7 +5849,6 @@
         }
 
         function toggleProfileDropdown() {
-            alert('Profile button clicked!'); // Temporary debug alert
             console.log('🔍 toggleProfileDropdown called');
             const user = getCurrentUser();
             console.log('👤 Current user:', user);
@@ -5895,6 +5895,8 @@
             btn.classList.add('active');
             
             console.log('✨ Added show and active classes');
+            console.log('🔍 Dropdown classes after show:', dropdown.className);
+            console.log('🔍 Dropdown computed styles:', window.getComputedStyle(dropdown));
             
             // Add click outside listener
             setTimeout(() => {
