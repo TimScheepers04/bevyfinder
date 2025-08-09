@@ -5848,6 +5848,7 @@
         }
 
         function toggleProfileDropdown() {
+            alert('Profile button clicked!'); // Temporary debug alert
             console.log('🔍 toggleProfileDropdown called');
             const user = getCurrentUser();
             console.log('👤 Current user:', user);
@@ -6219,6 +6220,13 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded - initializing...');
+            
+            // Test if toggleProfileDropdown function exists
+            if (typeof toggleProfileDropdown === 'function') {
+                console.log('✅ toggleProfileDropdown function exists');
+            } else {
+                console.error('❌ toggleProfileDropdown function not found!');
+            }
             
             // Initialize profile button
             updateProfileButton();
