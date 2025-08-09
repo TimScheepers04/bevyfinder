@@ -5852,7 +5852,8 @@
             const user = getCurrentUser();
             console.log('👤 Current user:', user);
             
-            if (user && user._id) {
+            // Check if user is logged in (has any form of ID and name/email)
+            if (user && (user._id || user.id) && user.name && user.email) {
                 console.log('✅ User is logged in, toggling dropdown');
                 // User is logged in - toggle dropdown
                 const dropdown = document.getElementById('profile-dropdown');
@@ -5925,7 +5926,7 @@
             
             // Check if user is logged in
             const user = getCurrentUser();
-            if (user && user._id) { // MongoDB users have _id, temp user doesn't
+            if (user && (user._id || user.id) && user.name && user.email) {
                 showUserInfo(user);
             } else {
                 // Show sign-in form by default for better UX
@@ -6122,9 +6123,11 @@
         function updateProfileButton() {
             console.log('🔄 updateProfileButton called');
             console.log('👤 currentUser:', currentUser);
+            console.log('🔍 currentUser type:', typeof currentUser);
+            console.log('🔍 currentUser keys:', currentUser ? Object.keys(currentUser) : 'null');
             
             const btnText = document.getElementById('profile-btn-text');
-            if (currentUser) {
+            if (currentUser && currentUser.name && currentUser.email) {
                 console.log('✅ User logged in, updating button to:', currentUser.name);
                 btnText.textContent = currentUser.name;
                 // Update dropdown content if it exists
@@ -6138,7 +6141,7 @@
                 
                 console.log('📝 Updated dropdown content');
             } else {
-                console.log('❌ No user, setting button to Profile');
+                console.log('❌ No user or invalid user data, setting button to Profile');
                 btnText.textContent = 'Profile';
                 // Hide dropdown if it's open
                 hideProfileDropdown();
