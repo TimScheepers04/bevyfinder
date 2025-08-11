@@ -2695,9 +2695,294 @@
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
         }
+
+        /* Consent Modal Styles */
+        .consent-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .consent-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .consent-header {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            padding: 30px;
+            border-radius: 18px 18px 0 0;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .consent-header h1 {
+            color: white;
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .consent-header i {
+            color: #fbbf24;
+            margin-right: 10px;
+        }
+
+        .consent-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .consent-body {
+            padding: 30px;
+            color: white;
+        }
+
+        .consent-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #ef4444;
+        }
+
+        .consent-section h3 {
+            color: #fbbf24;
+            font-size: 1.3rem;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .consent-section h3 i {
+            margin-right: 10px;
+            color: #ef4444;
+        }
+
+        .consent-section p {
+            margin: 0 0 15px 0;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .consent-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .consent-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .consent-section strong {
+            color: #fbbf24;
+        }
+
+        .consent-footer {
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 18px 18px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .consent-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .consent-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            accent-color: #10b981;
+        }
+
+        .consent-checkbox label {
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .consent-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .consent-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .decline-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .decline-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: 2px solid #10b981;
+        }
+
+        .accept-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .accept-btn:disabled {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .consent-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+
+            .consent-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .consent-body {
+                padding: 20px;
+            }
+
+            .consent-section {
+                padding: 15px;
+            }
+
+            .consent-buttons {
+                flex-direction: column;
+            }
+
+            .consent-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Consent Modal - Must be accepted before accessing the app -->
+    <div class="consent-modal" id="consent-modal">
+        <div class="consent-content">
+            <div class="consent-header">
+                <h1><i class="fas fa-exclamation-triangle"></i> Important Legal Disclaimer</h1>
+                <p class="consent-subtitle">Please read carefully before using BevyFinder</p>
+            </div>
+            
+            <div class="consent-body">
+                <div class="consent-section">
+                    <h3><i class="fas fa-calculator"></i> BAC Estimates Disclaimer</h3>
+                    <p>BevyFinder provides <strong>estimated Blood Alcohol Content (BAC) calculations</strong> based on mathematical formulas that are not perfect. These estimates are:</p>
+                    <ul>
+                        <li>Approximations only and may not reflect your actual BAC</li>
+                        <li>Based on general population averages and may not apply to your specific situation</li>
+                        <li>Affected by many factors including metabolism, food intake, medications, and individual physiology</li>
+                        <li>Not a substitute for professional medical advice or breathalyzer testing</li>
+                    </ul>
+                </div>
+                
+                <div class="consent-section">
+                    <h3><i class="fas fa-shield-alt"></i> Legal Liability Disclaimer</h3>
+                    <p>By using BevyFinder, you acknowledge and agree that:</p>
+                    <ul>
+                        <li><strong>BevyFinder is not liable</strong> for any decisions you make based on BAC estimates</li>
+                        <li><strong>You are responsible</strong> for your own actions and decisions while drinking</li>
+                        <li><strong>BAC estimates are not legal evidence</strong> and should not be used to determine if you are safe to drive</li>
+                        <li><strong>You understand</strong> that drinking and driving is illegal and dangerous regardless of BAC estimates</li>
+                        <li><strong>You will not hold BevyFinder responsible</strong> for any legal consequences, accidents, or injuries</li>
+                    </ul>
+                </div>
+                
+                <div class="consent-section">
+                    <h3><i class="fas fa-car"></i> Driving Safety Warning</h3>
+                    <p><strong>NEVER drink and drive.</strong> Even low BAC levels can impair your ability to drive safely. Always:</p>
+                    <ul>
+                        <li>Designate a sober driver</li>
+                        <li>Use public transportation or ride-sharing services</li>
+                        <li>Wait until you are completely sober before driving</li>
+                        <li>Follow local laws and regulations regarding alcohol consumption</li>
+                    </ul>
+                </div>
+                
+                <div class="consent-section">
+                    <h3><i class="fas fa-user-check"></i> User Responsibility</h3>
+                    <p>You acknowledge that you:</p>
+                    <ul>
+                        <li>Are of legal drinking age in your jurisdiction</li>
+                        <li>Will use BevyFinder responsibly and for educational purposes only</li>
+                        <li>Will not rely solely on BAC estimates for making decisions about driving or other activities</li>
+                        <li>Understand that individual alcohol tolerance and effects vary significantly</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="consent-footer">
+                <div class="consent-checkbox">
+                    <input type="checkbox" id="consent-checkbox" required>
+                    <label for="consent-checkbox">
+                        <strong>I have read, understood, and agree to all terms and conditions above</strong>
+                    </label>
+                </div>
+                
+                <div class="consent-buttons">
+                    <button class="consent-btn decline-btn" onclick="declineConsent()">
+                        <i class="fas fa-times"></i> Decline & Exit
+                    </button>
+                    <button class="consent-btn accept-btn" id="accept-consent-btn" onclick="acceptConsent()" disabled>
+                        <i class="fas fa-check"></i> Accept & Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
             <!-- Profile Button -->
         <div class="profile-container" id="profile-container">
             <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
@@ -6881,7 +7166,92 @@
             }
         };
 
+        // Consent Modal Functions
+        let consentAccepted = false;
+
+        // Check if user has already accepted consent
+        function checkConsent() {
+            const hasConsented = localStorage.getItem('bevyfinder_consent');
+            if (hasConsented === 'true') {
+                consentAccepted = true;
+                hideConsentModal();
+                return true;
+            } else {
+                showConsentModal();
+                return false;
+            }
+        }
+
+        // Show consent modal
+        function showConsentModal() {
+            const modal = document.getElementById('consent-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+                console.log('Consent modal shown');
+            }
+        }
+
+        // Hide consent modal
+        function hideConsentModal() {
+            const modal = document.getElementById('consent-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Restore scrolling
+                console.log('Consent modal hidden');
+            }
+        }
+
+        // Handle consent checkbox change
+        function handleConsentCheckbox() {
+            const checkbox = document.getElementById('consent-checkbox');
+            const acceptBtn = document.getElementById('accept-consent-btn');
+            
+            if (checkbox && acceptBtn) {
+                acceptBtn.disabled = !checkbox.checked;
+            }
+        }
+
+        // Accept consent
+        function acceptConsent() {
+            const checkbox = document.getElementById('consent-checkbox');
+            if (checkbox && checkbox.checked) {
+                consentAccepted = true;
+                localStorage.setItem('bevyfinder_consent', 'true');
+                hideConsentModal();
+                showNotification('Thank you for accepting the terms. Welcome to BevyFinder!', 'success');
+                console.log('Consent accepted');
+            } else {
+                showNotification('Please check the consent checkbox to continue.', 'error');
+            }
+        }
+
+        // Decline consent
+        function declineConsent() {
+            showNotification('You must accept the terms to use BevyFinder.', 'error');
+            // Optionally redirect to a different page or show a message
+            console.log('Consent declined');
+        }
+
+        // Initialize consent check when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listener to checkbox
+            const checkbox = document.getElementById('consent-checkbox');
+            if (checkbox) {
+                checkbox.addEventListener('change', handleConsentCheckbox);
+            }
+            
+            // Check consent status
+            checkConsent();
+        });
+
         function startSession() {
+            if (!consentAccepted) {
+                showNotification('Please accept the terms and conditions first.', 'error');
+                showConsentModal();
+                return;
+            }
+            
             sessionActive = true;
             sessionStartTime = new Date();
             document.getElementById('session-status').textContent = 'Session active - Started at ' + sessionStartTime.toLocaleTimeString();
@@ -6932,6 +7302,12 @@
         }
 
         function addDrink(drinkType) {
+            if (!consentAccepted) {
+                showNotification('Please accept the terms and conditions first.', 'error');
+                showConsentModal();
+                return;
+            }
+            
             if (!sessionActive) {
                 alert('Please start a session first!');
                 return;
