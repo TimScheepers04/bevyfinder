@@ -12,6 +12,7 @@ const authRoutes = require('./server/routes/auth');
 const reviewRoutes = require('./server/routes/reviews');
 const favoritesRoutes = require('./server/routes/favorites');
 const likesRoutes = require('./server/routes/likes');
+const socialRoutes = require('./server/routes/social');
 
 // Initialize express app
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/likes', likesRoutes);
+app.use('/api/social', socialRoutes);
 
 // API test endpoint
 app.get('/api/test', (req, res) => {
