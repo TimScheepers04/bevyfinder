@@ -6170,7 +6170,7 @@
         // Profile Functions
         let isSignUpMode = true;
         let currentUser = null;
-        const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your deployed backend URL
+        const API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Railway production backend URL
         
         // Initialize currentUser with TEMP_USER if bypass is enabled
         if (TEMP_AUTH_BYPASS) {
@@ -6681,7 +6681,7 @@
             
             // Refresh user data from server to get latest personalDetails
             try {
-                const response = await fetch('/api/auth/me', {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -6931,7 +6931,7 @@
                 }
                 
                 // Update profile using the API
-                const response = await fetch('/api/auth/profile', {
+                const response = await fetch(`${API_BASE_URL}/auth/profile`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
