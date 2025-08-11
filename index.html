@@ -2906,6 +2906,293 @@
                 justify-content: center;
             }
         }
+
+        /* Social Features Styles */
+        .social-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .feed-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .post {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .post-user-info h4 {
+            color: white;
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .post-user-info span {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+        }
+
+        .post-content p {
+            color: white;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .post-drinks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .drink-tag {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .action-btn.liked {
+            color: #ef4444;
+        }
+
+        .friends-tabs, .leaderboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .friends-container, .requests-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .friend-item, .request-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .friend-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .friend-details h4 {
+            color: white;
+            margin: 0 0 5px 0;
+        }
+
+        .friend-details span {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-friends-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .user-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .leaderboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .leaderboard-rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #333; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e5e5e5); color: #333; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa520); color: white; }
+        .rank-other { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .leaderboard-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .leaderboard-stats {
+            text-align: right;
+        }
+
+        .leaderboard-stats .stat-value {
+            color: #10b981;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .leaderboard-stats .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .loading-spinner i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Mobile responsiveness for social features */
+        @media (max-width: 768px) {
+            .social-actions {
+                flex-direction: column;
+            }
+
+            .friends-tabs, .leaderboard-tabs {
+                flex-direction: column;
+            }
+
+            .friend-item, .request-item, .user-item, .leaderboard-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .friend-actions {
+                justify-content: center;
+            }
+
+            .post-actions {
+                justify-content: space-around;
+            }
+        }
     </style>
 </head>
 <body>
@@ -3229,6 +3516,18 @@
             <button class="sidebar-btn" id="sidebar-btn-3">
                 <i class="fas fa-history"></i>
                 History
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-social">
+                <i class="fas fa-users"></i>
+                Social Feed
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-friends">
+                <i class="fas fa-user-friends"></i>
+                Friends
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-leaderboard">
+                <i class="fas fa-trophy"></i>
+                Leaderboards
             </button>
             <button class="sidebar-btn" id="sidebar-btn-4">
                 <i class="fas fa-cog"></i>
@@ -3597,6 +3896,116 @@
                     </div>
                     <h3>Settings</h3>
                     <p>Customize your BevyFinder experience</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Feed Page -->
+    <div class="page" id="social-feed-page">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-users"></i> Social Feed</h1>
+                <p>See what your friends are drinking and share your own experiences</p>
+            </div>
+            
+            <div class="social-actions">
+                <button class="btn primary-btn" onclick="showCreatePostModal()">
+                    <i class="fas fa-plus"></i> Create Post
+                </button>
+                <button class="btn secondary-btn" onclick="refreshFeed()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="feed-container" id="feed-container">
+                <div class="loading-spinner" id="feed-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading feed...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friends Page -->
+    <div class="page" id="friends-page">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-user-friends"></i> Friends</h1>
+                <p>Connect with other BevyFinder users</p>
+            </div>
+            
+            <div class="friends-tabs">
+                <button class="tab-btn active" data-tab="friends-list">
+                    <i class="fas fa-users"></i> My Friends
+                </button>
+                <button class="tab-btn" data-tab="friend-requests">
+                    <i class="fas fa-user-plus"></i> Requests
+                </button>
+                <button class="tab-btn" data-tab="find-friends">
+                    <i class="fas fa-search"></i> Find Friends
+                </button>
+            </div>
+            
+            <div class="tab-content active" id="friends-list-tab">
+                <div class="friends-container" id="friends-container">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading friends...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="friend-requests-tab">
+                <div class="requests-container" id="requests-container">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading requests...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="find-friends-tab">
+                <div class="search-friends-container">
+                    <div class="input-group">
+                        <input type="text" id="friend-search" placeholder="Search by name or email...">
+                        <button class="btn primary-btn" onclick="searchUsers()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboards Page -->
+    <div class="page" id="leaderboard-page">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-trophy"></i> Leaderboards</h1>
+                <p>See who's leading the pack in the BevyFinder community</p>
+            </div>
+            
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-tab="total-drinks">
+                    <i class="fas fa-beer"></i> Total Drinks
+                </button>
+                <button class="tab-btn" data-tab="total-sessions">
+                    <i class="fas fa-calendar"></i> Total Sessions
+                </button>
+                <button class="tab-btn" data-tab="longest-session">
+                    <i class="fas fa-clock"></i> Longest Session
+                </button>
+                <button class="tab-btn" data-tab="searches">
+                    <i class="fas fa-search"></i> Most Searches
+                </button>
+            </div>
+            
+            <div class="leaderboard-container" id="leaderboard-container">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading leaderboards...</p>
                 </div>
             </div>
         </div>
@@ -9177,6 +9586,646 @@
                 alert(`${drink.name} added to favorites!`);
             }
         }
+
+        // Social Features JavaScript
+        let friends = [];
+        let friendRequests = [];
+        let feedPosts = [];
+        let leaderboardData = {};
+
+        // Initialize social features
+        async function initializeSocial() {
+            if (!consentAccepted) {
+                showNotification('Please accept the terms and conditions first.', 'error');
+                showConsentModal();
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showNotification('Please log in to access social features.', 'error');
+                return;
+            }
+
+            try {
+                // Get current user
+                const userResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    currentUser = userData.user;
+                }
+            } catch (error) {
+                console.error('Error initializing social features:', error);
+            }
+        }
+
+        // Social Feed Functions
+        async function loadSocialFeed() {
+            if (!currentUser) {
+                await initializeSocial();
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/feed`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    feedPosts = data.posts;
+                    renderFeed();
+                }
+            } catch (error) {
+                console.error('Error loading feed:', error);
+                showNotification('Error loading social feed', 'error');
+            }
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feed-container');
+            if (!container) return;
+
+            if (feedPosts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No posts yet</h3>
+                        <p>Be the first to share your drink experiences!</p>
+                        <button class="btn primary-btn" onclick="showCreatePostModal()">
+                            <i class="fas fa-plus"></i> Create First Post
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = feedPosts.map(post => `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">${post.user.name.charAt(0).toUpperCase()}</div>
+                        <div class="post-user-info">
+                            <h4>${post.user.name}</h4>
+                            <span>${formatDate(post.createdAt)}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>${post.content}</p>
+                        ${post.drinks.length > 0 ? `
+                            <div class="post-drinks">
+                                ${post.drinks.map(drink => `
+                                    <span class="drink-tag">${drink.drinkName}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn ${post.likes.includes(currentUser?.id) ? 'liked' : ''}" 
+                                onclick="toggleLike('${post._id}')">
+                            <i class="fas fa-heart"></i> ${post.likes.length}
+                        </button>
+                        <button class="action-btn" onclick="showComments('${post._id}')">
+                            <i class="fas fa-comment"></i> ${post.comments.length}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function refreshFeed() {
+            await loadSocialFeed();
+            showNotification('Feed refreshed!', 'success');
+        }
+
+        // Friends Functions
+        async function loadFriends() {
+            if (!currentUser) {
+                await initializeSocial();
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friends`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    friends = data.friends;
+                    renderFriends();
+                }
+            } catch (error) {
+                console.error('Error loading friends:', error);
+                showNotification('Error loading friends', 'error');
+            }
+        }
+
+        async function loadFriendRequests() {
+            if (!currentUser) {
+                await initializeSocial();
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friend-requests`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    friendRequests = data.friendRequests;
+                    renderFriendRequests();
+                }
+            } catch (error) {
+                console.error('Error loading friend requests:', error);
+                showNotification('Error loading friend requests', 'error');
+            }
+        }
+
+        function renderFriends() {
+            const container = document.getElementById('friends-container');
+            if (!container) return;
+
+            if (friends.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>No friends yet</h3>
+                        <p>Start connecting with other BevyFinder users!</p>
+                        <button class="btn primary-btn" onclick="switchToFindFriends()">
+                            <i class="fas fa-search"></i> Find Friends
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = friends.map(friend => `
+                <div class="friend-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${friend.name}</h4>
+                            <span>Last active: ${formatDate(friend.stats?.lastActive)}</span>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn secondary-btn" onclick="viewFriendProfile('${friend.id}')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                        <button class="btn secondary-btn" onclick="removeFriend('${friend.id}')">
+                            <i class="fas fa-user-minus"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFriendRequests() {
+            const container = document.getElementById('requests-container');
+            if (!container) return;
+
+            if (friendRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-plus"></i>
+                        <h3>No friend requests</h3>
+                        <p>When someone sends you a friend request, it will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = friendRequests.map(request => `
+                <div class="request-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${request.from.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${request.from.name}</h4>
+                            <span>Sent ${formatDate(request.date)}</span>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from.id}')">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from.id}')">
+                            <i class="fas fa-times"></i> Decline
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function searchUsers() {
+            const query = document.getElementById('friend-search').value.trim();
+            if (query.length < 2) {
+                showNotification('Please enter at least 2 characters', 'error');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/search-users?query=${encodeURIComponent(query)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderSearchResults(data.users);
+                }
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showNotification('Error searching users', 'error');
+            }
+        }
+
+        function renderSearchResults(users) {
+            const container = document.getElementById('search-results');
+            if (!container) return;
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No users found</h3>
+                        <p>Try searching with a different name or email.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${user.name}</h4>
+                            <span>${user.email}</span>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
+                            <i class="fas fa-user-plus"></i> Add Friend
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Leaderboard Functions
+        async function loadLeaderboard(type = 'totalDrinks') {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/leaderboards?type=${type}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    leaderboardData[type] = data.leaderboard.users;
+                    renderLeaderboard(type);
+                }
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                showNotification('Error loading leaderboard', 'error');
+            }
+        }
+
+        function renderLeaderboard(type) {
+            const container = document.getElementById('leaderboard-container');
+            if (!container) return;
+
+            const users = leaderboardData[type] || [];
+            const typeLabels = {
+                totalDrinks: 'Total Drinks',
+                totalSessions: 'Total Sessions',
+                longestSession: 'Longest Session (min)',
+                searches: 'Total Searches'
+            };
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-trophy"></i>
+                        <h3>No leaderboard data</h3>
+                        <p>Start using BevyFinder to appear on the leaderboards!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = users.map((user, index) => `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank rank-${index < 3 ? index + 1 : 'other'}">
+                        ${index + 1}
+                    </div>
+                    <div class="leaderboard-user">
+                        <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${user.name}</h4>
+                            <span>Last active: ${formatDate(user.stats?.lastActive)}</span>
+                        </div>
+                    </div>
+                    <div class="leaderboard-stats">
+                        <div class="stat-value">${user.stats[type] || 0}</div>
+                        <div class="stat-label">${typeLabels[type]}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Social Action Functions
+        async function sendFriendRequest(userId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friend-request/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ targetUserId: userId })
+                });
+
+                if (response.ok) {
+                    showNotification('Friend request sent!', 'success');
+                    searchUsers(); // Refresh search results
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error sending friend request', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending friend request:', error);
+                showNotification('Error sending friend request', 'error');
+            }
+        }
+
+        async function acceptFriendRequest(userId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friend-request/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fromUserId: userId })
+                });
+
+                if (response.ok) {
+                    showNotification('Friend request accepted!', 'success');
+                    loadFriendRequests();
+                    loadFriends();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error accepting friend request', 'error');
+                }
+            } catch (error) {
+                console.error('Error accepting friend request:', error);
+                showNotification('Error accepting friend request', 'error');
+            }
+        }
+
+        async function declineFriendRequest(userId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friend-request/decline`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fromUserId: userId })
+                });
+
+                if (response.ok) {
+                    showNotification('Friend request declined', 'info');
+                    loadFriendRequests();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error declining friend request', 'error');
+                }
+            } catch (error) {
+                console.error('Error declining friend request:', error);
+                showNotification('Error declining friend request', 'error');
+            }
+        }
+
+        async function removeFriend(userId) {
+            if (!confirm('Are you sure you want to remove this friend?')) return;
+
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/friends/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    showNotification('Friend removed', 'info');
+                    loadFriends();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error removing friend', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing friend:', error);
+                showNotification('Error removing friend', 'error');
+            }
+        }
+
+        async function toggleLike(postId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update the post in the feed
+                    const postIndex = feedPosts.findIndex(p => p._id === postId);
+                    if (postIndex !== -1) {
+                        if (data.liked) {
+                            feedPosts[postIndex].likes.push(currentUser.id);
+                        } else {
+                            feedPosts[postIndex].likes = feedPosts[postIndex].likes.filter(id => id !== currentUser.id);
+                        }
+                        feedPosts[postIndex].likes.length = data.likesCount;
+                        renderFeed();
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                showNotification('Error updating like', 'error');
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function switchToFindFriends() {
+            const tabBtns = document.querySelectorAll('.friends-tabs .tab-btn');
+            const tabContents = document.querySelectorAll('#friends-page .tab-content');
+            
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            document.querySelector('[data-tab="find-friends"]').classList.add('active');
+            document.getElementById('find-friends-tab').classList.add('active');
+        }
+
+        function showCreatePostModal() {
+            // Simple post creation for now
+            const content = prompt('What\'s on your mind? Share your drink experience:');
+            if (content && content.trim()) {
+                createPost(content.trim());
+            }
+        }
+
+        async function createPost(content) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content })
+                });
+
+                if (response.ok) {
+                    showNotification('Post created successfully!', 'success');
+                    loadSocialFeed();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error creating post', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showNotification('Error creating post', 'error');
+            }
+        }
+
+        // Add event listeners for social sidebar buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const socialBtn = document.getElementById('sidebar-btn-social');
+            const friendsBtn = document.getElementById('sidebar-btn-friends');
+            const leaderboardBtn = document.getElementById('sidebar-btn-leaderboard');
+
+            if (socialBtn) {
+                socialBtn.addEventListener('click', function() {
+                    showPage('social-feed-page');
+                    loadSocialFeed();
+                    closeMenu();
+                });
+            }
+
+            if (friendsBtn) {
+                friendsBtn.addEventListener('click', function() {
+                    showPage('friends-page');
+                    loadFriends();
+                    loadFriendRequests();
+                    closeMenu();
+                });
+            }
+
+            if (leaderboardBtn) {
+                leaderboardBtn.addEventListener('click', function() {
+                    showPage('leaderboard-page');
+                    loadLeaderboard('totalDrinks');
+                    closeMenu();
+                });
+            }
+
+            // Add tab switching for friends page
+            const friendsTabBtns = document.querySelectorAll('.friends-tabs .tab-btn');
+            friendsTabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs
+                    friendsTabBtns.forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#friends-page .tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    document.getElementById(`${tab}-tab`).classList.add('active');
+                    
+                    // Load appropriate data
+                    if (tab === 'friends-list') {
+                        loadFriends();
+                    } else if (tab === 'friend-requests') {
+                        loadFriendRequests();
+                    }
+                });
+            });
+
+            // Add tab switching for leaderboard page
+            const leaderboardTabBtns = document.querySelectorAll('.leaderboard-tabs .tab-btn');
+            leaderboardTabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs
+                    leaderboardTabBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Load appropriate leaderboard
+                    const typeMap = {
+                        'total-drinks': 'totalDrinks',
+                        'total-sessions': 'totalSessions',
+                        'longest-session': 'longestSession',
+                        'searches': 'searches'
+                    };
+                    
+                    loadLeaderboard(typeMap[tab]);
+                });
+            });
+        });
     </script>
 </body>
 </html> 

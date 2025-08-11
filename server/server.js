@@ -17,6 +17,7 @@ const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/reviews');
 const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
+const socialRoutes = require('./routes/social');
 
 // Initialize express app
 const app = express();
@@ -148,6 +149,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/likes', likesRoutes);
+app.use('/api/social', socialRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

@@ -88,9 +88,63 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 0
         },
+        totalDrinks: {
+            type: Number,
+            default: 0
+        },
+        totalSessions: {
+            type: Number,
+            default: 0
+        },
+        longestSession: {
+            type: Number,
+            default: 0
+        },
         lastActive: {
             type: Date,
             default: Date.now
+        }
+    },
+    // Social features
+    friends: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    friendRequests: [{
+        from: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        date: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    sentFriendRequests: [{
+        to: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        date: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    privacy: {
+        profileVisibility: {
+            type: String,
+            enum: ['public', 'friends', 'private'],
+            default: 'public'
+        },
+        showDrinks: {
+            type: String,
+            enum: ['public', 'friends', 'private'],
+            default: 'friends'
+        },
+        showStats: {
+            type: String,
+            enum: ['public', 'friends', 'private'],
+            default: 'friends'
         }
     },
     isVerified: {
@@ -197,6 +251,109 @@ userSchema.methods.trackSearch = function() {
     return this.save();
 };
 
+// Social methods
+userSchema.methods.sendFriendRequest = async function(targetUserId) {
+    const targetUser = await this.model('User').findById(targetUserId);
+    if (!targetUser) {
+        throw new Error('User not found');
+    }
+    
+    // Check if already friends or request already sent
+    const isFriend = this.friends.includes(targetUserId);
+    const hasSentRequest = this.sentFriendRequests.some(req => req.to.toString() === targetUserId.toString());
+    
+    if (isFriend || hasSentRequest) {
+        throw new Error('Friend request already sent or already friends');
+    }
+    
+    // Use updateOne to avoid version conflicts
+    await this.model('User').updateOne(
+        { _id: this._id },
+        { $push: { sentFriendRequests: { to: targetUserId } } }
+    );
+    
+    await this.model('User').updateOne(
+        { _id: targetUserId },
+        { $push: { friendRequests: { from: this._id } } }
+    );
+    
+    // Refresh this user object
+    const updatedUser = await this.model('User').findById(this._id);
+    Object.assign(this, updatedUser);
+    
+    return this;
+};
+
+userSchema.methods.acceptFriendRequest = async function(fromUserId) {
+    const fromUser = await this.model('User').findById(fromUserId);
+    if (!fromUser) {
+        throw new Error('User not found');
+    }
+    
+    // Use updateOne to avoid version conflicts
+    await this.model('User').updateOne(
+        { _id: this._id },
+        { 
+            $pull: { friendRequests: { from: fromUserId } },
+            $addToSet: { friends: fromUserId }
+        }
+    );
+    
+    await this.model('User').updateOne(
+        { _id: fromUserId },
+        { 
+            $pull: { sentFriendRequests: { to: this._id } },
+            $addToSet: { friends: this._id }
+        }
+    );
+    
+    // Refresh this user object
+    const updatedUser = await this.model('User').findById(this._id);
+    Object.assign(this, updatedUser);
+    
+    return this;
+};
+
+userSchema.methods.declineFriendRequest = async function(fromUserId) {
+    // Remove from friend requests
+    this.friendRequests = this.friendRequests.filter(req => req.from.toString() !== fromUserId.toString());
+    
+    // Remove from sent requests for the other user
+    const fromUser = await this.model('User').findById(fromUserId);
+    if (fromUser) {
+        fromUser.sentFriendRequests = fromUser.sentFriendRequests.filter(req => req.to.toString() !== this._id.toString());
+        await fromUser.save();
+    }
+    
+    await this.save();
+    return this;
+};
+
+userSchema.methods.removeFriend = async function(friendUserId) {
+    // Remove from friends list
+    this.friends = this.friends.filter(friend => friend.toString() !== friendUserId.toString());
+    
+    // Remove from other user's friends list
+    const friendUser = await this.model('User').findById(friendUserId);
+    if (friendUser) {
+        friendUser.friends = friendUser.friends.filter(friend => friend.toString() !== this._id.toString());
+        await friendUser.save();
+    }
+    
+    await this.save();
+    return this;
+};
+
+userSchema.methods.updateStats = function(drinksCount = 0, sessionDuration = 0) {
+    this.stats.totalDrinks += drinksCount;
+    this.stats.totalSessions += 1;
+    if (sessionDuration > this.stats.longestSession) {
+        this.stats.longestSession = sessionDuration;
+    }
+    this.stats.lastActive = new Date();
+    return this.save();
+};
+
 // Method to update profile
 userSchema.methods.updateProfile = async function(updates) {
     // Handle email change - check if new email is already taken
@@ -229,6 +386,9 @@ userSchema.methods.getPublicProfile = function() {
         personalDetails: this.personalDetails,
         profile: this.profile,
         stats: this.stats,
+        friends: this.friends,
+        friendRequests: this.friendRequests,
+        privacy: this.privacy,
         createdAt: this.createdAt
     };
 };
