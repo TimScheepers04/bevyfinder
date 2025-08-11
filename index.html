@@ -1180,20 +1180,40 @@
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: none;
-            padding: 8px;
+            padding: 12px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 35px;
-            height: 35px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .close-profile-btn:hover {
             background: rgba(239, 68, 68, 0.3);
             transform: scale(1.1);
+        }
+
+        /* Mobile-specific improvements for close button */
+        @media (max-width: 768px) {
+            .close-profile-btn {
+                width: 55px;
+                height: 55px;
+                padding: 15px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .close-profile-btn i {
+                font-size: 1.2rem;
+            }
         }
 
         .profile-form {
@@ -2758,9 +2778,9 @@
         </div>
 
     <!-- Profile Modal -->
-    <div class="profile-modal" id="profile-modal">
-        <div class="profile-modal-content">
-            <button class="close-profile-btn" onclick="closeProfileModal()">
+    <div class="profile-modal" id="profile-modal" onclick="closeProfileModal()">
+        <div class="profile-modal-content" onclick="event.stopPropagation()">
+            <button class="close-profile-btn" onclick="closeProfileModal()" ontouchstart="closeProfileModal()" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                 <i class="fas fa-times"></i>
             </button>
             
@@ -6394,8 +6414,14 @@
 
         function closeProfileModal() {
             const modal = document.getElementById('profile-modal');
-            modal.classList.remove('show');
-            resetProfileForm();
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                resetProfileForm();
+                console.log('Modal closed successfully');
+            } else {
+                console.error('Modal element not found');
+            }
         }
 
         function toggleProfileMode() {
