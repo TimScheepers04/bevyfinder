@@ -1,6 +1,101 @@
 // Test if JavaScript is running
 console.log('Script.js loaded successfully!');
 
+// 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
+// This bypasses all authentication requirements so you can test features
+const TEMP_AUTH_BYPASS = false;
+const TEMP_USER = {
+    id: 'temp-user-123',
+    name: 'Test User',
+    email: 'test@bevyfinder.com',
+    age: 25,
+    weight: 70,
+    height: 175,
+    gender: 'male',
+    stats: {
+        searches: 15,
+        favorites: 8
+    },
+    profile: {
+        preferences: {
+            favoriteDrinks: [],
+            searchHistory: []
+        }
+    }
+};
+
+// Mock authentication functions
+function isAuthenticated() {
+    return TEMP_AUTH_BYPASS;
+}
+
+function getCurrentUser() {
+    return TEMP_AUTH_BYPASS ? TEMP_USER : null;
+}
+
+function requireAuth(callback) {
+    if (TEMP_AUTH_BYPASS) {
+        callback(TEMP_USER);
+    } else {
+        callback(null);
+    }
+}
+
+// Mock auth methods for testing
+async function addFavoriteDrink(beverageKey) {
+    if (TEMP_AUTH_BYPASS) {
+        const favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
+        if (!favorites.includes(beverageKey)) {
+            favorites.push(beverageKey);
+            localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+        }
+        return { success: true };
+    }
+}
+
+async function removeFavoriteDrink(beverageKey) {
+    if (TEMP_AUTH_BYPASS) {
+        const favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
+        const index = favorites.indexOf(beverageKey);
+        if (index > -1) {
+            favorites.splice(index, 1);
+            localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+        }
+        return { success: true };
+    }
+}
+
+async function trackSearch() {
+    if (TEMP_AUTH_BYPASS) {
+        // Mock search tracking
+        return { success: true };
+    }
+}
+
+async function updateProfile(updateData) {
+    if (TEMP_AUTH_BYPASS) {
+        // Mock profile update
+        Object.assign(TEMP_USER, updateData);
+        return { success: true };
+    }
+}
+
+function signOut() {
+    if (TEMP_AUTH_BYPASS) {
+        // Mock sign out - just show notification
+        showNotification('Mock sign out - authentication bypass is still active', 'info');
+    }
+}
+
+function getToken() {
+    if (TEMP_AUTH_BYPASS) {
+        return 'mock-token-123';
+    }
+    return null;
+}
+
+console.log('🔓 Authentication bypass enabled - all features available for testing');
+
 // DOM Elements - will be initialized when DOM is loaded
 let welcomePage, mainApp, startBtn, tabBtns, tabContents, beverageNameInput, searchBtn, suggestions;
 let uploadArea, previewArea, previewImage, removeBtn, resultsSection, beverageCard, uploadBtn;
@@ -159,10 +254,18 @@ function ensureMenuAccessibility() {
 
 // Menu and Sidebar Functionality
 function openMenu() {
-    console.log('openMenu function called!');
-    sidebar.classList.add('open');
-    sidebarOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    console.log('🔓 openMenu function called!');
+    console.log('🔓 Sidebar element:', sidebar);
+    console.log('🔓 Sidebar overlay element:', sidebarOverlay);
+    
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        console.log('🔓 Menu opened successfully');
+    } else {
+        console.error('🔓 Menu elements not found!');
+    }
 }
 
 function closeMenu() {
@@ -194,7 +297,7 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-dashboard': // Dashboard
             console.log('Dashboard button clicked');
-            if (auth.isUserAuthenticated()) {
+            if (isAuthenticated()) {
                 showDashboard();
             } else {
                 // Show auth page for sign up
@@ -204,7 +307,7 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-profile': // Profile
             console.log('Profile button clicked');
-            if (auth.isUserAuthenticated()) {
+            if (isAuthenticated()) {
                 showUserProfile();
             } else {
                 // Show auth page for sign up
@@ -214,7 +317,7 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-2': // Favorites
             console.log('Favorites button clicked');
-            if (auth.isUserAuthenticated()) {
+            if (isAuthenticated()) {
                 hideAllPages();
                 favoritesPage.style.display = 'block';
                 displayFavorites();
@@ -230,7 +333,7 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-3': // History
             console.log('History button clicked');
-            if (auth.isUserAuthenticated()) {
+            if (isAuthenticated()) {
                 hideAllPages();
                 historyPage.style.display = 'block';
                 displayHistory();
@@ -246,15 +349,15 @@ function handleSidebarButtonClick(buttonId) {
             break;
         case 'sidebar-btn-4': // Settings
             console.log('Settings button clicked');
-            // Could show settings panel
+            showSettings();
             break;
         case 'sidebar-btn-5': // About
             console.log('About button clicked');
-            // Could show about information
+            showAbout();
             break;
         case 'sidebar-btn-tracking': // Tracking
             console.log('Tracking button clicked');
-            if (!auth.isUserAuthenticated()) {
+            if (!isAuthenticated()) {
                 showNotification('Night Tracker is exclusive to BevyFinder members. Please sign in to access this feature.', 'info');
                 showAuthPage();
             } else {
@@ -288,9 +391,9 @@ let favorites = [];
 
 // Load favorites from API on initialization
 async function loadFavorites() {
-    if (auth.isUserAuthenticated()) {
+    if (isAuthenticated()) {
         try {
-            const user = auth.getCurrentUser();
+            const user = getCurrentUser();
             favorites = user.profile.preferences.favoriteDrinks || [];
         } catch (error) {
             console.error('Failed to load favorites:', error);
@@ -300,7 +403,7 @@ async function loadFavorites() {
 }
 
 async function addToFavorites(beverageKey) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Sign up to save your favorite drinks!', 'info');
         return;
     }
@@ -308,7 +411,7 @@ async function addToFavorites(beverageKey) {
     if (!favorites.includes(beverageKey)) {
         try {
             // Add to API
-            await auth.addFavoriteDrink(beverageKey);
+            await addFavoriteDrink(beverageKey);
             
             // Update local state
             favorites.push(beverageKey);
@@ -327,7 +430,7 @@ async function addToFavorites(beverageKey) {
 }
 
 async function removeFromFavorites(beverageKey) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Sign up to manage your favorite drinks!', 'info');
         return;
     }
@@ -336,7 +439,7 @@ async function removeFromFavorites(beverageKey) {
     if (index > -1) {
         try {
             // Remove from API
-            await auth.removeFavoriteDrink(beverageKey);
+            await removeFavoriteDrink(beverageKey);
             
             // Update local state
             favorites.splice(index, 1);
@@ -378,7 +481,7 @@ function updateFavoriteButton(beverageKey, isFavorited) {
 
 // Like functionality
 function isLiked(beverageKey) {
-    if (!auth.isUserAuthenticated()) return false;
+    if (!isAuthenticated()) return false;
     const likedDrinks = JSON.parse(localStorage.getItem('bevyfinder_liked_drinks') || '[]');
     return likedDrinks.includes(beverageKey);
 }
@@ -389,7 +492,7 @@ function getLikeCount(beverageKey) {
 }
 
 async function likeBeverage(beverageKey) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Please sign in to like drinks!', 'info');
         return;
     }
@@ -424,7 +527,7 @@ async function likeBeverage(beverageKey) {
 }
 
 async function unlikeBeverage(beverageKey) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Please sign in to unlike drinks!', 'info');
         return;
     }
@@ -659,9 +762,9 @@ let searchHistory = [];
 
 // Load history from API on initialization
 async function loadHistory() {
-    if (auth.isUserAuthenticated()) {
+    if (isAuthenticated()) {
         try {
-            const user = auth.getCurrentUser();
+            const user = getCurrentUser();
             searchHistory = user.profile.preferences.searchHistory || [];
         } catch (error) {
             console.error('Failed to load history:', error);
@@ -672,7 +775,7 @@ async function loadHistory() {
 
 async function addToHistory(beverageKey, searchMethod = 'text') {
     // Only track history for authenticated users
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         // Track analytics for non-authenticated users
         if (typeof analytics !== 'undefined') {
             analytics.trackSearch(beverageDatabase[beverageKey].name, searchMethod, true);
@@ -710,7 +813,7 @@ async function addToHistory(beverageKey, searchMethod = 'text') {
     
     // Track in user profile
     try {
-        await auth.trackSearch();
+        await trackSearch();
     } catch (error) {
         console.error('Failed to track search:', error);
     }
@@ -6381,7 +6484,7 @@ function displayBeverageInfo(beverage, fromImage = false) {
         likeBtn.innerHTML = `<i class="${isLiked(beverageKey) ? 'fas' : 'far'} fa-thumbs-up"></i> <span class="like-count">${getLikeCount(beverageKey)}</span>`;
         likeBtn.title = isLiked(beverageKey) ? 'Unlike this drink' : 'Like this drink';
         likeBtn.onclick = () => {
-            if (auth.isUserAuthenticated()) {
+            if (isAuthenticated()) {
                 if (isLiked(beverageKey)) {
                     unlikeBeverage(beverageKey);
                 } else {
@@ -6397,7 +6500,7 @@ function displayBeverageInfo(beverage, fromImage = false) {
         favoriteBtn.className = `favorite-btn ${isFavorite(beverageKey) ? 'favorited' : ''}`;
         favoriteBtn.setAttribute('data-beverage', beverageKey);
         
-        if (auth.isUserAuthenticated()) {
+        if (isAuthenticated()) {
             favoriteBtn.innerHTML = `<i class="${isFavorite(beverageKey) ? 'fas' : 'far'} fa-heart"></i>`;
             favoriteBtn.title = isFavorite(beverageKey) ? 'Remove from favorites' : 'Add to favorites';
             favoriteBtn.onclick = () => {
@@ -6648,7 +6751,7 @@ function highlightStars(stars, rating) {
 }
 
 async function submitReview(drinkId) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Please sign in to write reviews', 'warning');
         return;
     }
@@ -6670,7 +6773,7 @@ async function submitReview(drinkId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${auth.api.getToken()}`
+                'Authorization': `Bearer ${getToken()}`
             },
             body: JSON.stringify({
                 drinkId,
@@ -6695,7 +6798,7 @@ async function submitReview(drinkId) {
 }
 
 async function markReviewHelpful(reviewId) {
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showAuthNotification('Please sign in to mark reviews as helpful', 'warning');
         return;
     }
@@ -6704,7 +6807,7 @@ async function markReviewHelpful(reviewId) {
         const response = await fetch(`http://localhost:3000/api/reviews/${reviewId}/helpful`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${auth.api.getToken()}`
+                'Authorization': `Bearer ${getToken()}`
             }
         });
 
@@ -6769,7 +6872,7 @@ function showDashboard() {
 }
 
 function updateDashboardContent() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) return;
 
     const container = document.getElementById('dashboard-container');
@@ -6837,7 +6940,7 @@ function populateRecentActivity() {
     const recentActivity = document.getElementById('recent-activity');
     if (!recentActivity) return;
 
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     const history = searchHistory.slice(0, 5); // Last 5 searches
 
     if (history.length === 0) {
@@ -6867,7 +6970,7 @@ function populateTopFavorites() {
     const topFavorites = document.getElementById('top-favorites');
     if (!topFavorites) return;
 
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     const favorites = user.profile?.preferences?.favoriteDrinks || [];
 
     if (favorites.length === 0) {
@@ -6907,7 +7010,7 @@ function showDashboard() {
 }
 
 function updateDashboardContent() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) return;
 
     const container = document.getElementById('dashboard-container');
@@ -6975,7 +7078,7 @@ function populateRecentActivity() {
     const recentActivity = document.getElementById('recent-activity');
     if (!recentActivity) return;
 
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     const history = searchHistory.slice(0, 5); // Last 5 searches
 
     if (history.length === 0) {
@@ -7005,7 +7108,7 @@ function populateTopFavorites() {
     const topFavorites = document.getElementById('top-favorites');
     if (!topFavorites) return;
 
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     const favorites = user.profile?.preferences?.favoriteDrinks || [];
 
     if (favorites.length === 0) {
@@ -7166,7 +7269,7 @@ function createProfilePage() {
                             <i class="fas fa-download"></i>
                             Export Data
                         </button>
-                        <button class="profile-btn danger" onclick="auth.signOut()">
+                        <button class="profile-btn danger" onclick="signOut()">
                             <i class="fas fa-sign-out-alt"></i>
                             Sign Out
                         </button>
@@ -7180,7 +7283,7 @@ function createProfilePage() {
 }
 
 function updateProfileContent() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) return;
 
     // Update basic info
@@ -7273,7 +7376,7 @@ function getMemberLevel(searches) {
 
 // Profile action functions
 function editProfile() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) {
         showNotification('Please sign in to edit your profile', 'error');
         return;
@@ -7371,7 +7474,7 @@ function closeEditProfile() {
 async function handleProfileUpdate(event) {
     event.preventDefault();
     
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) {
         showNotification('Please sign in to update your profile', 'error');
         return;
@@ -7437,7 +7540,7 @@ async function handleProfileUpdate(event) {
         }
         
         // Update profile
-        await auth.updateProfile(updateData);
+        await updateProfile(updateData);
         
         showNotification('Profile updated successfully!', 'success');
         closeEditProfile();
@@ -7451,7 +7554,7 @@ async function handleProfileUpdate(event) {
 }
 
 function exportData() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     if (!user) return;
     
     const data = {
@@ -7481,7 +7584,7 @@ function exportData() {
 // Night Tracker Functions
 function showTrackingPage() {
     // Check if user is authenticated
-    if (!auth.isUserAuthenticated()) {
+    if (!isAuthenticated()) {
         showNotification('Please sign in to access the Night Tracker', 'error');
         showAuthPage();
         return;
@@ -7625,7 +7728,7 @@ function updateTrackingDisplay() {
 }
 
 function updateSobrietyStatus() {
-    const user = auth.getCurrentUser();
+    const user = getCurrentUser();
     let status, details, className, bac = 0;
     
     if (currentSession.totalAlcohol === 0) {
@@ -8006,8 +8109,8 @@ function updateProfileMenuContent() {
     const profileBtn = document.getElementById('profile-menu-profile');
     const signoutBtn = document.getElementById('profile-menu-signout');
     
-    if (auth.isAuthenticated && auth.currentUser) {
-        username.textContent = auth.currentUser.name;
+    if (isAuthenticated && TEMP_USER) {
+        username.textContent = TEMP_USER.name;
         signinBtn.style.display = 'none';
         signupBtn.style.display = 'none';
         profileBtn.style.display = 'block';
@@ -8034,15 +8137,728 @@ function showFeaturedPage() {
 }
 
 function showFriendsPage() {
-    showNotification('Friends page coming soon!', 'info');
+    hideAllPages();
+    const friendsPage = document.getElementById('friends-page');
+    if (friendsPage) {
+        friendsPage.style.display = 'flex';
+        loadFriendsPage();
+    } else {
+        createFriendsPage();
+    }
 }
 
 function showSettings() {
-    showNotification('Settings page coming soon!', 'info');
+    hideAllPages();
+    const settingsPage = document.getElementById('settings-page');
+    if (settingsPage) {
+        settingsPage.style.display = 'flex';
+        loadSettings();
+    } else {
+        createSettingsPage();
+    }
 }
 
 function showAbout() {
-    showNotification('About page coming soon!', 'info');
+    hideAllPages();
+    const aboutPage = document.getElementById('about-page');
+    if (aboutPage) {
+        aboutPage.style.display = 'flex';
+    } else {
+        createAboutPage();
+    }
+}
+
+// Friends Page Implementation
+function createFriendsPage() {
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) return;
+
+    const friendsPage = document.createElement('div');
+    friendsPage.id = 'friends-page';
+    friendsPage.className = 'friends-page';
+    friendsPage.style.display = 'flex';
+    friendsPage.style.flexDirection = 'column';
+    friendsPage.style.height = '100vh';
+
+    friendsPage.innerHTML = `
+        <header class="header">
+            <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+            <p>Connect with friends and share your beverage discoveries</p>
+            <button class="profile-btn-header" onclick="toggleProfileMenu()">
+                <i class="fas fa-user-circle"></i>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <div class="friends-container">
+                <div class="friends-header">
+                    <h3><i class="fas fa-users"></i> Your Friends</h3>
+                    <button class="add-friend-btn" onclick="showAddFriendModal()">
+                        <i class="fas fa-user-plus"></i> Add Friend
+                    </button>
+                </div>
+                
+                <div class="friends-list" id="friends-list">
+                    <!-- Friends will be populated here -->
+                </div>
+                
+                <div class="empty-friends" id="empty-friends">
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No Friends Yet</h3>
+                        <p>Connect with friends to share your beverage discoveries!</p>
+                        <button class="add-friend-btn" onclick="showAddFriendModal()">
+                            <i class="fas fa-user-plus"></i> Add Your First Friend
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Share your beverage journey with friends</p>
+            <p>By Tim Scheepers</p>
+        </footer>
+    `;
+
+    document.body.appendChild(friendsPage);
+    loadFriendsPage();
+}
+
+function loadFriendsPage() {
+    const friendsList = document.getElementById('friends-list');
+    const emptyFriends = document.getElementById('empty-friends');
+    
+    if (!friendsList || !emptyFriends) return;
+
+    // Get friends from localStorage (in a real app, this would come from the API)
+    const friends = JSON.parse(localStorage.getItem('bevyfinder_friends') || '[]');
+    
+    if (friends.length === 0) {
+        friendsList.style.display = 'none';
+        emptyFriends.style.display = 'block';
+    } else {
+        friendsList.style.display = 'block';
+        emptyFriends.style.display = 'none';
+        
+        friendsList.innerHTML = friends.map(friend => `
+            <div class="friend-item">
+                <div class="friend-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="friend-info">
+                    <h4>${friend.name}</h4>
+                    <p>${friend.email}</p>
+                    <div class="friend-stats">
+                        <span><i class="fas fa-star"></i> ${friend.favorites || 0} favorites</span>
+                        <span><i class="fas fa-search"></i> ${friend.searches || 0} searches</span>
+                    </div>
+                </div>
+                <div class="friend-actions">
+                    <button class="friend-btn" onclick="viewFriendProfile('${friend.id}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="friend-btn remove" onclick="removeFriend('${friend.id}')">
+                        <i class="fas fa-user-minus"></i> Remove
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function showAddFriendModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Add Friend</h3>
+                <button class="close-modal-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-friend-form">
+                    <div class="form-group">
+                        <label for="friend-email">Friend's Email</label>
+                        <input type="email" id="friend-email" placeholder="Enter friend's email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="friend-name">Friend's Name</label>
+                        <input type="text" id="friend-name" placeholder="Enter friend's name" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Friend</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('add-friend-form').addEventListener('submit', handleAddFriend);
+}
+
+function handleAddFriend(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('friend-email').value;
+    const name = document.getElementById('friend-name').value;
+    
+    // Add friend to localStorage (in a real app, this would be an API call)
+    const friends = JSON.parse(localStorage.getItem('bevyfinder_friends') || '[]');
+    const newFriend = {
+        id: Date.now().toString(),
+        name: name,
+        email: email,
+        favorites: 0,
+        searches: 0,
+        addedAt: new Date().toISOString()
+    };
+    
+    friends.push(newFriend);
+    localStorage.setItem('bevyfinder_friends', JSON.stringify(friends));
+    
+    closeModal();
+    loadFriendsPage();
+    showNotification(`Added ${name} as a friend!`, 'success');
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function removeFriend(friendId) {
+    if (confirm('Are you sure you want to remove this friend?')) {
+        const friends = JSON.parse(localStorage.getItem('bevyfinder_friends') || '[]');
+        const updatedFriends = friends.filter(friend => friend.id !== friendId);
+        localStorage.setItem('bevyfinder_friends', JSON.stringify(updatedFriends));
+        
+        loadFriendsPage();
+        showNotification('Friend removed successfully', 'success');
+    }
+}
+
+function viewFriendProfile(friendId) {
+    const friends = JSON.parse(localStorage.getItem('bevyfinder_friends') || '[]');
+    const friend = friends.find(f => f.id === friendId);
+    
+    if (friend) {
+        showNotification(`Viewing ${friend.name}'s profile - Coming soon!`, 'info');
+    }
+}
+
+// Settings Page Implementation
+function createSettingsPage() {
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) return;
+
+    const settingsPage = document.createElement('div');
+    settingsPage.id = 'settings-page';
+    settingsPage.className = 'settings-page';
+    settingsPage.style.display = 'flex';
+    settingsPage.style.flexDirection = 'column';
+    settingsPage.style.height = '100vh';
+
+    settingsPage.innerHTML = `
+        <header class="header">
+            <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+            <p>Customize your BevyFinder experience</p>
+            <button class="profile-btn-header" onclick="toggleProfileMenu()">
+                <i class="fas fa-user-circle"></i>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3><i class="fas fa-user"></i> Account Settings</h3>
+                    <div class="setting-item">
+                        <label>Email Notifications</label>
+                        <input type="checkbox" id="email-notifications" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label>Push Notifications</label>
+                        <input type="checkbox" id="push-notifications">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-search"></i> Search Preferences</h3>
+                    <div class="setting-item">
+                        <label>Default Search Method</label>
+                        <select id="default-search">
+                            <option value="name">Name Search</option>
+                            <option value="photo">Photo Upload</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Auto-save Search History</label>
+                        <input type="checkbox" id="auto-save-history" checked>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-palette"></i> Appearance</h3>
+                    <div class="setting-item">
+                        <label>Theme</label>
+                        <select id="theme-selector">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Font Size</label>
+                        <select id="font-size">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-shield-alt"></i> Privacy & Security</h3>
+                    <div class="setting-item">
+                        <label>Share Search History</label>
+                        <input type="checkbox" id="share-history">
+                    </div>
+                    <div class="setting-item">
+                        <label>Public Profile</label>
+                        <input type="checkbox" id="public-profile">
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                    <button class="btn-secondary" onclick="resetSettings()">
+                        <i class="fas fa-undo"></i> Reset to Default
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Customize your experience</p>
+            <p>By Tim Scheepers</p>
+        </footer>
+    `;
+
+    document.body.appendChild(settingsPage);
+    loadSettings();
+}
+
+function loadSettings() {
+    // Load saved settings from localStorage
+    const settings = JSON.parse(localStorage.getItem('bevyfinder_settings') || '{}');
+    
+    // Apply settings to form elements
+    if (document.getElementById('email-notifications')) {
+        document.getElementById('email-notifications').checked = settings.emailNotifications !== false;
+    }
+    if (document.getElementById('push-notifications')) {
+        document.getElementById('push-notifications').checked = settings.pushNotifications === true;
+    }
+    if (document.getElementById('default-search')) {
+        document.getElementById('default-search').value = settings.defaultSearch || 'name';
+    }
+    if (document.getElementById('auto-save-history')) {
+        document.getElementById('auto-save-history').checked = settings.autoSaveHistory !== false;
+    }
+    if (document.getElementById('theme-selector')) {
+        document.getElementById('theme-selector').value = settings.theme || 'auto';
+    }
+    if (document.getElementById('font-size')) {
+        document.getElementById('font-size').value = settings.fontSize || 'medium';
+    }
+    if (document.getElementById('share-history')) {
+        document.getElementById('share-history').checked = settings.shareHistory === true;
+    }
+    if (document.getElementById('public-profile')) {
+        document.getElementById('public-profile').checked = settings.publicProfile === true;
+    }
+}
+
+function saveSettings() {
+    const settings = {
+        emailNotifications: document.getElementById('email-notifications')?.checked,
+        pushNotifications: document.getElementById('push-notifications')?.checked,
+        defaultSearch: document.getElementById('default-search')?.value,
+        autoSaveHistory: document.getElementById('auto-save-history')?.checked,
+        theme: document.getElementById('theme-selector')?.value,
+        fontSize: document.getElementById('font-size')?.value,
+        shareHistory: document.getElementById('share-history')?.checked,
+        publicProfile: document.getElementById('public-profile')?.checked
+    };
+    
+    localStorage.setItem('bevyfinder_settings', JSON.stringify(settings));
+    showNotification('Settings saved successfully!', 'success');
+}
+
+function resetSettings() {
+    if (confirm('Are you sure you want to reset all settings to default?')) {
+        localStorage.removeItem('bevyfinder_settings');
+        loadSettings();
+        showNotification('Settings reset to default', 'success');
+    }
+}
+
+// About Page Implementation
+function createAboutPage() {
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) return;
+
+    const aboutPage = document.createElement('div');
+    aboutPage.id = 'about-page';
+    aboutPage.className = 'about-page';
+    aboutPage.style.display = 'flex';
+    aboutPage.style.flexDirection = 'column';
+    aboutPage.style.height = '100vh';
+
+    aboutPage.innerHTML = `
+        <header class="header">
+            <h1 class="logo-clickable" onclick="goToWelcomePage()"><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+            <p>Learn more about BevyFinder</p>
+            <button class="profile-btn-header" onclick="toggleProfileMenu()">
+                <i class="fas fa-user-circle"></i>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <div class="about-container">
+                <div class="about-section">
+                    <h3><i class="fas fa-info-circle"></i> About BevyFinder</h3>
+                    <p>BevyFinder is your ultimate beverage discovery platform, designed to help you explore and learn about alcoholic drinks from around the world. Whether you're a beer enthusiast, wine connoisseur, or cocktail lover, BevyFinder provides comprehensive information about your favorite beverages.</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3><i class="fas fa-star"></i> Features</h3>
+                    <ul class="features-list">
+                        <li><i class="fas fa-search"></i> Smart search with real-time suggestions</li>
+                        <li><i class="fas fa-camera"></i> Photo recognition for drink identification</li>
+                        <li><i class="fas fa-heart"></i> Save and organize your favorite drinks</li>
+                        <li><i class="fas fa-chart-line"></i> Track your drinking sessions</li>
+                        <li><i class="fas fa-users"></i> Connect with friends and share discoveries</li>
+                        <li><i class="fas fa-mobile-alt"></i> Mobile-optimized for on-the-go use</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h3><i class="fas fa-database"></i> Database</h3>
+                    <p>Our comprehensive database includes:</p>
+                    <ul class="database-list">
+                        <li><strong>500+ Beverages</strong> from around the world</li>
+                        <li><strong>Top 50 Australian Beers</strong> including craft favorites</li>
+                        <li><strong>100+ Classic Cocktails</strong> with recipes and ingredients</li>
+                        <li><strong>Wine Varieties</strong> from major wine regions</li>
+                        <li><strong>Spirits</strong> with detailed information</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h3><i class="fas fa-user"></i> Creator</h3>
+                    <div class="creator-info">
+                        <div class="creator-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="creator-details">
+                            <h4>Tim Scheepers</h4>
+                            <p>Full-stack developer and beverage enthusiast</p>
+                            <p>Created BevyFinder to help people make informed decisions about their drink choices.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-section">
+                    <h3><i class="fas fa-code"></i> Technology</h3>
+                    <p>BevyFinder is built with modern web technologies:</p>
+                    <ul class="tech-list">
+                        <li><i class="fab fa-html5"></i> HTML5 for structure</li>
+                        <li><i class="fab fa-css3-alt"></i> CSS3 for styling</li>
+                        <li><i class="fab fa-js"></i> Vanilla JavaScript for functionality</li>
+                        <li><i class="fas fa-mobile-alt"></i> Progressive Web App features</li>
+                        <li><i class="fas fa-search"></i> SEO optimized</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h3><i class="fas fa-heart"></i> Support</h3>
+                    <p>If you enjoy using BevyFinder, consider supporting the project:</p>
+                    <div class="support-actions">
+                        <button class="btn-primary" onclick="showSupportModal()">
+                            <i class="fas fa-coffee"></i> Buy me a coffee
+                        </button>
+                        <button class="btn-secondary" onclick="shareApp()">
+                            <i class="fas fa-share"></i> Share with friends
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Made with ❤️ by Tim Scheepers</p>
+            <p>Version 1.0.3</p>
+        </footer>
+    `;
+
+    document.body.appendChild(aboutPage);
+}
+
+function showSupportModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-heart"></i> Support BevyFinder</h3>
+                <button class="close-modal-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Thank you for considering supporting BevyFinder! Your support helps keep the app free and continuously improving.</p>
+                <div class="support-options">
+                    <div class="support-option">
+                        <i class="fas fa-coffee"></i>
+                        <h4>Buy me a coffee</h4>
+                        <p>Support the development with a small donation</p>
+                        <button class="btn-primary" onclick="donate()">Donate $5</button>
+                    </div>
+                    <div class="support-option">
+                        <i class="fas fa-star"></i>
+                        <h4>Rate the app</h4>
+                        <p>Leave a positive review to help others discover BevyFinder</p>
+                        <button class="btn-secondary" onclick="rateApp()">Rate on App Store</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function donate() {
+    showNotification('Thank you for your support! Donation feature coming soon.', 'success');
+    closeModal();
+}
+
+function rateApp() {
+    showNotification('Thank you for rating BevyFinder!', 'success');
+    closeModal();
+}
+
+function shareApp() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'BevyFinder - Ultimate Drink Database',
+            text: 'Check out BevyFinder, the ultimate beverage discovery platform!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            showNotification('Link copied to clipboard!', 'success');
+        });
+    }
+}
+
+// User Preferences Management
+function loadUserPreferences() {
+    const preferences = JSON.parse(localStorage.getItem('bevyfinder_preferences') || '{}');
+    
+    // Apply theme
+    if (preferences.theme) {
+        applyTheme(preferences.theme);
+    }
+    
+    // Apply font size
+    if (preferences.fontSize) {
+        applyFontSize(preferences.fontSize);
+    }
+    
+    // Apply other preferences
+    if (preferences.autoSaveHistory !== undefined) {
+        // Update auto-save behavior
+    }
+}
+
+function applyTheme(theme) {
+    const root = document.documentElement;
+    
+    if (theme === 'dark') {
+        root.classList.add('dark-theme');
+    } else if (theme === 'light') {
+        root.classList.remove('dark-theme');
+    } else {
+        // Auto theme - check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            root.classList.add('dark-theme');
+        } else {
+            root.classList.remove('dark-theme');
+        }
+    }
+}
+
+function applyFontSize(size) {
+    const root = document.documentElement;
+    root.style.fontSize = size === 'small' ? '14px' : size === 'large' ? '18px' : '16px';
+}
+
+// Enhanced Error Handling
+function handleError(error, context = '') {
+    console.error(`Error in ${context}:`, error);
+    
+    let userMessage = 'An unexpected error occurred. Please try again.';
+    
+    if (error.name === 'NetworkError') {
+        userMessage = 'Network error. Please check your internet connection.';
+    } else if (error.name === 'QuotaExceededError') {
+        userMessage = 'Storage limit reached. Please clear some data.';
+    } else if (error.message) {
+        userMessage = error.message;
+    }
+    
+    showNotification(userMessage, 'error');
+}
+
+// Performance Monitoring
+function trackPerformance(action, duration) {
+    if (window.gtag) {
+        gtag('event', 'timing_complete', {
+            name: action,
+            value: duration
+        });
+    }
+}
+
+// Enhanced Search with Debouncing
+let searchDebounceTimer;
+function debouncedSearch(query, callback, delay = 300) {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+        callback(query);
+    }, delay);
+}
+
+// Improved Mobile Detection
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           window.innerWidth <= 768;
+}
+
+// Enhanced Loading States
+function showLoading(element, message = 'Loading...') {
+    if (element) {
+        element.innerHTML = `
+            <div class="loading-state">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+}
+
+function hideLoading(element, content) {
+    if (element) {
+        element.innerHTML = content;
+    }
+}
+
+// Accessibility Improvements
+function improveAccessibility() {
+    // Add ARIA labels to interactive elements
+    const buttons = document.querySelectorAll('button:not([aria-label])');
+    buttons.forEach(button => {
+        const text = button.textContent.trim();
+        if (text) {
+            button.setAttribute('aria-label', text);
+        }
+    });
+    
+    // Add focus indicators
+    const focusableElements = document.querySelectorAll('button, input, select, textarea, a');
+    focusableElements.forEach(element => {
+        element.addEventListener('focus', () => {
+            element.style.outline = '2px solid var(--primary-color)';
+        });
+        
+        element.addEventListener('blur', () => {
+            element.style.outline = '';
+        });
+    });
+}
+
+// Enhanced Analytics
+function trackEvent(category, action, label = null, value = null) {
+    if (window.gtag) {
+        gtag('event', action, {
+            event_category: category,
+            event_label: label,
+            value: value
+        });
+    }
+}
+
+// Progressive Web App Features
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+    }
+}
+
+// Enhanced Caching
+function cacheData(key, data, expirationHours = 24) {
+    const cacheItem = {
+        data: data,
+        timestamp: Date.now(),
+        expiration: expirationHours * 60 * 60 * 1000
+    };
+    
+    try {
+        localStorage.setItem(key, JSON.stringify(cacheItem));
+    } catch (error) {
+        console.warn('Failed to cache data:', error);
+    }
+}
+
+function getCachedData(key) {
+    try {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const cacheItem = JSON.parse(cached);
+        const now = Date.now();
+        
+        if (now - cacheItem.timestamp > cacheItem.expiration) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        
+        return cacheItem.data;
+    } catch (error) {
+        console.warn('Failed to get cached data:', error);
+        return null;
+    }
 }
 
 // Featured page functionality
@@ -8133,7 +8949,7 @@ function viewFeaturedDrink(beverageKey) {
 // Profile Functions
 function signOut() {
     if (auth) {
-        auth.signOut();
+        signOut();
         showNotification('Signed out successfully!', 'success');
         // Close profile menu
         const profileMenu = document.getElementById('profile-menu');
@@ -8144,7 +8960,14 @@ function signOut() {
 }
 
 function showProfilePage() {
-    showNotification('Profile page coming soon!', 'info');
+    hideAllPages();
+    const profilePage = document.getElementById('profile-page');
+    if (profilePage) {
+        profilePage.style.display = 'flex';
+        updateProfileContent();
+    } else {
+        createProfilePage();
+    }
     // Close profile menu
     const profileMenu = document.getElementById('profile-menu');
     if (profileMenu) {
@@ -8159,7 +8982,16 @@ function showProfilePage() {
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     try {
-    console.log('DOM Content Loaded - Initializing app...');
+        console.log('🔓 DOM Content Loaded - Initializing app with auth bypass...');
+        console.log('🔓 Authentication bypass status:', TEMP_AUTH_BYPASS);
+        console.log('🔓 Mock user:', TEMP_USER);
+        alert('DOMContentLoaded event fired!');
+        
+        // Check for updates
+        checkForUpdates();
+        
+        // Load user preferences
+        loadUserPreferences();
     
     // Initialize DOM elements
     welcomePage = document.getElementById('welcome-page');
@@ -8171,6 +9003,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mainApp: !!mainApp,
         startBtn: !!startBtn
     });
+    
+    alert(`DOM Elements: welcomePage=${!!welcomePage}, mainApp=${!!mainApp}, startBtn=${!!startBtn}`);
     tabBtns = document.querySelectorAll('.tab-btn');
     tabContents = document.querySelectorAll('.tab-content');
     beverageNameInput = document.getElementById('beverage-name');
@@ -8232,8 +9066,15 @@ document.addEventListener('DOMContentLoaded', () => {
     emptyDrinks = document.getElementById('empty-drinks');
     safetyTips = document.getElementById('safety-tips');
     
-    // Set up event listeners
-    console.log('Setting up event listeners...');
+            // Set up event listeners
+        console.log('Setting up event listeners...');
+        
+        // Initialize additional features
+        improveAccessibility();
+        registerServiceWorker();
+        
+        // Track app initialization
+        trackEvent('app', 'initialized');
     
     // Close profile menu when clicking outside
     document.addEventListener('click', function(event) {

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder - Simple Working</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 20px;
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .welcome-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .welcome-content {
+            max-width: 600px;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .feature-list i {
+            color: #ffd700;
+            margin-right: 10px;
+        }
+
+        .btn {
+            background: #ffd700;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            color: #333;
+            transition: right 0.3s;
+            z-index: 1001;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+        }
+
+        .sidebar-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .sidebar-btn i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .input-section {
+            background: white;
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-wrapper {
+            display: flex;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .upload-content i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div class="page welcome-page active" id="welcome-page">
+        <div class="welcome-content">
+            <h1 class="welcome-title">
+                <i class="fas fa-wine-glass-alt"></i>
+                BevyFinder
+            </h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Your Ultimate Drink Database</p>
+            
+            <p style="margin-bottom: 20px;">Discover comprehensive information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information.</p>
+            
+            <ul class="feature-list">
+                <li><i class="fas fa-search"></i> Search 500+ drinks by name</li>
+                <li><i class="fas fa-camera"></i> Photo recognition for instant results</li>
+                <li><i class="fas fa-heart"></i> Save your favorite drinks</li>
+                <li><i class="fas fa-chart-line"></i> Track your drinking sessions</li>
+                <li><i class="fas fa-users"></i> Connect with friends</li>
+                <li><i class="fas fa-star"></i> Rate and review drinks</li>
+            </ul>
+            
+            <p style="margin: 20px 0;">Created by <strong>Tim Scheepers</strong></p>
+            
+            <button class="btn" id="start-btn">
+                <i class="fas fa-play"></i>
+                Start Exploring
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu Button -->
+    <button class="menu-btn" id="menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-wine-glass-alt"></i> Menu</h3>
+            <button class="close-menu-btn" id="close-menu-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <button class="sidebar-btn" id="sidebar-btn-1">
+                <i class="fas fa-home"></i>
+                Home
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-dashboard">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-2">
+                <i class="fas fa-star"></i>
+                Favorites
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-3">
+                <i class="fas fa-history"></i>
+                History
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-tracking">
+                <i class="fas fa-chart-line"></i>
+                Night Tracker
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-4">
+                <i class="fas fa-cog"></i>
+                Settings
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-5">
+                <i class="fas fa-info-circle"></i>
+                About
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main App -->
+    <div class="page" id="main-app">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Find your perfect drink</p>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="search">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </button>
+                    <button class="tab-btn" data-tab="photo">
+                        <i class="fas fa-camera"></i>
+                        <span>Photo</span>
+                    </button>
+                </div>
+                
+                <div class="tab-content active" id="search-tab">
+                    <div class="input-group">
+                        <label for="beverage-name">Search for a drink:</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="beverage-name" placeholder="Enter drink name...">
+                            <button class="search-btn" id="search-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="photo-tab">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <i class="fas fa-camera"></i>
+                            <h3>Upload a Photo</h3>
+                            <p>Take a photo or upload an image of a drink</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Pages -->
+    <div class="page" id="favorites-page">
+        <div class="container">
+            <h2><i class="fas fa-star"></i> Favorites</h2>
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <h3>No Favorites Yet</h3>
+                <p>Start exploring and add your favorite drinks!</p>
+                <button class="btn" onclick="showPage('main-app')">Start Exploring</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="history-page">
+        <div class="container">
+            <h2><i class="fas fa-history"></i> History</h2>
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <h3>No Search History</h3>
+                <p>Your search history will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="tracking-page">
+        <div class="container">
+            <h2><i class="fas fa-chart-line"></i> Night Tracker</h2>
+            <p>Track your drinking session and monitor your BAC</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple page management
+        function showPage(pageId) {
+            console.log('Showing page:', pageId);
+            
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+                console.log('Hiding page:', page.id);
+            });
+            
+            // Show target page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('✅ Page shown:', pageId);
+            } else {
+                console.error('❌ Page not found:', pageId);
+            }
+        }
+
+        // Menu functions
+        function openMenu() {
+            console.log('Opening menu...');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                console.log('✅ Menu opened');
+            }
+        }
+
+        function closeMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function handleSidebarClick(buttonId) {
+            console.log('Sidebar button clicked:', buttonId);
+            closeMenu();
+            
+            switch(buttonId) {
+                case 'sidebar-btn-1':
+                    showPage('main-app');
+                    break;
+                case 'sidebar-btn-dashboard':
+                    alert('Dashboard - Coming Soon!');
+                    break;
+                case 'sidebar-btn-2':
+                    showPage('favorites-page');
+                    break;
+                case 'sidebar-btn-3':
+                    showPage('history-page');
+                    break;
+                case 'sidebar-btn-tracking':
+                    showPage('tracking-page');
+                    break;
+                case 'sidebar-btn-4':
+                    alert('Settings - Coming Soon!');
+                    break;
+                case 'sidebar-btn-5':
+                    alert('About - Coming Soon!');
+                    break;
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            console.log('Switching to tab:', tab);
+            
+            // Update tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetContent = document.getElementById(`${tab}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                console.log('✅ Tab switched to:', tab);
+            }
+        }
+
+        // Search function
+        function searchBeverage() {
+            const input = document.getElementById('beverage-name');
+            const query = input.value.trim();
+            if (query) {
+                console.log('Searching for:', query);
+                alert(`Searching for: ${query}\n\nThis is a demo - real search functionality would be implemented here.`);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded - initializing...');
+            
+            // Start button
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    console.log('🚀 Start button clicked!');
+                    showPage('main-app');
+                });
+            }
+            
+            // Menu button
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', openMenu);
+            }
+            
+            // Close menu button
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            if (closeMenuBtn) {
+                closeMenuBtn.addEventListener('click', closeMenu);
+            }
+            
+            // Sidebar overlay
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeMenu);
+            }
+            
+            // Sidebar buttons
+            const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+            sidebarBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleSidebarClick(btn.id);
+                });
+            });
+            
+            // Tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = btn.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+            
+            // Search button
+            const searchBtn = document.getElementById('search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', searchBeverage);
+            }
+            
+            // Search input
+            const searchInput = document.getElementById('beverage-name');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        searchBeverage();
+                    }
+                });
+            }
+            
+            console.log('✅ All event listeners set up successfully!');
+            console.log('Current page:', document.querySelector('.page.active').id);
+        });
+    </script>
+</body>
+</html> 

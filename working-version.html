@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder - Working Version</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div class="welcome-page" id="welcome-page">
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h1 class="welcome-title">
+                    <i class="fas fa-wine-glass-alt"></i>
+                    BevyFinder
+                </h1>
+                <p class="welcome-subtitle">Your Ultimate Drink Database</p>
+            </div>
+            
+            <div class="welcome-description">
+                <p>Discover comprehensive information about beers, wines, and cocktails including ABV, calories, ingredients, and nutritional information.</p>
+                
+                <ul class="feature-list">
+                    <li><i class="fas fa-search"></i> Search 500+ drinks by name</li>
+                    <li><i class="fas fa-camera"></i> Photo recognition for instant results</li>
+                    <li><i class="fas fa-heart"></i> Save your favorite drinks</li>
+                    <li><i class="fas fa-chart-line"></i> Track your drinking sessions</li>
+                    <li><i class="fas fa-users"></i> Connect with friends</li>
+                    <li><i class="fas fa-star"></i> Rate and review drinks</li>
+                </ul>
+                
+                <div class="welcome-creator">
+                    <p>Created by <strong>Tim Scheepers</strong></p>
+                </div>
+                
+                <button class="start-btn" id="start-btn">
+                    <i class="fas fa-play"></i>
+                    Start Exploring
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Button -->
+    <button class="menu-btn" id="menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-wine-glass-alt"></i> Menu</h3>
+            <button class="close-menu-btn" id="close-menu-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <button class="sidebar-btn" id="sidebar-btn-1">
+                <i class="fas fa-home"></i>
+                Home
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-dashboard">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-2">
+                <i class="fas fa-star"></i>
+                Favorites
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-3">
+                <i class="fas fa-history"></i>
+                History
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-tracking">
+                <i class="fas fa-chart-line"></i>
+                Night Tracker
+                <span class="premium-badge">Premium</span>
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-4">
+                <i class="fas fa-cog"></i>
+                Settings
+            </button>
+            <button class="sidebar-btn" id="sidebar-btn-5">
+                <i class="fas fa-info-circle"></i>
+                About
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main App -->
+    <div class="main-app" id="main-app" style="display: none;">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-wine-glass-alt"></i> BevyFinder</h1>
+                <p>Find your perfect drink</p>
+            </div>
+            
+            <div class="main-content">
+                <div class="input-section">
+                    <div class="input-tabs">
+                        <button class="tab-btn active" data-tab="search">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </button>
+                        <button class="tab-btn" data-tab="photo">
+                            <i class="fas fa-camera"></i>
+                            <span>Photo</span>
+                        </button>
+                    </div>
+                    
+                    <div class="tab-content active" id="search-tab">
+                        <div class="input-group">
+                            <label for="beverage-name">Search for a drink:</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="beverage-name" placeholder="Enter drink name...">
+                                <button class="search-btn" id="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div id="suggestions" class="suggestions"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="photo-tab">
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-camera"></i>
+                                <h3>Upload a Photo</h3>
+                                <p>Take a photo or upload an image of a drink</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="results-section" class="results-section" style="display: none;">
+                    <h2>Search Results</h2>
+                    <div id="beverage-card" class="beverage-card"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Pages -->
+    <div id="favorites-page" class="favorites-page" style="display: none;">
+        <div class="favorites-container" id="favorites-container"></div>
+        <div class="empty-favorites" id="empty-favorites">
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <h3>No Favorites Yet</h3>
+                <p>Start exploring and add your favorite drinks!</p>
+                <button class="start-exploring-btn" onclick="goToHome()">Start Exploring</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-page" class="history-page" style="display: none;">
+        <div class="history-container" id="history-container"></div>
+        <div class="empty-history" id="empty-history">
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <h3>No Search History</h3>
+                <p>Your search history will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tracking-page" class="tracking-page" style="display: none;">
+        <div class="container">
+            <h2><i class="fas fa-chart-line"></i> Night Tracker</h2>
+            <p>Track your drinking session and monitor your BAC</p>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
+        const TEMP_AUTH_BYPASS = true;
+        const TEMP_USER = {
+            id: 'temp-user-123',
+            name: 'Test User',
+            email: 'test@bevyfinder.com',
+            age: 25,
+            weight: 70,
+            height: 175,
+            gender: 'male',
+            stats: {
+                searches: 15,
+                favorites: 8
+            },
+            profile: {
+                preferences: {
+                    favoriteDrinks: [],
+                    searchHistory: []
+                }
+            }
+        };
+
+        // Mock authentication functions
+        function isAuthenticated() {
+            return TEMP_AUTH_BYPASS;
+        }
+
+        function getCurrentUser() {
+            return TEMP_AUTH_BYPASS ? TEMP_USER : null;
+        }
+
+        console.log('🔓 Authentication bypass enabled - all features available for testing');
+
+        // DOM Elements
+        let welcomePage, mainApp, startBtn, menuBtn, sidebar, sidebarOverlay, closeMenuBtn;
+        let sidebarBtns, tabBtns, tabContents, beverageNameInput, searchBtn, suggestions;
+        let favoritesPage, favoritesContainer, emptyFavorites;
+        let historyPage, historyContainer, emptyHistory;
+        let trackingPage;
+
+        // Page Management
+        function hideAllPages() {
+            const pages = [welcomePage, mainApp, favoritesPage, historyPage, trackingPage];
+            pages.forEach(page => {
+                if (page) page.style.display = 'none';
+            });
+        }
+
+        function goToHome() {
+            hideAllPages();
+            mainApp.style.display = 'block';
+        }
+
+        function showMainApp() {
+            hideAllPages();
+            mainApp.style.display = 'block';
+        }
+
+        // Menu Functions
+        function openMenu() {
+            console.log('🔓 Opening menu...');
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.add('open');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                console.log('🔓 Menu opened successfully');
+            }
+        }
+
+        function closeMenu() {
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function handleSidebarButtonClick(buttonId) {
+            console.log('🔓 Sidebar button clicked:', buttonId);
+            closeMenu();
+            
+            switch(buttonId) {
+                case 'sidebar-btn-1': // Home
+                    goToHome();
+                    break;
+                case 'sidebar-btn-dashboard': // Dashboard
+                    alert('Dashboard - Coming Soon!');
+                    break;
+                case 'sidebar-btn-2': // Favorites
+                    hideAllPages();
+                    favoritesPage.style.display = 'block';
+                    break;
+                case 'sidebar-btn-3': // History
+                    hideAllPages();
+                    historyPage.style.display = 'block';
+                    break;
+                case 'sidebar-btn-tracking': // Tracking
+                    hideAllPages();
+                    trackingPage.style.display = 'block';
+                    break;
+                case 'sidebar-btn-4': // Settings
+                    alert('Settings - Coming Soon!');
+                    break;
+                case 'sidebar-btn-5': // About
+                    alert('About - Coming Soon!');
+                    break;
+                default:
+                    console.log('Unknown sidebar button clicked');
+            }
+        }
+
+        // Tab Functions
+        function switchTab(tab) {
+            console.log('🔄 Switching to tab:', tab);
+            
+            // Update tab buttons
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide content sections
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetContent = document.getElementById(`${tab}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        }
+
+        // Search Functions
+        function searchBeverage() {
+            const query = beverageNameInput.value.trim();
+            if (query) {
+                console.log('🔍 Searching for:', query);
+                alert(`Searching for: ${query}\n\nThis is a demo - real search functionality would be implemented here.`);
+            }
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔓 DOM Content Loaded - Initializing app with auth bypass...');
+            
+            // Initialize DOM elements
+            welcomePage = document.getElementById('welcome-page');
+            mainApp = document.getElementById('main-app');
+            startBtn = document.getElementById('start-btn');
+            menuBtn = document.getElementById('menu-btn');
+            sidebar = document.getElementById('sidebar');
+            sidebarOverlay = document.getElementById('sidebar-overlay');
+            closeMenuBtn = document.getElementById('close-menu-btn');
+            sidebarBtns = document.querySelectorAll('.sidebar-btn');
+            tabBtns = document.querySelectorAll('.tab-btn');
+            tabContents = document.querySelectorAll('.tab-content');
+            beverageNameInput = document.getElementById('beverage-name');
+            searchBtn = document.getElementById('search-btn');
+            suggestions = document.getElementById('suggestions');
+            favoritesPage = document.getElementById('favorites-page');
+            favoritesContainer = document.getElementById('favorites-container');
+            emptyFavorites = document.getElementById('empty-favorites');
+            historyPage = document.getElementById('history-page');
+            historyContainer = document.getElementById('history-container');
+            emptyHistory = document.getElementById('empty-history');
+            trackingPage = document.getElementById('tracking-page');
+            
+            console.log('DOM Elements found:', {
+                welcomePage: !!welcomePage,
+                mainApp: !!mainApp,
+                startBtn: !!startBtn,
+                menuBtn: !!menuBtn,
+                sidebar: !!sidebar
+            });
+            
+            // Set up event listeners
+            if (startBtn) {
+                console.log('Adding click listener to start button');
+                startBtn.addEventListener('click', showMainApp);
+            }
+            
+            if (menuBtn) {
+                console.log('Adding click listener to menu button');
+                menuBtn.addEventListener('click', openMenu);
+            }
+            
+            if (closeMenuBtn) {
+                closeMenuBtn.addEventListener('click', closeMenu);
+            }
+            
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeMenu);
+            }
+            
+            // Sidebar button event listeners
+            sidebarBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    handleSidebarButtonClick(btn.id);
+                });
+            });
+            
+            // Tab switching functionality
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    switchTab(targetTab);
+                });
+            });
+            
+            // Search functionality
+            if (searchBtn) {
+                searchBtn.addEventListener('click', searchBeverage);
+            }
+            
+            if (beverageNameInput) {
+                beverageNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        searchBeverage();
+                    }
+                });
+            }
+            
+            console.log('✅ App initialized successfully!');
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Bypass Test - BevyFinder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #1976D2;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔓 BevyFinder Authentication Bypass Test</h1>
+    
+    <div class="test-section">
+        <h2>Authentication Status</h2>
+        <div id="auth-status" class="status info">Checking authentication status...</div>
+        <button class="test-button" onclick="checkAuthStatus()">Check Auth Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>User Information</h2>
+        <div id="user-info" class="status info">Loading user information...</div>
+        <button class="test-button" onclick="getUserInfo()">Get User Info</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Feature Tests</h2>
+        <button class="test-button" onclick="testFavorites()">Test Favorites</button>
+        <button class="test-button" onclick="testLikes()">Test Likes</button>
+        <button class="test-button" onclick="testHistory()">Test History</button>
+        <button class="test-button" onclick="testProfile()">Test Profile</button>
+        <div id="feature-results" class="status info">Click buttons to test features...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Navigation Test</h2>
+        <button class="test-button" onclick="testNavigation()">Test Navigation</button>
+        <div id="nav-results" class="status info">Click to test navigation...</div>
+    </div>
+
+    <script>
+        // Import the main script to test the bypass
+        const script = document.createElement('script');
+        script.src = 'script.js';
+        document.head.appendChild(script);
+        
+        script.onload = function() {
+            console.log('🔓 Test page loaded with auth bypass');
+            checkAuthStatus();
+            getUserInfo();
+        };
+        
+        function checkAuthStatus() {
+            const statusDiv = document.getElementById('auth-status');
+            try {
+                const isAuth = isAuthenticated();
+                const user = getCurrentUser();
+                
+                if (isAuth && user) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `
+                        <strong>✅ Authentication Bypass Active</strong><br>
+                        User ID: ${user.id}<br>
+                        Name: ${user.name}<br>
+                        Email: ${user.email}
+                    `;
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = '<strong>❌ Authentication Bypass Failed</strong>';
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+            }
+        }
+        
+        function getUserInfo() {
+            const infoDiv = document.getElementById('user-info');
+            try {
+                const user = getCurrentUser();
+                if (user) {
+                    infoDiv.className = 'status success';
+                    infoDiv.innerHTML = `
+                        <strong>✅ User Information Retrieved</strong><br>
+                        <pre>${JSON.stringify(user, null, 2)}</pre>
+                    `;
+                } else {
+                    infoDiv.className = 'status error';
+                    infoDiv.innerHTML = '<strong>❌ No user information available</strong>';
+                }
+            } catch (error) {
+                infoDiv.className = 'status error';
+                infoDiv.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+            }
+        }
+        
+        function testFavorites() {
+            const resultsDiv = document.getElementById('feature-results');
+            try {
+                // Test adding a favorite
+                addFavoriteDrink('test-drink-1');
+                resultsDiv.className = 'status success';
+                resultsDiv.innerHTML = '<strong>✅ Favorites Test Passed</strong><br>Successfully called addFavoriteDrink()';
+            } catch (error) {
+                resultsDiv.className = 'status error';
+                resultsDiv.innerHTML = `<strong>❌ Favorites Test Failed:</strong> ${error.message}`;
+            }
+        }
+        
+        function testLikes() {
+            const resultsDiv = document.getElementById('feature-results');
+            try {
+                // Test liking a drink
+                likeBeverage('test-drink-2');
+                resultsDiv.className = 'status success';
+                resultsDiv.innerHTML = '<strong>✅ Likes Test Passed</strong><br>Successfully called likeBeverage()';
+            } catch (error) {
+                resultsDiv.className = 'status error';
+                resultsDiv.innerHTML = `<strong>❌ Likes Test Failed:</strong> ${error.message}`;
+            }
+        }
+        
+        function testHistory() {
+            const resultsDiv = document.getElementById('feature-results');
+            try {
+                // Test adding to history
+                addToHistory('test-drink-3', 'test');
+                resultsDiv.className = 'status success';
+                resultsDiv.innerHTML = '<strong>✅ History Test Passed</strong><br>Successfully called addToHistory()';
+            } catch (error) {
+                resultsDiv.className = 'status error';
+                resultsDiv.innerHTML = `<strong>❌ History Test Failed:</strong> ${error.message}`;
+            }
+        }
+        
+        function testProfile() {
+            const resultsDiv = document.getElementById('feature-results');
+            try {
+                // Test profile update
+                updateProfile({ name: 'Updated Test User' });
+                resultsDiv.className = 'status success';
+                resultsDiv.innerHTML = '<strong>✅ Profile Test Passed</strong><br>Successfully called updateProfile()';
+            } catch (error) {
+                resultsDiv.className = 'status error';
+                resultsDiv.innerHTML = `<strong>❌ Profile Test Failed:</strong> ${error.message}`;
+            }
+        }
+        
+        function testNavigation() {
+            const resultsDiv = document.getElementById('nav-results');
+            try {
+                // Test navigation functions
+                if (typeof showDashboard === 'function' && 
+                    typeof showSettings === 'function' && 
+                    typeof showAbout === 'function') {
+                    resultsDiv.className = 'status success';
+                    resultsDiv.innerHTML = '<strong>✅ Navigation Test Passed</strong><br>All navigation functions are available';
+                } else {
+                    resultsDiv.className = 'status error';
+                    resultsDiv.innerHTML = '<strong>❌ Navigation Test Failed</strong><br>Some navigation functions are missing';
+                }
+            } catch (error) {
+                resultsDiv.className = 'status error';
+                resultsDiv.innerHTML = `<strong>❌ Navigation Test Failed:</strong> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 

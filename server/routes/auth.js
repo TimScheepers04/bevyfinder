@@ -206,8 +206,23 @@ router.put('/profile', protect, async (req, res) => {
         }
 
         // Update allowed fields
-        const { name, profile } = req.body;
+        const { name, email, password, personalDetails, profile } = req.body;
+        
+        // Update basic info
         if (name) user.name = name;
+        if (email) user.email = email;
+        
+        // Update password if provided
+        if (password) {
+            user.password = password;
+        }
+        
+        // Update personal details
+        if (personalDetails) {
+            user.personalDetails = { ...user.personalDetails, ...personalDetails };
+        }
+        
+        // Update profile fields
         if (profile) {
             if (profile.preferences) user.profile.preferences = { ...user.profile.preferences, ...profile.preferences };
             if (profile.avatar) user.profile.avatar = profile.avatar;

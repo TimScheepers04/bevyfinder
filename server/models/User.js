@@ -226,6 +226,7 @@ userSchema.methods.getPublicProfile = function() {
         id: this._id,
         name: this.name,
         email: this.email,
+        personalDetails: this.personalDetails,
         profile: this.profile,
         stats: this.stats,
         createdAt: this.createdAt

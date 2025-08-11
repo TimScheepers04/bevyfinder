@@ -2,5 +2,15 @@ services:
   - type: web
     name: bevyfinder-api
     env: node
+    plan: free
     buildCommand: npm install
-    startCommand: node test.js 
+    startCommand: node server-minimal.js
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder
+      - key: JWT_SECRET
+        value: 201ce5ec42a13b34b99ee6acc9a681aea47ace77aab8ada1e3337f152e1b813b
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: NODE_ENV
+        value: production 

@@ -31,14 +31,13 @@ class BevyFinderAPI {
             protocol: currentProtocol
         });
         
-        // HARDCODED FALLBACK: Always use the known working local server
-        // This ensures the app works regardless of hostname resolution issues
-        this.baseURL = 'http://192.168.4.36:3000/api';
-        console.log('API: Using hardcoded local server URL:', this.baseURL);
+        // Use Railway API URL for production
+        this.baseURL = 'https://bevyfinder.up.railway.app/api';
+        console.log('API: Using Railway production URL:', this.baseURL);
         
         // Test the connection to make sure it works
         try {
-            const response = await fetch('http://192.168.4.36:3000/health', {
+            const response = await fetch('https://bevyfinder.up.railway.app/health', {
                 method: 'GET',
                 mode: 'cors',
                 headers: {
@@ -86,9 +85,9 @@ class BevyFinderAPI {
             }
         }
         
-        // If no URL works, use the hardcoded one as final fallback
-        this.baseURL = 'http://192.168.4.36:3000/api';
-        console.warn('⚠️ No working API URL found, using hardcoded fallback:', this.baseURL);
+        // If no URL works, use current hostname as final fallback
+        this.baseURL = `${currentProtocol}//${currentHost}:3000/api`;
+        console.warn('⚠️ No working API URL found, using current hostname fallback:', this.baseURL);
     }
     
     generatePossibleURLs(hostname, port, protocol) {
@@ -98,7 +97,7 @@ class BevyFinderAPI {
         // This prevents the app from trying production URLs when running locally
         
         // 1. Always try the known working local network IP first
-        urls.push('http://192.168.4.36:3000/api');
+        urls.push('http://localhost:3000/api');
         
         // 2. If we're on a local network (192.168.x.x, 10.x.x.x, etc.)
         if (hostname.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/)) {

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder Account Details Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .profile-btn {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #333;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+        
+        .profile-btn i {
+            font-size: 1.1rem;
+        }
+        
+        .profile-btn .fa-chevron-down {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-btn.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            min-width: 300px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .dropdown-user-info {
+            flex: 1;
+        }
+        
+        .dropdown-username {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+        
+        .dropdown-email {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+        
+        .dropdown-status {
+            color: #10b981;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0;
+        }
+        
+        .dropdown-section {
+            padding: 15px 20px;
+        }
+        
+        .dropdown-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .account-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            padding: 8px 0;
+        }
+        
+        .dropdown-item {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .dropdown-item i {
+            width: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .dropdown-item:hover i {
+            color: white;
+        }
+        
+        .logout-item {
+            color: #ef4444;
+        }
+        
+        .logout-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .logout-item i {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 BevyFinder Account Details Test</h1>
+        
+        <div class="test-section">
+            <h3>Profile Button Test</h3>
+            <p>Click the profile button to test the account details dropdown:</p>
+            
+            <!-- Profile Button -->
+            <div class="profile-container" id="profile-container">
+                <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
+                    <i class="fas fa-user"></i>
+                    <span id="profile-btn-text">Profile</span>
+                    <i class="fas fa-chevron-down" id="profile-chevron"></i>
+                </button>
+                
+                <!-- Profile Dropdown -->
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-avatar" id="dropdown-avatar">U</div>
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-username" id="dropdown-username">User</div>
+                            <div class="dropdown-email" id="dropdown-email">user@example.com</div>
+                            <div class="dropdown-status" id="dropdown-status">Guest</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <!-- Account Details Section (shown when logged in) -->
+                    <div class="dropdown-section" id="account-details-section" style="display: none;">
+                        <div class="dropdown-section-title">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Account Details</span>
+                        </div>
+                        <div class="account-details" id="account-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Member Since:</span>
+                                <span class="detail-value" id="member-since">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Searches:</span>
+                                <span class="detail-value" id="total-searches">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Favorites:</span>
+                                <span class="detail-value" id="total-favorites">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Member Level:</span>
+                                <span class="detail-value" id="member-level">Guest</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" onclick="editProfile()">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </button>
+                        <button class="dropdown-item" onclick="showFavorites()">
+                            <i class="fas fa-heart"></i>
+                            <span>Favorites</span>
+                        </button>
+                        <button class="dropdown-item" onclick="showHistory()">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </button>
+                    </div>
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item logout-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button class="btn btn-success" onclick="simulateLogin()">Simulate Login</button>
+            <button class="btn btn-warning" onclick="simulateLogout()">Simulate Logout</button>
+            <button class="btn" onclick="updateStats()">Update Stats</button>
+            <button class="btn" onclick="toggleDropdown()">Toggle Dropdown</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Current State</h3>
+            <div id="current-state">No user logged in</div>
+        </div>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Mock user data
+        let currentUser = null;
+        
+        // Mock authentication functions
+        function isAuthenticated() {
+            return currentUser !== null;
+        }
+        
+        function getCurrentUser() {
+            return currentUser;
+        }
+        
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            const btn = document.getElementById('profile-btn');
+            const chevron = document.getElementById('profile-chevron');
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                btn.classList.remove('active');
+            } else {
+                dropdown.classList.add('show');
+                btn.classList.add('active');
+            }
+        }
+        
+        function hideProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            const btn = document.getElementById('profile-btn');
+            dropdown.classList.remove('show');
+            btn.classList.remove('active');
+        }
+        
+        function updateProfileButton() {
+            const btnText = document.getElementById('profile-btn-text');
+            const profileBtn = document.getElementById('profile-btn');
+            
+            if (currentUser && currentUser.name && currentUser.email) {
+                btnText.textContent = 'Account Details';
+                
+                // Change button style to indicate logged in state
+                profileBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                profileBtn.style.color = 'white';
+                profileBtn.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.3)';
+                
+                // Update dropdown content
+                const dropdownAvatar = document.getElementById('dropdown-avatar');
+                const dropdownUsername = document.getElementById('dropdown-username');
+                const dropdownEmail = document.getElementById('dropdown-email');
+                const dropdownStatus = document.getElementById('dropdown-status');
+                const accountDetailsSection = document.getElementById('account-details-section');
+                
+                if (dropdownAvatar) dropdownAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+                if (dropdownUsername) dropdownUsername.textContent = currentUser.name;
+                if (dropdownEmail) dropdownEmail.textContent = currentUser.email;
+                if (dropdownStatus) dropdownStatus.textContent = 'Member';
+                
+                // Show account details section
+                if (accountDetailsSection) {
+                    accountDetailsSection.style.display = 'block';
+                    updateAccountDetails();
+                }
+            } else {
+                btnText.textContent = 'Profile';
+                
+                // Reset button style to default
+                profileBtn.style.background = 'linear-gradient(135deg, #ffd700, #f59e0b)';
+                profileBtn.style.color = '#333';
+                profileBtn.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
+                
+                // Hide account details section
+                const accountDetailsSection = document.getElementById('account-details-section');
+                if (accountDetailsSection) {
+                    accountDetailsSection.style.display = 'none';
+                }
+                
+                // Update dropdown status
+                const dropdownStatus = document.getElementById('dropdown-status');
+                if (dropdownStatus) dropdownStatus.textContent = 'Guest';
+                
+                hideProfileDropdown();
+            }
+            
+            updateCurrentState();
+        }
+        
+        function updateAccountDetails() {
+            if (!currentUser) return;
+            
+            // Calculate member since date
+            const memberSince = currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'Today';
+            
+            // Get user stats
+            const totalSearches = currentUser.stats ? currentUser.stats.searches || 0 : 0;
+            const totalFavorites = currentUser.stats ? currentUser.stats.favorites || 0 : 0;
+            
+            // Determine member level based on activity
+            let memberLevel = 'Guest';
+            if (totalSearches >= 50) memberLevel = 'Expert';
+            else if (totalSearches >= 20) memberLevel = 'Regular';
+            else if (totalSearches >= 5) memberLevel = 'Member';
+            else if (currentUser.name) memberLevel = 'New Member';
+            
+            // Update the account details display
+            const memberSinceEl = document.getElementById('member-since');
+            const totalSearchesEl = document.getElementById('total-searches');
+            const totalFavoritesEl = document.getElementById('total-favorites');
+            const memberLevelEl = document.getElementById('member-level');
+            
+            if (memberSinceEl) memberSinceEl.textContent = memberSince;
+            if (totalSearchesEl) totalSearchesEl.textContent = totalSearches;
+            if (totalFavoritesEl) totalFavoritesEl.textContent = totalFavorites;
+            if (memberLevelEl) memberLevelEl.textContent = memberLevel;
+        }
+        
+        function updateCurrentState() {
+            const stateDiv = document.getElementById('current-state');
+            if (currentUser) {
+                stateDiv.innerHTML = `
+                    <strong>Logged in as:</strong> ${currentUser.name}<br>
+                    <strong>Email:</strong> ${currentUser.email}<br>
+                    <strong>Searches:</strong> ${currentUser.stats ? currentUser.stats.searches || 0 : 0}<br>
+                    <strong>Favorites:</strong> ${currentUser.stats ? currentUser.stats.favorites || 0 : 0}
+                `;
+            } else {
+                stateDiv.textContent = 'No user logged in';
+            }
+        }
+        
+        // Test functions
+        function simulateLogin() {
+            currentUser = {
+                name: 'Test User',
+                email: 'test@example.com',
+                createdAt: new Date().toISOString(),
+                stats: {
+                    searches: 15,
+                    favorites: 8
+                }
+            };
+            updateProfileButton();
+            showStatus('✅ Simulated login successful!', 'success');
+        }
+        
+        function simulateLogout() {
+            currentUser = null;
+            updateProfileButton();
+            showStatus('✅ Simulated logout successful!', 'info');
+        }
+        
+        function updateStats() {
+            if (currentUser) {
+                currentUser.stats.searches += Math.floor(Math.random() * 5) + 1;
+                currentUser.stats.favorites += Math.floor(Math.random() * 2);
+                updateAccountDetails();
+                showStatus('✅ Stats updated!', 'success');
+            } else {
+                showStatus('❌ No user logged in', 'error');
+            }
+        }
+        
+        function toggleDropdown() {
+            toggleProfileDropdown();
+        }
+        
+        function editProfile() {
+            showStatus('📝 Edit Profile clicked', 'info');
+        }
+        
+        function showFavorites() {
+            showStatus('❤️ Favorites clicked', 'info');
+        }
+        
+        function showHistory() {
+            showStatus('📚 History clicked', 'info');
+        }
+        
+        function logout() {
+            simulateLogout();
+            showStatus('👋 Logged out successfully!', 'info');
+        }
+        
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = 'status';
+            }, 3000);
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.getElementById('profile-container');
+            if (!container.contains(e.target)) {
+                hideProfileDropdown();
+            }
+        });
+        
+        // Initialize
+        updateCurrentState();
+    </script>
+</body>
+</html>

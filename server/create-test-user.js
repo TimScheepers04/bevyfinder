@@ -1,63 +1,88 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
-
-// Import models
-const User = require('./models/User');
 
 // Connect to MongoDB
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+        const mongoUri = process.env.MONGODB_URI;
+        if (!mongoUri) {
+            throw new Error('MONGODB_URI not found in environment variables');
+        }
+        
+        await mongoose.connect(mongoUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-        return true;
+
+        console.log('MongoDB Connected');
     } catch (error) {
         console.error('MongoDB connection error:', error);
-        return false;
+        process.exit(1);
     }
 };
 
-// Create test user
+// Create a test user
 const createTestUser = async () => {
     try {
-        console.log('Creating test user...');
+        const User = require('./models/User');
         
         // Check if user already exists
-        const existingUser = await User.findOne({ email: 'demo@bevyfinder.com' });
+        const existingUser = await User.findOne({ email: 'testlogin@example.com' });
         if (existingUser) {
-            console.log('Test user already exists. Updating password...');
-            existingUser.password = 'password123';
-            await existingUser.save();
-            console.log('✅ Password updated for demo@bevyfinder.com');
+            console.log('User already exists, updating password...');
+            
+            // Update password
+            const hashedPassword = await bcrypt.hash('123456', 12);
+            await User.updateOne(
+                { email: 'testlogin@example.com' },
+                { 
+                    password: hashedPassword,
+                    name: 'Test User',
+                    personalDetails: {
+                        age: 25,
+                        weight: 70,
+                        gender: 'male'
+                    }
+                }
+            );
+            console.log('✅ User password updated');
         } else {
-            const testUser = await User.create({
-                name: 'Demo User',
-                email: 'demo@bevyfinder.com',
-                password: 'password123',
-                isVerified: true,
-                profile: {
-                    bio: 'Demo user for testing social feed',
-                    location: 'Sydney, Australia',
-                    avatar: null
+            // Create new user
+            const hashedPassword = await bcrypt.hash('123456', 12);
+            const newUser = new User({
+                name: 'Test User',
+                email: 'testlogin@example.com',
+                password: hashedPassword,
+                personalDetails: {
+                    age: 25,
+                    weight: 70,
+                    gender: 'male'
                 }
             });
-            console.log('✅ Test user created: demo@bevyfinder.com / password123');
+            
+            await newUser.save();
+            console.log('✅ Test user created successfully');
         }
-
+        
+        console.log('\n📋 Test User Details:');
+        console.log('Email: testlogin@example.com');
+        console.log('Password: 123456');
+        console.log('Name: Test User');
+        console.log('Age: 25');
+        console.log('Weight: 70 kg');
+        console.log('Gender: male');
+        
     } catch (error) {
         console.error('Error creating test user:', error);
     }
 };
 
-// Main execution
+// Main function
 const main = async () => {
-    const connected = await connectDB();
-    if (connected) {
-        await createTestUser();
-        mongoose.connection.close();
-    }
+    await connectDB();
+    await createTestUser();
+    process.exit(0);
 };
 
 main(); 
