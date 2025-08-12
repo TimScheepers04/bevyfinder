@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Favorites</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 5px;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .info { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border: none;
+            border-radius: 5px;
+            background: #ffd700;
+            color: #333;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #f59e0b;
+        }
+        input { 
+            padding: 10px; 
+            width: 300px; 
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+        }
+        .drink-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍺 Test Favorites Functionality</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Authentication Status</h3>
+        <div id="auth-status">Checking...</div>
+        <button onclick="checkAuth()">Check Authentication</button>
+        <button onclick="login()">Login</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="test-section">
+        <h3>🌐 API Connection</h3>
+        <div id="api-status">Checking...</div>
+        <button onclick="testAPI()">Test API Connection</button>
+    </div>
+
+    <div class="test-section">
+        <h3>❤️ Test Favorites</h3>
+        <div id="favorites-status">Ready to test</div>
+        <button onclick="testAddFavorite()">Add Test Drink to Favorites</button>
+        <button onclick="testGetFavorites()">Get My Favorites</button>
+        <button onclick="testRemoveFavorite()">Remove Test Drink from Favorites</button>
+    </div>
+
+    <div class="test-section">
+        <h3>📱 Main App Test</h3>
+        <p>Open the main app and try to favorite a drink. Check the console for errors.</p>
+        <button onclick="openMainApp()">Open Main App</button>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        
+        function log(message, type = 'info', elementId) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `<div class="result ${type}">
+                <strong>[${timestamp}]</strong> ${message}
+            </div>`;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function checkAuth() {
+            clearLog('auth-status');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                log('❌ No token found - you need to log in', 'error', 'auth-status');
+                return;
+            }
+
+            log(`🔑 Token found: ${token.substring(0, 20)}...`, 'info', 'auth-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Authenticated as: ${data.user.name} (${data.user.email})`, 'success', 'auth-status');
+                } else {
+                    log('❌ Authentication failed - token may be invalid', 'error', 'auth-status');
+                }
+            } catch (error) {
+                log(`❌ Error checking auth: ${error.message}`, 'error', 'auth-status');
+            }
+        }
+
+        async function login() {
+            clearLog('auth-status');
+            log('🔐 Attempting to login...', 'info', 'auth-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@bevyfinder.com',
+                        password: 'password123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    log(`✅ Login successful! Token saved.`, 'success', 'auth-status');
+                    checkAuth();
+                } else {
+                    const error = await response.json();
+                    log(`❌ Login failed: ${error.message}`, 'error', 'auth-status');
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`, 'error', 'auth-status');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            clearLog('auth-status');
+            log('✅ Logged out - token removed', 'success', 'auth-status');
+        }
+
+        async function testAPI() {
+            clearLog('api-status');
+            log('🌐 Testing API connection...', 'info', 'api-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ API is running: ${data.message}`, 'success', 'api-status');
+                } else {
+                    log('❌ API health check failed', 'error', 'api-status');
+                }
+            } catch (error) {
+                log(`❌ API connection error: ${error.message}`, 'error', 'api-status');
+            }
+        }
+
+        async function testAddFavorite() {
+            clearLog('favorites-status');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                log('❌ Please log in first', 'error', 'favorites-status');
+                return;
+            }
+
+            log('❤️ Adding test drink to favorites...', 'info', 'favorites-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/favorites/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        beverageKey: 'test-heineken'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Drink added to favorites!`, 'success', 'favorites-status');
+                    log(`📊 Response: ${JSON.stringify(data)}`, 'info', 'favorites-status');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Failed to add favorite: ${error.message}`, 'error', 'favorites-status');
+                }
+            } catch (error) {
+                log(`❌ Error adding favorite: ${error.message}`, 'error', 'favorites-status');
+            }
+        }
+
+        async function testGetFavorites() {
+            clearLog('favorites-status');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                log('❌ Please log in first', 'error', 'favorites-status');
+                return;
+            }
+
+            log('📋 Getting favorites...', 'info', 'favorites-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/favorites`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Favorites retrieved!`, 'success', 'favorites-status');
+                    log(`📊 You have ${data.data.totalFavorites} favorites: ${data.data.favorites.join(', ')}`, 'info', 'favorites-status');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Failed to get favorites: ${error.message}`, 'error', 'favorites-status');
+                }
+            } catch (error) {
+                log(`❌ Error getting favorites: ${error.message}`, 'error', 'favorites-status');
+            }
+        }
+
+        async function testRemoveFavorite() {
+            clearLog('favorites-status');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                log('❌ Please log in first', 'error', 'favorites-status');
+                return;
+            }
+
+            log('🗑️ Removing test drink from favorites...', 'info', 'favorites-status');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/favorites/remove`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        beverageKey: 'test-heineken'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Drink removed from favorites!`, 'success', 'favorites-status');
+                    log(`📊 Response: ${JSON.stringify(data)}`, 'info', 'favorites-status');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Failed to remove favorite: ${error.message}`, 'error', 'favorites-status');
+                }
+            } catch (error) {
+                log(`❌ Error removing favorite: ${error.message}`, 'error', 'favorites-status');
+            }
+        }
+
+        function openMainApp() {
+            window.open('index.html', '_blank');
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            log('🚀 Favorites test page loaded', 'info', 'auth-status');
+            checkAuth();
+            testAPI();
+        });
+    </script>
+</body>
+</html>

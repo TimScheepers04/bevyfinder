@@ -4310,7 +4310,7 @@
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await fetch(`${API_BASE_URL}/api/tracking/search`, {
+                const response = await fetch(`${API_BASE_URL}/tracking/search`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -4340,7 +4340,7 @@
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await fetch(`${API_BASE_URL}/api/tracking/favorite`, {
+                const response = await fetch(`${API_BASE_URL}/tracking/favorite`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -4370,7 +4370,7 @@
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await fetch(`${API_BASE_URL}/api/tracking/session`, {
+                const response = await fetch(`${API_BASE_URL}/tracking/session`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -4425,7 +4425,7 @@
                 }
 
                 console.log('🔄 Fetching dashboard stats from API...');
-                const response = await fetch(`${API_BASE_URL}/api/tracking/dashboard`, {
+                const response = await fetch(`${API_BASE_URL}/tracking/dashboard`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -10080,7 +10080,7 @@
                         return;
                     }
 
-                    const response = await fetch(`${API_BASE_URL}/api/favorites/add`, {
+                    const response = await fetch(`${API_BASE_URL}/favorites/add`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -10116,7 +10116,7 @@
                         return;
                     }
 
-                    const response = await fetch(`${API_BASE_URL}/api/favorites/remove`, {
+                    const response = await fetch(`${API_BASE_URL}/favorites/remove`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`,
