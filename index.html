@@ -3018,9 +3018,127 @@
 
         .friends-tabs, .leaderboard-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced Friends Tab Buttons */
+        .friends-tabs .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 18px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .friends-tabs .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        .friends-tabs .tab-btn:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .friends-tabs .tab-btn.active {
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .friends-tabs .tab-btn.active::before {
+            opacity: 0;
+        }
+
+        .friends-tabs .tab-btn i {
+            font-size: 1.3rem;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .friends-tabs .tab-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .friends-tabs .tab-btn span {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+
+        /* Specific tab colors for different sections */
+        .friends-tabs .tab-btn[data-tab="friends-list"] {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="friends-list"]:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="friend-requests"] {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="friend-requests"]:hover {
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="friend-requests"].active {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .friends-tabs .tab-btn[data-tab="find-friends"] {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="find-friends"]:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .friends-tabs .tab-btn[data-tab="find-friends"].active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
 
         .friends-container, .requests-container {
@@ -3961,6 +4079,28 @@
                 flex: 1;
                 justify-content: center;
             }
+
+            /* Enhanced mobile styles for friends tabs */
+            .friends-tabs {
+                padding: 15px;
+                gap: 10px;
+                margin-bottom: 30px;
+            }
+
+            .friends-tabs .tab-btn {
+                min-width: 120px;
+                padding: 15px 20px;
+                font-size: 0.9rem;
+                gap: 8px;
+            }
+
+            .friends-tabs .tab-btn i {
+                font-size: 1.1rem;
+            }
+
+            .friends-tabs .tab-btn span {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -4706,13 +4846,16 @@
             
             <div class="friends-tabs">
                 <button class="tab-btn active" data-tab="friends-list">
-                    <i class="fas fa-users"></i> My Friends
+                    <i class="fas fa-users"></i>
+                    <span>My Friends</span>
                 </button>
                 <button class="tab-btn" data-tab="friend-requests">
-                    <i class="fas fa-user-plus"></i> Requests
+                    <i class="fas fa-user-plus"></i>
+                    <span>Requests</span>
                 </button>
                 <button class="tab-btn" data-tab="find-friends">
-                    <i class="fas fa-search"></i> Find Friends
+                    <i class="fas fa-search"></i>
+                    <span>Find Friends</span>
                 </button>
             </div>
             
