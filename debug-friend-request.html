@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Friend Request</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 10px; width: 300px; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Friend Request System</h1>
+    <p>Let's check what's happening with the friend request system.</p>
+    
+    <div>
+        <input type="text" id="targetUserId" value="689ac642903a8d7c32059a6b" placeholder="Target User ID (John's ID)">
+        <button onclick="sendFriendRequest()">Send Friend Request</button>
+        <button onclick="checkYourSentRequests()">Check Your Sent Requests</button>
+        <button onclick="checkJohnsReceivedRequests()">Check John's Received Requests</button>
+        <button onclick="acceptFriendRequestAsJohn()">Accept Request (as John)</button>
+        <button onclick="checkYourFriends()">Check Your Friends List</button>
+        <button onclick="checkJohnsFriends()">Check John's Friends List</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            resultDiv.innerHTML += `<div class="result ${type}">
+                <strong>[${timestamp}]</strong> ${message}
+            </div>`;
+        }
+        
+        // Your token (the one who sends the request) - Original user
+        const YOUR_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWFiNmIxZmMwYzVkYmMxNjJlYTlkMCIsImlhdCI6MTc1NDk2OTc3NywiZXhwIjoxNzU1NTc0NTc3fQ.3aqXejwIA0bXKecSE5xpYtQhXkkaMUHTHuDP3n49gWE';
+        
+        // John's token (the one who receives the request) - Different user
+        const JOHN_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWFjNjQyOTAzYThkN2MzMjA1OWE2YiIsImlhdCI6MTc1NDk3Mzc2MiwiZXhwIjoxNzU1NTc4NTYyfQ.eZATPZN2ag070IWQTbVEMQqjTcVx7SfMzqlCqZD768g';
+        
+        async function sendFriendRequest() {
+            const targetUserId = document.getElementById('targetUserId').value;
+            log('🚀 Sending friend request...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/social/friend-request/send', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${YOUR_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ targetUserId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Friend request sent successfully!`, 'success');
+                    log(`📄 Response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error sending request: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkYourSentRequests() {
+            log('🔍 Checking your sent friend requests...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/social/friend-requests', {
+                    headers: {
+                        'Authorization': `Bearer ${YOUR_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ You have ${data.friendRequests.length} received requests`, 'success');
+                    
+                    data.friendRequests.forEach((request, index) => {
+                        log(`👤 Received request ${index + 1}: From ${request.from.name} (${request.from.email})`, 'success');
+                    });
+                    
+                    log(`📄 Full response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error checking requests: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkJohnsReceivedRequests() {
+            log('🔍 Checking John\'s received friend requests...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/social/friend-requests', {
+                    headers: {
+                        'Authorization': `Bearer ${JOHN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ John has ${data.friendRequests.length} received requests`, 'success');
+                    
+                    data.friendRequests.forEach((request, index) => {
+                        log(`👤 Received request ${index + 1}: From ${request.from.name} (${request.from.email})`, 'success');
+                    });
+                    
+                    log(`📄 Full response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error checking John's requests: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function acceptFriendRequestAsJohn() {
+            log('✅ Accepting friend request as John...', 'info');
+            
+            try {
+                // First, get John's friend requests to find the actual fromUserId
+                const requestsResponse = await fetch('http://localhost:3000/api/social/friend-requests', {
+                    headers: {
+                        'Authorization': `Bearer ${JOHN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!requestsResponse.ok) {
+                    log('❌ Error getting friend requests', 'error');
+                    return;
+                }
+                
+                const requestsData = await requestsResponse.json();
+                log(`📄 Found ${requestsData.friendRequests.length} friend requests`, 'info');
+                
+                if (requestsData.friendRequests.length === 0) {
+                    log('❌ No friend requests to accept', 'error');
+                    return;
+                }
+                
+                // Get the first request's fromUserId
+                const fromUserId = requestsData.friendRequests[0].from._id || requestsData.friendRequests[0].from.id;
+                log(`🔍 Using fromUserId: ${fromUserId}`, 'info');
+                
+                if (!fromUserId) {
+                    log('❌ Could not find fromUserId in friend request', 'error');
+                    return;
+                }
+                
+                const response = await fetch('http://localhost:3000/api/social/friend-request/accept', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${JOHN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fromUserId: fromUserId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Friend request accepted!`, 'success');
+                    log(`📄 Response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                    
+                    // Check friends lists after acceptance
+                    setTimeout(() => {
+                        checkYourFriends();
+                        checkJohnsFriends();
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error accepting request: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkJohnsFriends() {
+            log('👥 Checking John\'s friends list...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/social/friends', {
+                    headers: {
+                        'Authorization': `Bearer ${JOHN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ John has ${data.friends.length} friends`, 'success');
+                    
+                    data.friends.forEach((friend, index) => {
+                        log(`👤 Friend ${index + 1}: ${friend.name} (${friend.email})`, 'success');
+                    });
+                    
+                    log(`📄 Full response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error checking John's friends: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkYourFriends() {
+            log('👥 Checking your friends list...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/social/friends', {
+                    headers: {
+                        'Authorization': `Bearer ${YOUR_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ You have ${data.friends.length} friends`, 'success');
+                    
+                    data.friends.forEach((friend, index) => {
+                        log(`👤 Friend ${index + 1}: ${friend.name} (${friend.email})`, 'success');
+                    });
+                    
+                    log(`📄 Full response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Error checking friends: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-check on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkYourSentRequests();
+                checkJohnsReceivedRequests();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

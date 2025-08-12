@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/reviews');
 const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
+const socialRoutes = require('./routes/social');
 
 // Initialize express app
 const app = express();
@@ -38,10 +39,37 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
+console.log('🔗 Loading API routes...');
 app.use('/api/auth', authRoutes);
+console.log('✅ Auth routes loaded');
 app.use('/api/reviews', reviewRoutes);
+console.log('✅ Review routes loaded');
 app.use('/api/favorites', favoritesRoutes);
+console.log('✅ Favorites routes loaded');
 app.use('/api/likes', likesRoutes);
+console.log('✅ Likes routes loaded');
+try {
+    app.use('/api/social', socialRoutes);
+    console.log('✅ Social routes loaded');
+} catch (error) {
+    console.error('❌ Error loading social routes:', error);
+}
+
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`🔍 ${req.method} ${req.path}`);
+    next();
+});
+
+// Test route to verify social routes are working
+app.get('/test-social', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Social routes test endpoint',
+        socialRoutesLoaded: !!socialRoutes,
+        socialRoutesStack: socialRoutes.stack ? socialRoutes.stack.length : 0
+    });
+});
 
 // 404 handler
 app.use('*', (req, res) => {

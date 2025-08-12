@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Search Users - BevyFinder</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 10px; width: 300px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Search Users</h1>
+    
+    <div class="debug-section">
+        <h3>1. Authentication Test</h3>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>2. Server Connection Test</h3>
+        <button onclick="testServer()">Test Server Connection</button>
+        <div id="server-result"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>3. Search Users Test</h3>
+        <input type="text" id="search-query" value="sarah" placeholder="Enter search term">
+        <button onclick="testSearch()">Test Search</button>
+        <div id="search-result"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>4. Frontend Function Test</h3>
+        <button onclick="testFrontendSearch()">Test Frontend Search Function</button>
+        <div id="frontend-result"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Mock showNotification if it doesn't exist (for testing)
+        if (typeof showNotification === 'undefined') {
+            window.showNotification = function(message, type = 'info') {
+                console.log(`[${type.toUpperCase()}] ${message}`);
+            };
+        }
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        async function testAuth() {
+            try {
+                const token = getToken();
+                if (token) {
+                    log('auth-result', `✅ Token found: ${token.substring(0, 20)}...`, 'success');
+                } else {
+                    log('auth-result', '❌ No token found - authentication bypass should be enabled', 'error');
+                }
+            } catch (error) {
+                log('auth-result', `❌ Auth error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testServer() {
+            try {
+                const response = await fetch('http://localhost:3000/api/social/ping');
+                const data = await response.json();
+                log('server-result', `✅ Server connected: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                log('server-result', `❌ Server error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSearch() {
+            try {
+                const query = document.getElementById('search-query').value;
+                const token = getToken();
+                
+                if (!token) {
+                    log('search-result', '❌ No authentication token', 'error');
+                    return;
+                }
+                
+                const response = await fetch(`http://localhost:3000/api/social/search-users?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('search-result', `✅ Search successful: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    log('search-result', `❌ Search failed: ${JSON.stringify(errorData)}`, 'error');
+                }
+            } catch (error) {
+                log('search-result', `❌ Search error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFrontendSearch() {
+            try {
+                // Check if searchUsers function exists
+                if (typeof searchUsers === 'undefined') {
+                    log('frontend-result', `❌ searchUsers function is not defined`, 'error');
+                    return;
+                }
+                
+                // Create temporary elements for the frontend function
+                const tempInput = document.createElement('input');
+                tempInput.id = 'friend-search';
+                tempInput.value = 'sarah';
+                document.body.appendChild(tempInput);
+                
+                const tempResults = document.createElement('div');
+                tempResults.id = 'search-results';
+                document.body.appendChild(tempResults);
+                
+                log('frontend-result', `🔍 Calling searchUsers() function...`, 'info');
+                
+                // Call the frontend search function
+                await searchUsers();
+                
+                // Check results
+                const results = tempResults.innerHTML;
+                log('frontend-result', `📄 Raw results length: ${results.length}`, 'info');
+                
+                if (results.includes('user-item') || results.includes('No Users Found') || results.includes('empty-state')) {
+                    log('frontend-result', `✅ Frontend search function executed successfully`, 'success');
+                    log('frontend-result', `📄 Results: ${results.substring(0, 200)}...`, 'info');
+                } else {
+                    log('frontend-result', `❌ Frontend search function failed or returned unexpected results`, 'error');
+                    log('frontend-result', `📄 Raw output: ${results}`, 'info');
+                }
+                
+                // Clean up
+                document.body.removeChild(tempInput);
+                document.body.removeChild(tempResults);
+                
+            } catch (error) {
+                log('frontend-result', `❌ Frontend search error: ${error.message}`, 'error');
+                console.error('Frontend search error:', error);
+                
+                // Show more detailed error information
+                if (error.stack) {
+                    log('frontend-result', `📄 Stack trace: ${error.stack}`, 'info');
+                }
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testAuth();
+                testServer();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

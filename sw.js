@@ -1,7 +1,7 @@
 // Service Worker for BevyFinder - Enhanced Auto-Update System
-const CACHE_NAME = 'bevyfinder-v1.0.10';
-const STATIC_CACHE = 'bevyfinder-static-v1.0.10';
-const DYNAMIC_CACHE = 'bevyfinder-dynamic-v1.0.10';
+const CACHE_NAME = 'bevyfinder-v1.0.11';
+const STATIC_CACHE = 'bevyfinder-static-v1.0.11';
+const DYNAMIC_CACHE = 'bevyfinder-dynamic-v1.0.11';
 
 // Files to cache immediately
 const STATIC_FILES = [

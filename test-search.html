@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Users Test - BevyFinder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .search-btn {
+            padding: 12px 24px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .search-btn:hover {
+            background: #059669;
+        }
+        
+        .results-section {
+            margin-top: 20px;
+        }
+        
+        .user-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .user-details h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        
+        .user-details span {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .user-actions {
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .action-btn.primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+        }
+        
+        .status-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Search Users Test</h1>
+        <p>Test the search users functionality for BevyFinder social features</p>
+        
+        <div class="search-section">
+            <h2>Search for Users</h2>
+            <input type="text" id="search-input" class="search-input" placeholder="Enter name or email to search..." value="sarah">
+            <button class="search-btn" onclick="performSearch()">Search Users</button>
+            
+            <div class="results-section" id="search-results">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+        
+        <div class="search-section">
+            <h2>Test Data</h2>
+            <p>Available test users in the database:</p>
+            <ul>
+                <li><strong>Sarah Johnson</strong> - sarah@example.com</li>
+                <li><strong>Sarah Johnson</strong> - sarah.j@example.com</li>
+                <li><strong>Mike Chen</strong> - mike.c@example.com</li>
+                <li><strong>Test User 1</strong> - test1@example.com</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Override the search function to work with our test page
+        async function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            
+            const query = searchInput.value.trim();
+            if (!query) {
+                searchResults.innerHTML = '<p style="color: red;">Please enter a search term</p>';
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                if (!token) {
+                    searchResults.innerHTML = '<p style="color: red;">Please sign in to search for users</p>';
+                    return;
+                }
+                
+                const response = await fetch(`http://localhost:3000/api/social/search-users?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displaySearchResults(data.users);
+                } else {
+                    const errorData = await response.json();
+                    searchResults.innerHTML = `<p style="color: red;">Error: ${errorData.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Error searching users:', error);
+                searchResults.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        function displaySearchResults(users) {
+            const searchResults = document.getElementById('search-results');
+            
+            if (!users || users.length === 0) {
+                searchResults.innerHTML = '<p>No users found</p>';
+                return;
+            }
+            
+            searchResults.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            ${user.profile?.avatar || user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="user-details">
+                            <h4>${user.name}</h4>
+                            <span>${user.email}</span>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        ${user.isFriend ? `
+                            <button class="action-btn secondary" disabled>
+                                <i class="fas fa-check"></i> Friends
+                            </button>
+                        ` : user.hasSentRequest ? `
+                            <button class="action-btn secondary" disabled>
+                                <i class="fas fa-clock"></i> Request Sent
+                            </button>
+                        ` : user.hasReceivedRequest ? `
+                            <button class="action-btn primary" onclick="acceptFriendRequest('${user.id}')">
+                                <i class="fas fa-check"></i> Accept
+                            </button>
+                        ` : `
+                            <button class="action-btn primary" onclick="sendFriendRequest('${user.id}')">
+                                <i class="fas fa-user-plus"></i> Add Friend
+                            </button>
+                        `}
+                    </div>
+                    <div class="status-info">
+                        <strong>Status:</strong> 
+                        ${user.isFriend ? 'Already friends' : 
+                          user.hasSentRequest ? 'Friend request sent' : 
+                          user.hasReceivedRequest ? 'Friend request received' : 
+                          'Not connected'}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Auto-search on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                performSearch();
+            }, 1000);
+        });
+        
+        // Allow Enter key to trigger search
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

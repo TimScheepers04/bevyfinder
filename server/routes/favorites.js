@@ -30,6 +30,22 @@ router.post('/add', protect, async (req, res) => {
         if (!user.profile.preferences.favoriteDrinks.includes(beverageKey)) {
             user.profile.preferences.favoriteDrinks.push(beverageKey);
             user.stats.favorites++;
+            
+            // Track favorite action
+            const favoriteEntry = {
+                beverageKey,
+                action: 'add',
+                timestamp: new Date()
+            };
+            
+            if (!user.favoriteHistory) {
+                user.favoriteHistory = [];
+            }
+            user.favoriteHistory.unshift(favoriteEntry);
+            if (user.favoriteHistory.length > 100) {
+                user.favoriteHistory = user.favoriteHistory.slice(0, 100);
+            }
+            
             await user.save();
         }
 
@@ -76,6 +92,22 @@ router.delete('/remove', protect, async (req, res) => {
         if (index > -1) {
             user.profile.preferences.favoriteDrinks.splice(index, 1);
             user.stats.favorites = Math.max(0, user.stats.favorites - 1);
+            
+            // Track favorite removal
+            const favoriteEntry = {
+                beverageKey,
+                action: 'remove',
+                timestamp: new Date()
+            };
+            
+            if (!user.favoriteHistory) {
+                user.favoriteHistory = [];
+            }
+            user.favoriteHistory.unshift(favoriteEntry);
+            if (user.favoriteHistory.length > 100) {
+                user.favoriteHistory = user.favoriteHistory.slice(0, 100);
+            }
+            
             await user.save();
         }
 

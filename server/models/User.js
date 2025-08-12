@@ -105,6 +105,44 @@ const userSchema = new mongoose.Schema({
             default: Date.now
         }
     },
+    // Tracking history
+    searchHistory: [{
+        query: String,
+        results: Number,
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    favoriteHistory: [{
+        beverageKey: String,
+        action: {
+            type: String,
+            enum: ['add', 'remove']
+        },
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    sessionHistory: [{
+        startTime: {
+            type: Date,
+            default: Date.now
+        },
+        endTime: Date,
+        duration: Number, // in minutes
+        drinks: [{
+            beverageKey: String,
+            quantity: Number,
+            timestamp: Date
+        }],
+        status: {
+            type: String,
+            enum: ['active', 'completed'],
+            default: 'active'
+        }
+    }],
     // Social features
     friends: [{
         type: mongoose.Schema.Types.ObjectId,

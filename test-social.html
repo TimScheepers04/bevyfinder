@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Features Test - BevyFinder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .test-btn {
+            padding: 10px 20px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .test-btn:hover {
+            background: #059669;
+        }
+        
+        .test-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .info {
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Social Features Test</h1>
+        <p>Testing the social features implementation for BevyFinder</p>
+        
+        <div class="test-section">
+            <h2>🔗 Server Connection Test</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testServerConnection()">Test Server Connection</button>
+                <button class="test-btn" onclick="testSocialPing()">Test Social Ping</button>
+            </div>
+            <div id="server-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>👥 Friends Features Test</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testLoadFriends()">Load Friends</button>
+                <button class="test-btn" onclick="testLoadFriendRequests()">Load Friend Requests</button>
+                <button class="test-btn" onclick="testSearchUsers()">Search Users</button>
+            </div>
+            <div id="friends-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Social Feed Test</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testLoadSocialFeed()">Load Social Feed</button>
+                <button class="test-btn" onclick="testCreatePost()">Create Post</button>
+            </div>
+            <div id="feed-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🏆 Leaderboard Test</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testLoadLeaderboard()">Load Leaderboard</button>
+            </div>
+            <div id="leaderboard-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Friend Request Actions Test</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testSendFriendRequest()">Send Friend Request</button>
+                <button class="test-btn" onclick="testAcceptFriendRequest()">Accept Friend Request</button>
+                <button class="test-btn" onclick="testDeclineFriendRequest()">Decline Friend Request</button>
+            </div>
+            <div id="actions-result" class="test-result"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Test functions
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${type}`;
+        }
+        
+        async function testServerConnection() {
+            try {
+                const response = await fetch('http://localhost:3000/api/social/ping');
+                const data = await response.json();
+                logResult('server-result', `✅ Server is running!\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                logResult('server-result', `❌ Server connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSocialPing() {
+            try {
+                const response = await fetch('http://localhost:3000/api/social/ping');
+                const data = await response.json();
+                logResult('server-result', `✅ Social routes are working!\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                logResult('server-result', `❌ Social ping failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLoadFriends() {
+            try {
+                const result = await loadFriends();
+                logResult('friends-result', `✅ Friends loaded successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('friends-result', `❌ Load friends failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLoadFriendRequests() {
+            try {
+                const result = await loadFriendRequests();
+                logResult('friends-result', `✅ Friend requests loaded successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('friends-result', `❌ Load friend requests failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSearchUsers() {
+            try {
+                // Simulate search input
+                const searchInput = document.createElement('input');
+                searchInput.id = 'friend-search';
+                searchInput.value = 'test';
+                document.body.appendChild(searchInput);
+                
+                const searchResults = document.createElement('div');
+                searchResults.id = 'search-results';
+                document.body.appendChild(searchResults);
+                
+                const result = await searchUsers();
+                logResult('friends-result', `✅ User search executed successfully!\nFunction executed without errors.`, 'success');
+                
+                // Clean up
+                document.body.removeChild(searchInput);
+                document.body.removeChild(searchResults);
+            } catch (error) {
+                logResult('friends-result', `❌ User search failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLoadSocialFeed() {
+            try {
+                const result = await loadSocialFeed();
+                logResult('feed-result', `✅ Social feed loaded successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('feed-result', `❌ Load social feed failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCreatePost() {
+            try {
+                showCreatePostModal();
+                logResult('feed-result', `✅ Create post modal opened successfully!\nModal should be visible now.`, 'success');
+            } catch (error) {
+                logResult('feed-result', `❌ Create post failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLoadLeaderboard() {
+            try {
+                const result = await loadLeaderboard('totalDrinks');
+                logResult('leaderboard-result', `✅ Leaderboard loaded successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('leaderboard-result', `❌ Load leaderboard failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSendFriendRequest() {
+            try {
+                const result = await sendFriendRequest('demo-user-id');
+                logResult('actions-result', `✅ Send friend request executed successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('actions-result', `❌ Send friend request failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAcceptFriendRequest() {
+            try {
+                const result = await acceptFriendRequest('demo-user-id');
+                logResult('actions-result', `✅ Accept friend request executed successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('actions-result', `❌ Accept friend request failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDeclineFriendRequest() {
+            try {
+                const result = await declineFriendRequest('demo-user-id');
+                logResult('actions-result', `✅ Decline friend request executed successfully!\nFunction executed without errors.`, 'success');
+            } catch (error) {
+                logResult('actions-result', `❌ Decline friend request failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testServerConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

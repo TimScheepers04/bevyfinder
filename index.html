@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CACHE BUST: v3 - Fixed API URL to localhost:3000 -->
+<!-- CACHE BUST: v2 - Updated API URL to localhost -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1466,6 +1466,109 @@
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.8);
             margin-top: 5px;
+        }
+
+        .stat-subtitle {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3px;
+        }
+
+        /* Dashboard Recent Activity */
+        .dashboard-recent {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dashboard-recent h3 {
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .recent-section h4 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recent-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .recent-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-left: 3px solid #ffd700;
+            transition: all 0.3s ease;
+        }
+
+        .recent-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .recent-item.empty {
+            border-left-color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .recent-item-title {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3px;
+        }
+
+        .recent-item-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .recent-item-details {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 3px;
+        }
+
+        /* Active session indicator */
+        .stat-card.active-session {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-card.active-session .stat-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        /* Live update animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .stat-card.updating {
+            animation: pulse 0.5s ease-in-out;
         }
 
         /* Pinboard Grid */
@@ -3018,820 +3121,79 @@
 
         .friends-tabs, .leaderboard-tabs {
             display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
+            gap: 10px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
-            justify-content: center;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Enhanced Friends Tab Buttons */
-        .friends-tabs .tab-btn {
-            flex: 1;
-            min-width: 140px;
-            padding: 18px 24px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .friends-tabs .tab-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 0;
-        }
-
-        .friends-tabs .tab-btn:hover {
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .friends-tabs .tab-btn.active {
-            color: white;
-            font-weight: 700;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .friends-tabs .tab-btn.active::before {
-            opacity: 0;
-        }
-
-        .friends-tabs .tab-btn i {
-            font-size: 1.3rem;
-            position: relative;
-            z-index: 1;
-            transition: transform 0.3s ease;
-        }
-
-        .friends-tabs .tab-btn:hover i {
-            transform: scale(1.1);
-        }
-
-        .friends-tabs .tab-btn span {
-            position: relative;
-            z-index: 1;
-            font-weight: 600;
-        }
-
-        /* Specific tab colors for different sections */
-        .friends-tabs .tab-btn[data-tab="friends-list"] {
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="friends-list"]:hover {
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="friend-requests"] {
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="friend-requests"]:hover {
-            border-color: rgba(245, 158, 11, 0.5);
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="friend-requests"].active {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            border-color: rgba(245, 158, 11, 0.5);
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-        }
-
-        .friends-tabs .tab-btn[data-tab="find-friends"] {
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="find-friends"]:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-        }
-
-        .friends-tabs .tab-btn[data-tab="find-friends"].active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
 
         .friends-container, .requests-container {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        /* Enhanced Friends Header */
-        .friends-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .friends-header-content h2 {
-            margin: 15px 0 10px 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .friends-header-content p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .friends-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-        }
-
-        .friends-icon-wrapper i {
-            font-size: 2rem;
-            color: white;
-        }
-
-        /* Enhanced Requests Header */
-        .requests-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .requests-header-content h2 {
-            margin: 15px 0 10px 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .requests-header-content p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .requests-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-        }
-
-        .requests-icon-wrapper i {
-            font-size: 2rem;
-            color: white;
-        }
-
-        /* Stats Cards */
-        .friends-stats, .requests-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        .friend-item, .request-item {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .friends-stats .stat-icon {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .requests-stats .stat-icon {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .stat-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            line-height: 1;
-        }
-
-        .stat-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            margin-top: 2px;
-        }
-
-        /* Enhanced Friend and Request Items */
-        .friend-item, .request-item {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .friend-item:hover, .request-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .request-item:hover {
-            border-color: rgba(245, 158, 11, 0.3);
         }
 
         .friend-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .friend-avatar {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.5rem;
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .request-item .friend-avatar {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+            font-size: 1.2rem;
         }
 
         .friend-details h4 {
             color: white;
-            margin: 0 0 8px 0;
-            font-size: 1.3rem;
-            font-weight: 600;
+            margin: 0 0 5px 0;
         }
 
         .friend-details span {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .friend-details span i {
-            color: #10b981;
             font-size: 0.9rem;
-        }
-
-        .request-item .friend-details span i {
-            color: #f59e0b;
         }
 
         .friend-actions {
             display: flex;
-            gap: 12px;
-        }
-
-        .friend-actions .btn {
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: none;
-            font-size: 0.95rem;
-        }
-
-        .friend-actions .primary-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        .friend-actions .primary-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .friend-actions .secondary-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .friend-actions .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .friend-actions .danger-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .friend-actions .danger-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
-        }
-
-        /* List Headers */
-        .friends-list-header, .requests-list-header {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .requests-list-header {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
-        }
-
-        .friends-list-header h3, .requests-list-header h3 {
-            margin: 0;
-            color: white;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
 
-        .friends-list-header h3 i {
-            color: #10b981;
-        }
-
-        .requests-list-header h3 i {
-            color: #f59e0b;
-        }
-
-        /* Empty State Tips */
-        .empty-state-tips {
-            margin-top: 20px;
-            text-align: left;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .empty-state-tips p {
-            margin: 0 0 10px 0;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .empty-state-tips ul {
-            margin: 0;
-            padding-left: 20px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .empty-state-tips li {
-            margin-bottom: 5px;
-        }
-
         .search-friends-container {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        /* Enhanced Search Header */
-        .search-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .search-header-content h2 {
-            margin: 15px 0 10px 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .search-header-content p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .search-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-        }
-
-        .search-icon-wrapper i {
-            font-size: 2rem;
-            color: white;
-        }
-
-        /* Enhanced Search Input */
-        .search-input-container {
-            margin-bottom: 30px;
-        }
-
-        .search-input-wrapper {
-            position: relative;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50px;
-            padding: 5px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input-wrapper:focus-within {
-            border-color: #10b981;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .search-input-icon {
-            padding: 0 20px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .search-input-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.1rem;
-            padding: 15px 0;
-            outline: none;
-        }
-
-        .search-input-wrapper input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .search-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 5px;
-        }
-
-        .search-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .search-tips {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .tip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-        }
-
-        .tip i {
-            color: #fbbf24;
-        }
-
-        /* Enhanced Search Results */
         .search-results {
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
-        .search-placeholder {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .placeholder-icon {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-        }
-
-        .placeholder-icon i {
-            font-size: 2.5rem;
-            opacity: 0.5;
-        }
-
-        .search-placeholder h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .search-placeholder p {
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        /* Enhanced User Items */
         .user-item {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .user-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .user-item .friend-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .user-item .friend-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .user-item .friend-details h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.3rem;
-            color: white;
-            font-weight: 600;
-        }
-
-        .user-item .friend-details span {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
-        }
-
-        .user-item .friend-actions .btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .user-item .friend-actions .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        /* Recent Searches */
-        .recent-searches {
-            margin-top: 40px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .recent-searches h3 {
-            margin: 0 0 20px 0;
-            color: white;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .recent-searches-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .recent-search-tag {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .recent-search-tag:hover {
-            background: rgba(16, 185, 129, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* Search Results Header */
-        .search-results-header {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .search-results-header h3 {
-            margin: 0;
-            color: white;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .search-results-header h3 i {
-            color: #10b981;
-        }
-
-        /* User Stats */
-        .user-stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 8px;
-        }
-
-        .user-stats .stat {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
-        }
-
-        .user-stats .stat i {
-            color: #10b981;
-        }
-
-        /* Search Suggestions */
-        .search-suggestions {
-            margin-top: 20px;
-            text-align: left;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .search-suggestions p {
-            margin: 0 0 10px 0;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .search-suggestions ul {
-            margin: 0;
-            padding-left: 20px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-suggestions li {
-            margin-bottom: 5px;
-        }
-
-        /* Loading State */
-        .search-loading {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-loading i {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .leaderboard-container {
@@ -3933,173 +3295,6 @@
 
             .post-actions {
                 justify-content: space-around;
-            }
-
-            /* Enhanced mobile styles for find friends */
-            .search-friends-container {
-                padding: 15px;
-            }
-
-            .search-header {
-                padding: 20px 15px;
-                margin-bottom: 30px;
-            }
-
-            .search-header-content h2 {
-                font-size: 1.8rem;
-            }
-
-            .search-header-content p {
-                font-size: 1rem;
-            }
-
-            .search-icon-wrapper {
-                width: 60px;
-                height: 60px;
-            }
-
-            .search-icon-wrapper i {
-                font-size: 1.5rem;
-            }
-
-            .search-input-wrapper {
-                border-radius: 25px;
-            }
-
-            .search-input-wrapper input {
-                font-size: 1rem;
-                padding: 12px 0;
-            }
-
-            .search-btn {
-                width: 45px;
-                height: 45px;
-            }
-
-            .user-item {
-                padding: 20px;
-                margin-bottom: 15px;
-            }
-
-            .user-item .friend-info {
-                gap: 15px;
-            }
-
-            .user-item .friend-avatar {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-
-            .user-item .friend-details h4 {
-                font-size: 1.1rem;
-            }
-
-            .user-stats {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .recent-searches {
-                padding: 20px;
-            }
-
-            .recent-searches-list {
-                justify-content: center;
-            }
-
-            /* Enhanced mobile styles for friends and requests */
-            .friends-header, .requests-header {
-                padding: 20px 15px;
-                margin-bottom: 30px;
-            }
-
-            .friends-header-content h2, .requests-header-content h2 {
-                font-size: 1.8rem;
-            }
-
-            .friends-header-content p, .requests-header-content p {
-                font-size: 1rem;
-            }
-
-            .friends-icon-wrapper, .requests-icon-wrapper {
-                width: 60px;
-                height: 60px;
-            }
-
-            .friends-icon-wrapper i, .requests-icon-wrapper i {
-                font-size: 1.5rem;
-            }
-
-            .friends-stats, .requests-stats {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .stat-card {
-                padding: 15px;
-            }
-
-            .stat-number {
-                font-size: 1.5rem;
-            }
-
-            .friend-item, .request-item {
-                padding: 20px;
-                margin-bottom: 15px;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .friend-info {
-                gap: 15px;
-            }
-
-            .friend-avatar {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-
-            .friend-details h4 {
-                font-size: 1.1rem;
-            }
-
-            .user-stats {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .friend-actions {
-                justify-content: center;
-                width: 100%;
-            }
-
-            .friend-actions .btn {
-                flex: 1;
-                justify-content: center;
-            }
-
-            /* Enhanced mobile styles for friends tabs */
-            .friends-tabs {
-                padding: 15px;
-                gap: 10px;
-                margin-bottom: 30px;
-            }
-
-            .friends-tabs .tab-btn {
-                min-width: 120px;
-                padding: 15px 20px;
-                font-size: 0.9rem;
-                gap: 8px;
-            }
-
-            .friends-tabs .tab-btn i {
-                font-size: 1.1rem;
-            }
-
-            .friends-tabs .tab-btn span {
-                font-size: 0.9rem;
             }
         }
     </style>
@@ -4694,41 +3889,28 @@
                 <p>Your BevyFinder Command Center</p>
             </div>
             
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-search"></i>
+
+            
+            <div class="dashboard-recent" id="dashboard-recent">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <div class="recent-grid">
+                    <div class="recent-section">
+                        <h4><i class="fas fa-search"></i> Recent Searches</h4>
+                        <div class="recent-list" id="recent-searches">
+                            <div class="recent-item empty">No recent searches</div>
+                        </div>
                     </div>
-                    <div class="stat-info">
-                        <div class="stat-value">15</div>
-                        <div class="stat-label">Searches</div>
+                    <div class="recent-section">
+                        <h4><i class="fas fa-heart"></i> Recent Favorites</h4>
+                        <div class="recent-list" id="recent-favorites">
+                            <div class="recent-item empty">No recent favorites</div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">8</div>
-                        <div class="stat-label">Favorites</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">History</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">3</div>
-                        <div class="stat-label">Sessions</div>
+                    <div class="recent-section">
+                        <h4><i class="fas fa-chart-line"></i> Recent Sessions</h4>
+                        <div class="recent-list" id="recent-sessions">
+                            <div class="recent-item empty">No recent sessions</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4846,153 +4028,43 @@
             
             <div class="friends-tabs">
                 <button class="tab-btn active" data-tab="friends-list">
-                    <i class="fas fa-users"></i>
-                    <span>My Friends</span>
+                    <i class="fas fa-users"></i> My Friends
                 </button>
                 <button class="tab-btn" data-tab="friend-requests">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Requests</span>
+                    <i class="fas fa-user-plus"></i> Requests
                 </button>
                 <button class="tab-btn" data-tab="find-friends">
-                    <i class="fas fa-search"></i>
-                    <span>Find Friends</span>
+                    <i class="fas fa-search"></i> Find Friends
                 </button>
             </div>
             
             <div class="tab-content active" id="friends-list-tab">
                 <div class="friends-container" id="friends-container">
-                    <!-- Enhanced Friends Header -->
-                    <div class="friends-header">
-                        <div class="friends-header-content">
-                            <div class="friends-icon-wrapper">
-                                <i class="fas fa-user-friends"></i>
-                            </div>
-                            <h2>My Friends</h2>
-                            <p>Stay connected with your BevyFinder community</p>
-                        </div>
-                    </div>
-
-                    <!-- Friends Stats -->
-                    <div class="friends-stats" id="friends-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-content">
-                                <span class="stat-number" id="total-friends">0</span>
-                                <span class="stat-label">Total Friends</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-content">
-                                <span class="stat-number" id="active-friends">0</span>
-                                <span class="stat-label">Active Today</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Friends List -->
-                    <div class="friends-list" id="friends-list">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading friends...</p>
-                        </div>
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading friends...</p>
                     </div>
                 </div>
             </div>
             
             <div class="tab-content" id="friend-requests-tab">
                 <div class="requests-container" id="requests-container">
-                    <!-- Enhanced Requests Header -->
-                    <div class="requests-header">
-                        <div class="requests-header-content">
-                            <div class="requests-icon-wrapper">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <h2>Friend Requests</h2>
-                            <p>Manage your incoming connection requests</p>
-                        </div>
-                    </div>
-
-                    <!-- Requests Stats -->
-                    <div class="requests-stats" id="requests-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="stat-content">
-                                <span class="stat-number" id="pending-requests">0</span>
-                                <span class="stat-label">Pending Requests</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Requests List -->
-                    <div class="requests-list" id="requests-list">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading requests...</p>
-                        </div>
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading requests...</p>
                     </div>
                 </div>
             </div>
             
             <div class="tab-content" id="find-friends-tab">
                 <div class="search-friends-container">
-                    <!-- Enhanced Search Header -->
-                    <div class="search-header">
-                        <div class="search-header-content">
-                            <div class="search-icon-wrapper">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h2>Find New Friends</h2>
-                            <p>Connect with other BevyFinder users and expand your social circle</p>
-                        </div>
+                    <div class="input-group">
+                        <input type="text" id="friend-search" placeholder="Search by name or email...">
+                        <button class="btn primary-btn" onclick="searchUsers()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
                     </div>
-
-                    <!-- Enhanced Search Input -->
-                    <div class="search-input-container">
-                        <div class="search-input-wrapper">
-                            <div class="search-input-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <input 
-                                type="text" 
-                                id="friend-search" 
-                                placeholder="Search by name or email..."
-                                onkeypress="if(event.key === 'Enter') searchUsers()"
-                            >
-                            <button class="search-btn" onclick="searchUsers()">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div class="search-tips">
-                            <span class="tip">
-                                <i class="fas fa-lightbulb"></i>
-                                Try searching by first name, last name, or email address
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Search Results with Enhanced Design -->
-                    <div class="search-results" id="search-results">
-                        <div class="search-placeholder">
-                            <div class="placeholder-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <h3>Ready to Find Friends?</h3>
-                            <p>Enter a name or email above to start searching for new connections</p>
-                        </div>
-                    </div>
-
-                    <!-- Recent Searches Section -->
-                    <div class="recent-searches" id="recent-searches" style="display: none;">
-                        <h3><i class="fas fa-history"></i> Recent Searches</h3>
-                        <div class="recent-searches-list" id="recent-searches-list"></div>
-                    </div>
+                    <div class="search-results" id="search-results"></div>
                 </div>
             </div>
         </div>
@@ -5031,10 +4103,8 @@
     </div>
 
     <script>
-        console.log('🚀 Script loading - CACHE BUST v3 -', new Date().toISOString());
         // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
-        let TEMP_AUTH_BYPASS = true;
-        let FORCE_LOGOUT = localStorage.getItem('FORCE_LOGOUT') === 'true'; // Persist logout state
+        const TEMP_AUTH_BYPASS = false;
         const TEMP_USER = {
             _id: 'temp-user-123',
             name: 'Test User',
@@ -5046,8 +4116,8 @@
                 gender: 'male'
             },
             stats: {
-                searches: 15,
-                favorites: 8
+                searches: 0,
+                favorites: 0
             },
             profile: {
                 preferences: {
@@ -5059,35 +4129,18 @@
 
         // Mock authentication functions
         function isAuthenticated() {
-            return TEMP_AUTH_BYPASS && !FORCE_LOGOUT;
+            return TEMP_AUTH_BYPASS;
         }
 
-        function getToken() {
-            if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
-                // For testing, we'll use a real token from one of our test users
-                // This token is from the test user we created earlier
-                return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWFiNmIxZmMwYzVkYmMxNjJlYTlkMCIsImlhdCI6MTc1NDk2OTc3NywiZXhwIjoxNzU1NTc0NTc3fQ.3aqXejwIA0bXKecSE5xpYtQhXkkaMUHTHuDP3n49gWE';
-            }
-            return null;
+        // Check if user is logged in
+        function isLoggedIn() {
+            const token = localStorage.getItem('token');
+            return token && token.length > 0;
         }
 
         // Note: getCurrentUser function is defined later in the file
 
         console.log('🔓 Authentication bypass enabled - all features available for testing');
-        console.log('🚪 Logout state:', FORCE_LOGOUT ? 'LOGGED OUT' : 'LOGGED IN');
-        
-        // Function to re-enable authentication bypass for testing
-        function enableTestMode() {
-            FORCE_LOGOUT = false;
-            localStorage.removeItem('FORCE_LOGOUT'); // Clear logout state
-            currentUser = TEMP_USER;
-            localStorage.setItem('currentUser', JSON.stringify(TEMP_USER));
-            updateProfileButton();
-            console.log('🔓 Test mode re-enabled');
-            if (typeof showNotification === 'function') {
-                showNotification('Test mode enabled - logged in as test@bevyfinder.com', 'success');
-            }
-        }
 
         // Simple page management
         function showPage(pageId) {
@@ -5152,6 +4205,12 @@
                     break;
                 case 'sidebar-btn-dashboard':
                     showPage('dashboard-page');
+                    // Initialize dashboard with live data
+                    console.log('📊 Loading dashboard...');
+                    updateDashboardStats();
+                    if (isLoggedIn()) {
+                        startDashboardUpdates();
+                    }
                     break;
                 case 'sidebar-btn-2':
                     showPage('favorites-page');
@@ -5240,6 +4299,366 @@
         let totalCarbs = 0;
         let totalSugar = 0;
         let totalProtein = 0;
+
+        // Live Tracking Functions
+        let dashboardUpdateInterval = null;
+        let activeSessionTimer = null;
+
+        // Track search activity
+        async function trackSearch(query, results) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(`${API_BASE_URL}/api/tracking/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        results: results
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ Search tracked successfully');
+                    // Update dashboard if visible
+                    if (document.getElementById('dashboard-page').classList.contains('active')) {
+                        updateDashboardStats();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error tracking search:', error);
+            }
+        }
+
+        // Track favorite action
+        async function trackFavorite(beverageKey, action) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(`${API_BASE_URL}/api/tracking/favorite`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        beverageKey: beverageKey,
+                        action: action
+                    })
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Favorite ${action} tracked successfully`);
+                    // Update dashboard if visible
+                    if (document.getElementById('dashboard-page').classList.contains('active')) {
+                        updateDashboardStats();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error tracking favorite:', error);
+            }
+        }
+
+        // Track session activity
+        async function trackSession(action, duration = null, drinks = null) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(`${API_BASE_URL}/api/tracking/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        duration: duration,
+                        drinks: drinks
+                    })
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Session ${action} tracked successfully`);
+                    // Update dashboard if visible
+                    if (document.getElementById('dashboard-page').classList.contains('active')) {
+                        updateDashboardStats();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error tracking session:', error);
+            }
+        }
+
+        // Update dashboard stats
+        async function updateDashboardStats() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.log('🔑 No token found - showing default dashboard values');
+                    // Show default values when not logged in
+                    updateDashboardUI({
+                        stats: {
+                            totalSearches: 0,
+                            totalFavorites: 0,
+                            totalSessions: 0,
+                            longestSession: 0,
+                            lastActive: new Date()
+                        },
+                        today: {
+                            searches: 0,
+                            favorites: 0
+                        },
+                        recent: {
+                            searches: [],
+                            favorites: [],
+                            sessions: []
+                        },
+                        activeSession: null
+                    });
+                    return;
+                }
+
+                console.log('🔄 Fetching dashboard stats from API...');
+                const response = await fetch(`${API_BASE_URL}/api/tracking/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Dashboard stats received:', data.data);
+                    updateDashboardUI(data.data);
+                } else {
+                    console.error('❌ API response not ok:', response.status);
+                    // Show default values on API error
+                    updateDashboardUI({
+                        stats: {
+                            totalSearches: 0,
+                            totalFavorites: 0,
+                            totalSessions: 0,
+                            longestSession: 0,
+                            lastActive: new Date()
+                        },
+                        today: {
+                            searches: 0,
+                            favorites: 0
+                        },
+                        recent: {
+                            searches: [],
+                            favorites: [],
+                            sessions: []
+                        },
+                        activeSession: null
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error updating dashboard stats:', error);
+                // Show default values on error
+                updateDashboardUI({
+                    stats: {
+                        totalSearches: 0,
+                        totalFavorites: 0,
+                        totalSessions: 0,
+                        longestSession: 0,
+                        lastActive: new Date()
+                    },
+                    today: {
+                        searches: 0,
+                        favorites: 0
+                    },
+                    recent: {
+                        searches: [],
+                        favorites: [],
+                        sessions: []
+                    },
+                    activeSession: null
+                });
+            }
+        }
+
+        // Update dashboard UI with live data
+        function updateDashboardUI(data) {
+            // Update stat cards with animation
+            const searchesCard = document.getElementById('searches-stat');
+            const favoritesCard = document.getElementById('favorites-stat');
+            const sessionsCard = document.getElementById('sessions-stat');
+            const activeSessionCard = document.getElementById('active-session-stat');
+
+            // Add update animation
+            [searchesCard, favoritesCard, sessionsCard, activeSessionCard].forEach(card => {
+                if (card) {
+                    card.classList.add('updating');
+                    setTimeout(() => card.classList.remove('updating'), 500);
+                }
+            });
+
+            // Update search stats
+            if (data.stats) {
+                const searchesValue = document.getElementById('searches-value');
+                const searchesToday = document.getElementById('searches-today');
+                if (searchesValue) searchesValue.textContent = data.stats.totalSearches;
+                if (searchesToday) searchesToday.textContent = `Today: ${data.today.searches}`;
+            }
+
+            // Update favorite stats
+            if (data.stats) {
+                const favoritesValue = document.getElementById('favorites-value');
+                const favoritesToday = document.getElementById('favorites-today');
+                if (favoritesValue) favoritesValue.textContent = data.stats.totalFavorites;
+                if (favoritesToday) favoritesToday.textContent = `Today: ${data.today.favorites}`;
+            }
+
+            // Update session stats
+            if (data.stats) {
+                const sessionsValue = document.getElementById('sessions-value');
+                const sessionsLongest = document.getElementById('sessions-longest');
+                if (sessionsValue) sessionsValue.textContent = data.stats.totalSessions;
+                if (sessionsLongest) sessionsLongest.textContent = `Longest: ${Math.round(data.stats.longestSession)}m`;
+            }
+
+            // Update active session
+            if (data.activeSession) {
+                const activeSessionValue = document.getElementById('active-session-value');
+                const activeSessionTime = document.getElementById('active-session-time');
+                if (activeSessionValue) activeSessionValue.textContent = 'Active';
+                if (activeSessionTime) {
+                    const startTime = new Date(data.activeSession.startTime);
+                    const duration = Math.floor((Date.now() - startTime.getTime()) / 1000 / 60);
+                    activeSessionTime.textContent = `${duration}m`;
+                }
+                
+                // Add active session styling
+                if (activeSessionCard) {
+                    activeSessionCard.classList.add('active-session');
+                }
+            } else {
+                const activeSessionValue = document.getElementById('active-session-value');
+                const activeSessionTime = document.getElementById('active-session-time');
+                if (activeSessionValue) activeSessionValue.textContent = '--';
+                if (activeSessionTime) activeSessionTime.textContent = 'No active session';
+                
+                // Remove active session styling
+                if (activeSessionCard) {
+                    activeSessionCard.classList.remove('active-session');
+                }
+            }
+
+            // Update recent activity
+            updateRecentActivity(data.recent);
+        }
+
+        // Update recent activity sections
+        function updateRecentActivity(recent) {
+            // Update recent searches
+            const recentSearches = document.getElementById('recent-searches');
+            if (recentSearches && recent.searches) {
+                if (recent.searches.length === 0) {
+                    recentSearches.innerHTML = '<div class="recent-item empty">No recent searches</div>';
+                } else {
+                    recentSearches.innerHTML = recent.searches.map(search => `
+                        <div class="recent-item">
+                            <div class="recent-item-title">"${search.query}"</div>
+                            <div class="recent-item-time">${formatTimeAgo(search.timestamp)}</div>
+                            <div class="recent-item-details">${search.results} results found</div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Update recent favorites
+            const recentFavorites = document.getElementById('recent-favorites');
+            if (recentFavorites && recent.favorites) {
+                if (recent.favorites.length === 0) {
+                    recentFavorites.innerHTML = '<div class="recent-item empty">No recent favorites</div>';
+                } else {
+                    recentFavorites.innerHTML = recent.favorites.map(fav => `
+                        <div class="recent-item">
+                            <div class="recent-item-title">${fav.beverageKey}</div>
+                            <div class="recent-item-time">${formatTimeAgo(fav.timestamp)}</div>
+                            <div class="recent-item-details">${fav.action === 'add' ? 'Added to' : 'Removed from'} favorites</div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Update recent sessions
+            const recentSessions = document.getElementById('recent-sessions');
+            if (recentSessions && recent.sessions) {
+                if (recent.sessions.length === 0) {
+                    recentSessions.innerHTML = '<div class="recent-item empty">No recent sessions</div>';
+                } else {
+                    recentSessions.innerHTML = recent.sessions.map(session => `
+                        <div class="recent-item">
+                            <div class="recent-item-title">${session.status === 'active' ? 'Active Session' : 'Completed Session'}</div>
+                            <div class="recent-item-time">${formatTimeAgo(session.startTime)}</div>
+                            <div class="recent-item-details">${session.duration ? Math.round(session.duration) + 'm' : 'In progress'}</div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        // Format time ago
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diffMs = now - time;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return `${diffDays}d ago`;
+        }
+
+        // Start dashboard live updates
+        function startDashboardUpdates() {
+            if (dashboardUpdateInterval) {
+                clearInterval(dashboardUpdateInterval);
+            }
+            
+            dashboardUpdateInterval = setInterval(() => {
+                if (document.getElementById('dashboard-page').classList.contains('active')) {
+                    updateDashboardStats();
+                }
+            }, 30000); // Update every 30 seconds
+        }
+
+        // Stop dashboard updates
+        function stopDashboardUpdates() {
+            if (dashboardUpdateInterval) {
+                clearInterval(dashboardUpdateInterval);
+                dashboardUpdateInterval = null;
+            }
+        }
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopDashboardUpdates();
+            } else if (document.getElementById('dashboard-page').classList.contains('active')) {
+                startDashboardUpdates();
+            }
+        });
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start dashboard updates if dashboard is active
+            if (document.getElementById('dashboard-page').classList.contains('active') && isLoggedIn()) {
+                updateDashboardStats();
+                startDashboardUpdates();
+            }
+        });
 
         // Comprehensive drink database with 200+ drinks
         const drinkDatabase = {
@@ -8698,7 +8117,7 @@
             checkConsent();
         });
 
-        function startSession() {
+        async function startSession() {
             if (!consentAccepted) {
                 showNotification('Please accept the terms and conditions first.', 'error');
                 showConsentModal();
@@ -8711,10 +8130,17 @@
             document.getElementById('start-session-btn').style.display = 'none';
             document.getElementById('end-session-btn').style.display = 'inline-flex';
             console.log('Session started');
+            
+            // Track session start
+            if (isLoggedIn()) {
+                await trackSession('start');
+            }
         }
 
-        function endSession() {
+        async function endSession() {
             sessionActive = false;
+            const sessionDuration = sessionStartTime ? (Date.now() - sessionStartTime.getTime()) / 1000 / 60 : 0; // in minutes
+            
             document.getElementById('session-status').textContent = 'Session ended';
             document.getElementById('start-session-btn').style.display = 'inline-flex';
             document.getElementById('end-session-btn').style.display = 'none';
@@ -8723,6 +8149,15 @@
             showSessionSummary();
             
             console.log('Session ended');
+            
+            // Track session end
+            if (isLoggedIn()) {
+                await trackSession('end', sessionDuration, drinks.map(drink => ({
+                    beverageKey: drink.name,
+                    quantity: 1,
+                    timestamp: drink.time
+                })));
+            }
         }
 
         function resetSession() {
@@ -9257,34 +8692,20 @@
         let currentUser = null;
         // Dynamic API URL detection
         let API_BASE_URL;
-        console.log('🔍 Hostname detection:', {
-            hostname: window.location.hostname,
-            href: window.location.href,
-            protocol: window.location.protocol,
-            isLocalhost: window.location.hostname === 'localhost',
-            is127: window.location.hostname === '127.0.0.1'
-        });
-        
-        // Smart API URL detection for mobile and desktop
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            API_BASE_URL = 'http://localhost:3000/api'; // Local development
-            console.log('🏠 Using localhost API for development');
+            API_BASE_URL = 'http://localhost:8080/api'; // Local development
         } else {
             API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Production
-            console.log('🌍 Using production API for mobile/live deployment');
         }
         console.log('🌐 Using API URL:', API_BASE_URL);
         
-        // Initialize currentUser with TEMP_USER if bypass is enabled and not logged out
-        if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
+        // Initialize currentUser with TEMP_USER if bypass is enabled
+        if (TEMP_AUTH_BYPASS) {
             currentUser = TEMP_USER;
             console.log('🚀 TEMP_AUTH_BYPASS enabled, setting currentUser to:', currentUser);
             // Also store in localStorage to ensure consistency
             localStorage.setItem('currentUser', JSON.stringify(TEMP_USER));
             console.log('💾 Stored TEMP_USER in localStorage');
-        } else if (FORCE_LOGOUT) {
-            console.log('🚪 Logout state detected - keeping currentUser as null');
-            currentUser = null;
         }
 
         function toggleProfileDropdown() {
@@ -9681,38 +9102,13 @@
         }
 
         function logout() {
-            console.log('🚪 Logout function called');
-            
-            // Set logout flag to disable authentication bypass
-            FORCE_LOGOUT = true;
-            localStorage.setItem('FORCE_LOGOUT', 'true'); // Persist logout state
-            
-            // Clear user data completely
             currentUser = null;
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
-            
-            // Hide UI elements
             hideProfileDropdown();
-            closeProfileModal();
-            
-            // Show logout message
-            if (typeof showNotification === 'function') {
-                showNotification('Logged out successfully!', 'success');
-            } else {
-                alert('Logged out successfully!');
-            }
-            
-            // Update the UI to reflect logged out state
             updateProfileButton();
-            
-            console.log('✅ Logout completed - authentication bypass disabled');
-            
-            // Force page reload to ensure clean state
-            setTimeout(() => {
-                console.log('🔄 Reloading page to ensure clean logout state...');
-                window.location.reload();
-            }, 1500);
+            closeProfileModal();
+            alert('Logged out successfully!');
         }
 
         function updateProfileButton() {
@@ -10145,8 +9541,8 @@
                 return currentUser;
             }
             
-            // Only return TEMP_USER if bypass is enabled and not logged out
-            if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
+            // Only return TEMP_USER if bypass is enabled
+            if (TEMP_AUTH_BYPASS) {
                 return TEMP_USER;
             }
             
@@ -10505,6 +9901,11 @@
 
             searchResults = results;
             displaySearchResults(results, query);
+            
+            // Track search if user is logged in
+            if (isLoggedIn()) {
+                trackSearch(query, results.length);
+            }
         }
 
         function displaySearchResults(results, query) {
@@ -10669,11 +10070,75 @@
             showPage('tracking-page');
         }
 
-        function addToFavorites(drinkKey) {
+        async function addToFavorites(drinkKey) {
             const drink = drinkDatabase[drinkKey];
             if (drink) {
-                // Add to favorites (you can implement localStorage here)
-                alert(`${drink.name} added to favorites!`);
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        showNotification('Please log in to add favorites', 'error');
+                        return;
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}/api/favorites/add`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            beverageKey: drinkKey
+                        })
+                    });
+
+                    if (response.ok) {
+                        showNotification(`${drink.name} added to favorites!`, 'success');
+                        // Track the favorite action
+                        trackFavorite(drinkKey, 'add');
+                    } else {
+                        const error = await response.json();
+                        showNotification(error.message || 'Error adding to favorites', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error adding to favorites:', error);
+                    showNotification('Error adding to favorites', 'error');
+                }
+            }
+        }
+
+        async function removeFromFavorites(drinkKey) {
+            const drink = drinkDatabase[drinkKey];
+            if (drink) {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        showNotification('Please log in to remove favorites', 'error');
+                        return;
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}/api/favorites/remove`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            beverageKey: drinkKey
+                        })
+                    });
+
+                    if (response.ok) {
+                        showNotification(`${drink.name} removed from favorites!`, 'success');
+                        // Track the favorite removal
+                        trackFavorite(drinkKey, 'remove');
+                    } else {
+                        const error = await response.json();
+                        showNotification(error.message || 'Error removing from favorites', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error removing from favorites:', error);
+                    showNotification('Error removing from favorites', 'error');
+                }
             }
         }
 
@@ -10691,8 +10156,7 @@
                 return;
             }
 
-            // Use the working authentication bypass
-            const token = getToken();
+            const token = localStorage.getItem('token');
             if (!token) {
                 showNotification('Please log in to access social features.', 'error');
                 return;
@@ -10719,11 +10183,7 @@
                 await initializeSocial();
             }
 
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
@@ -10803,14 +10263,7 @@
                 await initializeSocial();
             }
 
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for loading friends');
-            } else {
-                console.log('🔑 Using test token for loading friends');
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
@@ -10834,14 +10287,7 @@
                 await initializeSocial();
             }
 
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for loading friend requests');
-            } else {
-                console.log('🔑 Using test token for loading friend requests');
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
@@ -10861,31 +10307,15 @@
         }
 
         function renderFriends() {
-            const container = document.getElementById('friends-list');
-            const statsContainer = document.getElementById('friends-stats');
+            const container = document.getElementById('friends-container');
             if (!container) return;
-
-            // Update stats
-            if (statsContainer) {
-                const totalFriends = friends.length;
-                const activeToday = friends.filter(friend => {
-                    const lastActive = new Date(friend.stats?.lastActive || 0);
-                    const today = new Date();
-                    return lastActive.toDateString() === today.toDateString();
-                }).length;
-
-                document.getElementById('total-friends').textContent = totalFriends;
-                document.getElementById('active-friends').textContent = activeToday;
-            }
 
             if (friends.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="placeholder-icon">
-                            <i class="fas fa-user-friends"></i>
-                        </div>
+                        <i class="fas fa-user-friends"></i>
                         <h3>No friends yet</h3>
-                        <p>Start connecting with other BevyFinder users to build your community!</p>
+                        <p>Start connecting with other BevyFinder users!</p>
                         <button class="btn primary-btn" onclick="switchToFindFriends()">
                             <i class="fas fa-search"></i> Find Friends
                         </button>
@@ -10894,182 +10324,87 @@
                 return;
             }
 
-            container.innerHTML = `
-                <div class="friends-list-header">
-                    <h3><i class="fas fa-users"></i> Your Friends (${friends.length})</h3>
-                </div>
-                ${friends.map(friend => `
-                    <div class="friend-item">
-                        <div class="friend-info">
-                            <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
-                            <div class="friend-details">
-                                <h4>${friend.name}</h4>
-                                <span>
-                                    <i class="fas fa-clock"></i>
-                                    Last active: ${formatDate(friend.stats?.lastActive)}
-                                </span>
-                                ${friend.stats ? `
-                                    <div class="user-stats">
-                                        <span class="stat"><i class="fas fa-beer"></i> ${friend.stats.searches || 0} searches</span>
-                                        <span class="stat"><i class="fas fa-heart"></i> ${friend.stats.favorites || 0} favorites</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="friend-actions">
-                            <button class="btn secondary-btn" onclick="viewFriendProfile('${friend.id}')">
-                                <i class="fas fa-user"></i> Profile
-                            </button>
-                            <button class="btn danger-btn" onclick="removeFriend('${friend.id}')">
-                                <i class="fas fa-user-minus"></i> Remove
-                            </button>
+            container.innerHTML = friends.map(friend => `
+                <div class="friend-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${friend.name}</h4>
+                            <span>Last active: ${formatDate(friend.stats?.lastActive)}</span>
                         </div>
                     </div>
-                `).join('')}
-            `;
+                    <div class="friend-actions">
+                        <button class="btn secondary-btn" onclick="viewFriendProfile('${friend.id}')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                        <button class="btn secondary-btn" onclick="removeFriend('${friend.id}')">
+                            <i class="fas fa-user-minus"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function renderFriendRequests() {
-            const container = document.getElementById('requests-list');
-            const statsContainer = document.getElementById('requests-stats');
+            const container = document.getElementById('requests-container');
             if (!container) return;
-
-            // Update stats
-            if (statsContainer) {
-                document.getElementById('pending-requests').textContent = friendRequests.length;
-            }
 
             if (friendRequests.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="placeholder-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
+                        <i class="fas fa-user-plus"></i>
                         <h3>No friend requests</h3>
                         <p>When someone sends you a friend request, it will appear here.</p>
-                        <div class="empty-state-tips">
-                            <p><strong>Tips:</strong></p>
-                            <ul>
-                                <li>Share your profile with others to get friend requests</li>
-                                <li>Be active in the community to connect with new users</li>
-                                <li>Check back regularly for new requests</li>
-                            </ul>
-                        </div>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = `
-                <div class="requests-list-header">
-                    <h3><i class="fas fa-bell"></i> Pending Requests (${friendRequests.length})</h3>
-                </div>
-                ${friendRequests.map(request => `
-                    <div class="request-item">
-                        <div class="friend-info">
-                            <div class="friend-avatar">${request.from.name.charAt(0).toUpperCase()}</div>
-                            <div class="friend-details">
-                                <h4>${request.from.name}</h4>
-                                <span>
-                                    <i class="fas fa-calendar"></i>
-                                    Sent ${formatDate(request.date)}
-                                </span>
-                                ${request.from.stats ? `
-                                    <div class="user-stats">
-                                        <span class="stat"><i class="fas fa-beer"></i> ${request.from.stats.searches || 0} searches</span>
-                                        <span class="stat"><i class="fas fa-heart"></i> ${request.from.stats.favorites || 0} favorites</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="friend-actions">
-                            <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id || request.from.id}')">
-                                <i class="fas fa-check"></i> Accept
-                            </button>
-                            <button class="btn danger-btn" onclick="declineFriendRequest('${request.from._id || request.from.id}')">
-                                <i class="fas fa-times"></i> Decline
-                            </button>
+            container.innerHTML = friendRequests.map(request => `
+                <div class="request-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${request.from.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${request.from.name}</h4>
+                            <span>Sent ${formatDate(request.date)}</span>
                         </div>
                     </div>
-                `).join('')}
-            `;
+                    <div class="friend-actions">
+                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from.id}')">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from.id}')">
+                            <i class="fas fa-times"></i> Decline
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         async function searchUsers() {
-            console.log('🚀 searchUsers function called');
-            
-            const searchInput = document.getElementById('friend-search');
-            const resultsContainer = document.getElementById('search-results');
-            
-            if (!searchInput) {
-                console.error('❌ Search input element not found');
-                return;
-            }
-            
-            const query = searchInput.value.trim();
+            const query = document.getElementById('friend-search').value.trim();
             console.log('🔍 Searching for users with query:', query);
             
             if (query.length < 2) {
-                console.log('❌ Query too short');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please enter at least 2 characters', 'error');
-                } else {
-                    alert('Please enter at least 2 characters');
-                }
+                showNotification('Please enter at least 2 characters', 'error');
                 return;
             }
 
-            // Show loading state
-            if (resultsContainer) {
-                resultsContainer.innerHTML = `
-                    <div class="search-loading">
-                        <i class="fas fa-spinner"></i>
-                        <p>Searching for users...</p>
-                    </div>
-                `;
-            }
-
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            console.log('🔍 Test token result:', token ? 'Found' : 'Not found');
-            
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔍 Real account token from localStorage:', token ? 'Found' : 'Not found');
-                if (token) {
-                    console.log('🔑 Using real account token from localStorage');
-                }
-            } else {
-                console.log('🔑 Using test token');
-            }
-            
-            // Debug: Check all localStorage items
-            console.log('🔍 All localStorage keys:', Object.keys(localStorage));
-            console.log('🔍 currentUser from localStorage:', localStorage.getItem('currentUser'));
-            
-            console.log('🔑 Token available:', !!token);
+            const token = localStorage.getItem('token');
             if (!token) {
                 console.error('❌ No token found for search');
-                console.error('❌ Check if you are properly logged in');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please log in to search users', 'error');
-                } else {
-                    alert('Please log in to search users');
-                }
                 return;
             }
 
             try {
                 const url = `${API_BASE_URL}/social/search-users?query=${encodeURIComponent(query)}`;
                 console.log('📤 Searching users at:', url);
-                console.log('🔑 Using token:', token.substring(0, 20) + '...');
                 
                 const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 console.log('📥 Search response status:', response.status);
-                console.log('📥 Search response ok:', response.ok);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -11078,23 +10413,11 @@
                 } else {
                     const error = await response.json();
                     console.error('❌ Search error:', error);
-                    if (typeof showNotification === 'function') {
-                        showNotification('Error searching users', 'error');
-                    } else {
-                        alert('Error searching users');
-                    }
+                    showNotification('Error searching users', 'error');
                 }
             } catch (error) {
                 console.error('❌ Error searching users:', error);
-                console.error('📄 Error details:', error.message);
-                if (error.stack) {
-                    console.error('📄 Stack trace:', error.stack);
-                }
-                if (typeof showNotification === 'function') {
-                    showNotification('Error searching users', 'error');
-                } else {
-                    alert('Error searching users');
-                }
+                showNotification('Error searching users', 'error');
             }
         }
 
@@ -11102,108 +10425,38 @@
             const container = document.getElementById('search-results');
             if (!container) return;
 
-            // Save search to recent searches
-            const searchInput = document.getElementById('friend-search');
-            if (searchInput && searchInput.value.trim()) {
-                saveRecentSearch(searchInput.value.trim());
-            }
-
             if (users.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="placeholder-icon">
-                            <i class="fas fa-user-slash"></i>
-                        </div>
+                        <i class="fas fa-search"></i>
                         <h3>No users found</h3>
-                        <p>Try searching with a different name or email address.</p>
-                        <div class="search-suggestions">
-                            <p><strong>Suggestions:</strong></p>
-                            <ul>
-                                <li>Check the spelling of the name</li>
-                                <li>Try searching by first name only</li>
-                                <li>Try searching by email address</li>
-                            </ul>
-                        </div>
+                        <p>Try searching with a different name or email.</p>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = `
-                <div class="search-results-header">
-                    <h3><i class="fas fa-users"></i> Found ${users.length} user${users.length === 1 ? '' : 's'}</h3>
-                </div>
-                ${users.map(user => `
-                    <div class="user-item">
-                        <div class="friend-info">
-                            <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                            <div class="friend-details">
-                                <h4>${user.name}</h4>
-                                <span><i class="fas fa-envelope"></i> ${user.email}</span>
-                                ${user.stats ? `
-                                    <div class="user-stats">
-                                        <span class="stat"><i class="fas fa-beer"></i> ${user.stats.searches || 0} searches</span>
-                                        <span class="stat"><i class="fas fa-heart"></i> ${user.stats.favorites || 0} favorites</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="friend-actions">
-                            <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
-                                <i class="fas fa-user-plus"></i> Add Friend
-                            </button>
+            container.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <div class="friend-info">
+                        <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                        <div class="friend-details">
+                            <h4>${user.name}</h4>
+                            <span>${user.email}</span>
                         </div>
                     </div>
-                `).join('')}
-            `;
-        }
-
-        function saveRecentSearch(query) {
-            let recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-            if (!recentSearches.includes(query)) {
-                recentSearches.unshift(query);
-                recentSearches = recentSearches.slice(0, 5); // Keep only last 5 searches
-                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-            }
-            updateRecentSearches();
-        }
-
-        function updateRecentSearches() {
-            const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-            const container = document.getElementById('recent-searches');
-            const list = document.getElementById('recent-searches-list');
-            
-            if (recentSearches.length === 0) {
-                container.style.display = 'none';
-                return;
-            }
-
-            container.style.display = 'block';
-            list.innerHTML = recentSearches.map(query => `
-                <span class="recent-search-tag" onclick="searchForQuery('${query}')">
-                    <i class="fas fa-search"></i> ${query}
-                </span>
+                    <div class="friend-actions">
+                        <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
+                            <i class="fas fa-user-plus"></i> Add Friend
+                        </button>
+                    </div>
+                </div>
             `).join('');
-        }
-
-        function searchForQuery(query) {
-            const searchInput = document.getElementById('friend-search');
-            if (searchInput) {
-                searchInput.value = query;
-                searchUsers();
-            }
         }
 
         // Leaderboard Functions
         async function loadLeaderboard(type = 'totalDrinks') {
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for loading leaderboard');
-            } else {
-                console.log('🔑 Using test token for loading leaderboard');
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
@@ -11268,23 +10521,9 @@
         // Social Action Functions
         async function sendFriendRequest(userId) {
             console.log('🔍 sendFriendRequest called with userId:', userId);
-            
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
+            const token = localStorage.getItem('token');
             if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for friend request');
-            } else {
-                console.log('🔑 Using test token for friend request');
-            }
-            
-            if (!token) {
-                console.error('❌ No token found for friend request');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please log in to send friend requests', 'error');
-                } else {
-                    alert('Please log in to send friend requests');
-                }
+                console.error('❌ No token found');
                 return;
             }
 
@@ -11318,38 +10557,8 @@
         }
 
         async function acceptFriendRequest(userId) {
-            console.log('🚀 acceptFriendRequest called with userId:', userId);
-            console.log('🔍 userId type:', typeof userId);
-            console.log('🔍 userId value:', userId);
-            
-            if (!userId || userId === 'undefined' || userId === 'null') {
-                console.error('❌ Invalid userId provided:', userId);
-                if (typeof showNotification === 'function') {
-                    showNotification('Error: Invalid user ID', 'error');
-                } else {
-                    alert('Error: Invalid user ID');
-                }
-                return;
-            }
-            
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for accepting friend request');
-            } else {
-                console.log('🔑 Using test token for accepting friend request');
-            }
-            
-            if (!token) {
-                console.error('❌ No token found for accepting friend request');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please log in to accept friend requests', 'error');
-                } else {
-                    alert('Please log in to accept friend requests');
-                }
-                return;
-            }
+            const token = localStorage.getItem('token');
+            if (!token) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/accept`, {
@@ -11376,24 +10585,8 @@
         }
 
         async function declineFriendRequest(userId) {
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for declining friend request');
-            } else {
-                console.log('🔑 Using test token for declining friend request');
-            }
-            
-            if (!token) {
-                console.error('❌ No token found for declining friend request');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please log in to decline friend requests', 'error');
-                } else {
-                    alert('Please log in to decline friend requests');
-                }
-                return;
-            }
+            const token = localStorage.getItem('token');
+            if (!token) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/decline`, {
@@ -11421,24 +10614,8 @@
         async function removeFriend(userId) {
             if (!confirm('Are you sure you want to remove this friend?')) return;
 
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for removing friend');
-            } else {
-                console.log('🔑 Using test token for removing friend');
-            }
-            
-            if (!token) {
-                console.error('❌ No token found for removing friend');
-                if (typeof showNotification === 'function') {
-                    showNotification('Please log in to remove friends', 'error');
-                } else {
-                    alert('Please log in to remove friends');
-                }
-                return;
-            }
+            const token = localStorage.getItem('token');
+            if (!token) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friends/${userId}`, {
@@ -11460,14 +10637,7 @@
         }
 
         async function toggleLike(postId) {
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for toggling like');
-            } else {
-                console.log('🔑 Using test token for toggling like');
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
@@ -11521,9 +10691,6 @@
             
             document.querySelector('[data-tab="find-friends"]').classList.add('active');
             document.getElementById('find-friends-tab').classList.add('active');
-            
-            // Initialize recent searches
-            updateRecentSearches();
         }
 
         function showCreatePostModal() {
@@ -11535,14 +10702,7 @@
         }
 
         async function createPost(content) {
-            // Try to get token from multiple sources
-            let token = getToken(); // Try test token first
-            if (!token) {
-                token = localStorage.getItem('token'); // Try real account token
-                console.log('🔑 Using real account token for creating post');
-            } else {
-                console.log('🔑 Using test token for creating post');
-            }
+            const token = localStorage.getItem('token');
             if (!token) return;
 
             try {

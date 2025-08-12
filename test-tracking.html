@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Live Tracking</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 5px;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .info { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border: none;
+            border-radius: 5px;
+            background: #ffd700;
+            color: #333;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #f59e0b;
+        }
+        input { 
+            padding: 10px; 
+            width: 300px; 
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+        }
+        .dashboard-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Live Tracking System</h1>
+    <p>Test the live tracking functionality for searches, favorites, and sessions.</p>
+    
+    <div class="test-section">
+        <h3>🔐 Authentication</h3>
+        <input type="text" id="token" placeholder="Enter your JWT token" style="width: 400px;">
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Dashboard Stats</h3>
+        <button onclick="getDashboardStats()">Get Dashboard Stats</button>
+        <div class="dashboard-preview" id="dashboard-preview">
+            <div class="stat-card">
+                <div class="stat-value" id="searches-preview">0</div>
+                <div class="stat-label">Searches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="favorites-preview">0</div>
+                <div class="stat-label">Favorites</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sessions-preview">0</div>
+                <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="active-session-preview">--</div>
+                <div class="stat-label">Active Session</div>
+            </div>
+        </div>
+        <div id="dashboard-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Search Tracking</h3>
+        <input type="text" id="search-query" placeholder="Enter search query" value="beer">
+        <button onclick="testSearchTracking()">Track Search</button>
+        <div id="search-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>❤️ Favorite Tracking</h3>
+        <input type="text" id="favorite-drink" placeholder="Enter drink key" value="heineken">
+        <button onclick="testFavoriteAdd()">Add Favorite</button>
+        <button onclick="testFavoriteRemove()">Remove Favorite</button>
+        <div id="favorite-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>⏱️ Session Tracking</h3>
+        <button onclick="testSessionStart()">Start Session</button>
+        <button onclick="testSessionEnd()">End Session</button>
+        <div id="session-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 Live Updates</h3>
+        <button onclick="startLiveUpdates()">Start Live Updates</button>
+        <button onclick="stopLiveUpdates()">Stop Live Updates</button>
+        <div id="live-result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        let liveUpdateInterval = null;
+
+        function log(message, type = 'info', elementId) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `<div class="result ${type}">
+                <strong>[${timestamp}]</strong> ${message}
+            </div>`;
+        }
+
+        function getToken() {
+            return document.getElementById('token').value;
+        }
+
+        async function testAuth() {
+            const token = getToken();
+            if (!token) {
+                log('Please enter a token', 'error', 'auth-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Authenticated as: ${data.user.name} (${data.user.email})`, 'success', 'auth-result');
+                } else {
+                    log('❌ Authentication failed', 'error', 'auth-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'auth-result');
+            }
+        }
+
+        async function getDashboardStats() {
+            const token = getToken();
+            if (!token) {
+                log('Please enter a token', 'error', 'dashboard-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update preview
+                    document.getElementById('searches-preview').textContent = data.data.stats.totalSearches;
+                    document.getElementById('favorites-preview').textContent = data.data.stats.totalFavorites;
+                    document.getElementById('sessions-preview').textContent = data.data.stats.totalSessions;
+                    
+                    if (data.data.activeSession) {
+                        document.getElementById('active-session-preview').textContent = 'Active';
+                    } else {
+                        document.getElementById('active-session-preview').textContent = '--';
+                    }
+
+                    log(`✅ Dashboard stats loaded: ${data.data.stats.totalSearches} searches, ${data.data.stats.totalFavorites} favorites, ${data.data.stats.totalSessions} sessions`, 'success', 'dashboard-result');
+                    log(`📄 Full data: ${JSON.stringify(data.data, null, 2)}`, 'info', 'dashboard-result');
+                } else {
+                    log('❌ Failed to load dashboard stats', 'error', 'dashboard-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'dashboard-result');
+            }
+        }
+
+        async function testSearchTracking() {
+            const token = getToken();
+            const query = document.getElementById('search-query').value;
+            
+            if (!token) {
+                log('Please enter a token', 'error', 'search-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        results: Math.floor(Math.random() * 10) + 1
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Search tracked: "${query}" with ${data.data.totalSearches} total searches`, 'success', 'search-result');
+                } else {
+                    log('❌ Failed to track search', 'error', 'search-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'search-result');
+            }
+        }
+
+        async function testFavoriteAdd() {
+            const token = getToken();
+            const drinkKey = document.getElementById('favorite-drink').value;
+            
+            if (!token) {
+                log('Please enter a token', 'error', 'favorite-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/favorite`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        beverageKey: drinkKey,
+                        action: 'add'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Favorite added: ${drinkKey} (${data.data.totalFavorites} total favorites)`, 'success', 'favorite-result');
+                } else {
+                    log('❌ Failed to add favorite', 'error', 'favorite-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'favorite-result');
+            }
+        }
+
+        async function testFavoriteRemove() {
+            const token = getToken();
+            const drinkKey = document.getElementById('favorite-drink').value;
+            
+            if (!token) {
+                log('Please enter a token', 'error', 'favorite-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/favorite`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        beverageKey: drinkKey,
+                        action: 'remove'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Favorite removed: ${drinkKey} (${data.data.totalFavorites} total favorites)`, 'success', 'favorite-result');
+                } else {
+                    log('❌ Failed to remove favorite', 'error', 'favorite-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'favorite-result');
+            }
+        }
+
+        async function testSessionStart() {
+            const token = getToken();
+            
+            if (!token) {
+                log('Please enter a token', 'error', 'session-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'start'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Session started: ${data.data.totalSessions} total sessions`, 'success', 'session-result');
+                } else {
+                    log('❌ Failed to start session', 'error', 'session-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'session-result');
+            }
+        }
+
+        async function testSessionEnd() {
+            const token = getToken();
+            
+            if (!token) {
+                log('Please enter a token', 'error', 'session-result');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/tracking/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'end',
+                        duration: 45 // 45 minutes
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Session ended: ${data.data.totalSessions} total sessions, longest: ${Math.round(data.data.longestSession)}m`, 'success', 'session-result');
+                } else {
+                    log('❌ Failed to end session', 'error', 'session-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error', 'session-result');
+            }
+        }
+
+        function startLiveUpdates() {
+            if (liveUpdateInterval) {
+                clearInterval(liveUpdateInterval);
+            }
+            
+            liveUpdateInterval = setInterval(() => {
+                getDashboardStats();
+                log('🔄 Live update performed', 'info', 'live-result');
+            }, 10000); // Update every 10 seconds
+            
+            log('✅ Live updates started (every 10 seconds)', 'success', 'live-result');
+        }
+
+        function stopLiveUpdates() {
+            if (liveUpdateInterval) {
+                clearInterval(liveUpdateInterval);
+                liveUpdateInterval = null;
+                log('⏹️ Live updates stopped', 'info', 'live-result');
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            log('🚀 Live tracking test page loaded', 'info', 'auth-result');
+            log('💡 Enter your JWT token and test the tracking functionality', 'info', 'auth-result');
+        });
+    </script>
+</body>
+</html>
