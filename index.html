@@ -5160,20 +5160,20 @@
                         <h4><i class="fas fa-search"></i> Recent Searches</h4>
                         <div class="recent-list" id="recent-searches">
                             <div class="recent-item empty">No recent searches</div>
-                        </div>
+                    </div>
                     </div>
                     <div class="recent-section">
                         <h4><i class="fas fa-heart"></i> Recent Favorites</h4>
                         <div class="recent-list" id="recent-favorites">
                             <div class="recent-item empty">No recent favorites</div>
-                        </div>
+                </div>
                     </div>
                     <div class="recent-section">
                         <h4><i class="fas fa-chart-line"></i> Recent Sessions</h4>
                         <div class="recent-list" id="recent-sessions">
                             <div class="recent-item empty">No recent sessions</div>
-                        </div>
                     </div>
+                </div>
                 </div>
             </div>
             
@@ -11910,10 +11910,10 @@
                                 <span>Jug</span>
                                 <small>1.14L</small>
                             </button>
-                        </div>
+                            </div>
                         <div class="measurement-details" id="measurement-details">
                             <!-- Measurement details will be populated here -->
-                        </div>
+                            </div>
                     </div>
                 </div>
 
@@ -12174,11 +12174,25 @@
                     
                     if (data.posts && Array.isArray(data.posts)) {
                         feedPosts = data.posts;
+                        console.log('📝 Posts to render:', feedPosts);
                         renderFeed();
                     } else {
                         console.warn('⚠️ No posts array in response:', data);
-                        feedPosts = [];
-                        renderFeed();
+                        // Show debug info if no posts
+                        const container = document.getElementById('feed-container');
+                        if (container) {
+                            container.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <h3>Debug: API Response</h3>
+                                    <p>No posts found in response. Here's what we got:</p>
+                                    <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; font-size: 12px; color: rgba(255,255,255,0.8); max-height: 200px; overflow-y: auto;">${JSON.stringify(data, null, 2)}</pre>
+                                    <button class="btn primary-btn" onclick="loadSocialFeed()">
+                                        <i class="fas fa-sync-alt"></i> Try Again
+                                    </button>
+                                </div>
+                            `;
+                        }
                     }
                 } else {
                     const errorText = await response.text();
@@ -12278,20 +12292,49 @@
         }
 
         function renderRegularPost(post) {
-            // Validate post data
-            if (!post || !post.user || !post.user.name) {
-                console.warn('⚠️ Invalid post data:', post);
+            // Debug: Log the actual post structure
+            console.log('🔍 Rendering post:', post);
+            
+            // More flexible validation - check for different possible user structures
+            let userName = 'Unknown User';
+            let userInitial = 'U';
+            
+            if (post && post.user) {
+                if (post.user.name) {
+                    userName = post.user.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.user.username) {
+                    userName = post.user.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.user.email) {
+                    userName = post.user.email.split('@')[0]; // Use email prefix as name
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            } else if (post && post.author) {
+                // Alternative structure with 'author' instead of 'user'
+                if (post.author.name) {
+                    userName = post.author.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.author.username) {
+                    userName = post.author.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            }
+            
+            // If we still don't have a valid user, show debug info
+            if (userName === 'Unknown User') {
+                console.warn('⚠️ Could not extract user name from post:', post);
                 return `
                     <div class="post error-post">
                         <div class="post-content">
                             <p><i class="fas fa-exclamation-triangle"></i> Invalid post data</p>
+                            <small style="color: rgba(255,255,255,0.6);">Debug: ${JSON.stringify(post).substring(0, 200)}...</small>
                         </div>
                     </div>
                 `;
             }
 
-            const userName = post.user.name || 'Unknown User';
-            const userInitial = userName.charAt(0).toUpperCase();
+            // Use the already extracted userName and userInitial
             const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
             const postContent = post.content || '';
             const likes = post.likes || [];
@@ -12332,20 +12375,49 @@
         }
 
         function renderNightSharePost(post) {
-            // Validate post data
-            if (!post || !post.user || !post.user.name || !post.nightData) {
-                console.warn('⚠️ Invalid night share post data:', post);
+            // Debug: Log the actual post structure
+            console.log('🔍 Rendering night share post:', post);
+            
+            // More flexible validation - check for different possible user structures
+            let userName = 'Unknown User';
+            let userInitial = 'U';
+            
+            if (post && post.user) {
+                if (post.user.name) {
+                    userName = post.user.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.user.username) {
+                    userName = post.user.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.user.email) {
+                    userName = post.user.email.split('@')[0];
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            } else if (post && post.author) {
+                if (post.author.name) {
+                    userName = post.author.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.author.username) {
+                    userName = post.author.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            }
+            
+            // Check for night data
+            if (!post.nightData) {
+                console.warn('⚠️ No night data in post:', post);
                 return `
                     <div class="post error-post">
                         <div class="post-content">
-                            <p><i class="fas fa-exclamation-triangle"></i> Invalid night share data</p>
+                            <p><i class="fas fa-exclamation-triangle"></i> Missing night session data</p>
+                            <small style="color: rgba(255,255,255,0.6);">Debug: ${JSON.stringify(post).substring(0, 200)}...</small>
                         </div>
                     </div>
                 `;
             }
 
             const nightData = post.nightData;
-            const userName = post.user.name || 'Unknown User';
+            // Use the already extracted userName
             const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
             const postContent = post.content || '';
             const likes = post.likes || [];
