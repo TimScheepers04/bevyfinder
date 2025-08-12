@@ -9122,21 +9122,14 @@
             is127: window.location.hostname === '127.0.0.1'
         });
         
-        // Force localhost for testing - CACHE BUST v3
-        API_BASE_URL = 'http://localhost:3000/api';
-        console.log('🏠 Forced to use localhost API for testing - CACHE BUST v3');
-        console.log('🕐 Cache bust timestamp:', new Date().toISOString());
-        
-        // Original logic (commented out for now)
-        /*
+        // Smart API URL detection for mobile and desktop
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            API_BASE_URL = 'http://localhost:3000/api'; // Local development - Updated to match our server
-            console.log('🏠 Using localhost API');
+            API_BASE_URL = 'http://localhost:3000/api'; // Local development
+            console.log('🏠 Using localhost API for development');
         } else {
             API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Production
-            console.log('🌍 Using production API');
+            console.log('🌍 Using production API for mobile/live deployment');
         }
-        */
         console.log('🌐 Using API URL:', API_BASE_URL);
         
         // Initialize currentUser with TEMP_USER if bypass is enabled and not logged out

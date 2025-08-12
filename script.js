@@ -1,8 +1,15 @@
 // Test if JavaScript is running
 console.log('Script.js loaded successfully!');
 
-// API Base URL - Must be at the top to avoid temporal dead zone issues
-const API_BASE_URL = 'http://localhost:3000/api';
+// API Base URL - Dynamic detection for mobile and desktop
+let API_BASE_URL;
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    API_BASE_URL = 'http://localhost:3000/api'; // Local development
+    console.log('🏠 Using localhost API for development');
+} else {
+    API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Production
+    console.log('🌍 Using production API for mobile/live deployment');
+}
 
 // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
 // This bypasses all authentication requirements so you can test features
