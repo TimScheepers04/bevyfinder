@@ -12428,34 +12428,30 @@
                         
                         console.log('✅ Valid posts found:', validPosts.length);
                         
-                        if (validPosts.length > 0) {
+                        // Always check for drink data, even if we have valid posts
+                        const drinkData = data.posts.filter(item => 
+                            item && item.sessionStats && item.userId
+                        );
+                        
+                        console.log('🍺 Drink data found:', drinkData.length, 'items');
+                        
+                        if (drinkData.length > 0) {
+                            console.log('🍺 Converting drink data to display format:', drinkData);
+                            // Convert drink data to posts
+                            const convertedDrinkPosts = await convertDrinkDataToPosts(drinkData);
+                            console.log('🔄 Converted drink posts:', convertedDrinkPosts);
+                            
+                            // Combine valid posts with converted drink posts
+                            feedPosts = [...validPosts, ...convertedDrinkPosts];
+                            console.log('📝 Combined posts to render:', feedPosts);
+                            renderFeed();
+                        } else if (validPosts.length > 0) {
                             feedPosts = validPosts;
                             console.log('📝 Valid posts to render:', feedPosts);
                             renderFeed();
                         } else {
-                            console.warn('⚠️ No valid posts in response, but found drink data:', data.posts);
-                            // Convert drink data to displayable format
-                            const drinkData = data.posts.filter(item => 
-                                item && item.sessionStats && item.userId
-                            );
-                            
-                            console.log('🍺 Drink data found:', drinkData.length, 'items');
-                            
-                            if (drinkData.length > 0) {
-                                console.log('🍺 Converting drink data to display format:', drinkData);
-                                // Use async/await properly
-                                convertDrinkDataToPosts(drinkData).then(posts => {
-                                    console.log('🔄 Converted posts:', posts);
-                                    feedPosts = posts;
-                                    renderFeed();
-                                }).catch(error => {
-                                    console.error('❌ Error converting drink data:', error);
-                                    showEmptyFeedWithCreateButton();
-                                });
-                            } else {
-                                console.log('❌ No drink data found, showing empty state');
-                                showEmptyFeedWithCreateButton();
-                            }
+                            console.log('❌ No valid posts or drink data found, showing empty state');
+                            showEmptyFeedWithCreateButton();
                         }
                     } else {
                         console.warn('⚠️ No posts array in response:', data);
