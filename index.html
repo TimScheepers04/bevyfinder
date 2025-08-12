@@ -1791,6 +1791,62 @@
             margin-right: 8px;
         }
 
+        /* Enhanced Empty State Styles */
+        .empty-state-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .empty-state-tips {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state-tips h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .empty-state-tips ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .empty-state-tips li {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .empty-state-tips li:before {
+            content: '→';
+            color: #667eea;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .empty-state-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .empty-state-actions .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+
         .profile-tab-btn.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -12173,26 +12229,22 @@
                     console.log('📊 Feed data received:', data);
                     
                     if (data.posts && Array.isArray(data.posts)) {
-                        feedPosts = data.posts;
-                        console.log('📝 Posts to render:', feedPosts);
-                        renderFeed();
+                        // Check if the posts are actually valid post objects
+                        const validPosts = data.posts.filter(post => 
+                            post && (post.content || post.type === 'night_share')
+                        );
+                        
+                        if (validPosts.length > 0) {
+                            feedPosts = validPosts;
+                            console.log('📝 Valid posts to render:', feedPosts);
+                            renderFeed();
+                        } else {
+                            console.warn('⚠️ No valid posts in response:', data.posts);
+                            showEmptyFeedWithCreateButton();
+                        }
                     } else {
                         console.warn('⚠️ No posts array in response:', data);
-                        // Show debug info if no posts
-                        const container = document.getElementById('feed-container');
-                        if (container) {
-                            container.innerHTML = `
-                                <div class="empty-state">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <h3>Debug: API Response</h3>
-                                    <p>No posts found in response. Here's what we got:</p>
-                                    <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; font-size: 12px; color: rgba(255,255,255,0.8); max-height: 200px; overflow-y: auto;">${JSON.stringify(data, null, 2)}</pre>
-                                    <button class="btn primary-btn" onclick="loadSocialFeed()">
-                                        <i class="fas fa-sync-alt"></i> Try Again
-                                    </button>
-                                </div>
-                            `;
-                        }
+                        showEmptyFeedWithCreateButton();
                     }
                 } else {
                     const errorText = await response.text();
@@ -12641,6 +12693,37 @@
             content.onclick = (e) => e.stopPropagation();
             
             document.body.appendChild(modal);
+        }
+
+        // Helper function to show empty feed with create button
+        function showEmptyFeedWithCreateButton() {
+            const container = document.getElementById('feed-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No Posts Yet</h3>
+                        <p>Be the first to share your drink experiences with friends!</p>
+                        <div class="empty-state-actions">
+                            <button class="btn primary-btn" onclick="showCreatePostModal()">
+                                <i class="fas fa-plus"></i> Create First Post
+                            </button>
+                            <button class="btn secondary-btn" onclick="showPage('dashboard-page')">
+                                <i class="fas fa-chart-line"></i> Track Your Night
+                            </button>
+                        </div>
+                        <div class="empty-state-tips">
+                            <h4>💡 Tips to get started:</h4>
+                            <ul>
+                                <li>Use the Night Tracker to record your drinking sessions</li>
+                                <li>Share your saved nights to the social feed</li>
+                                <li>Add friends to see their posts</li>
+                                <li>Like and comment on posts from your friends</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // Comments Function
