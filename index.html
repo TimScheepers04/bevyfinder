@@ -2036,6 +2036,110 @@
             }
         }
 
+        /* Share Nights Modal Styles */
+        .share-nights-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .share-nights-content {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .share-nights-content h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-nights-content p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+
+        .saved-nights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .saved-night-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .saved-night-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .night-info h4 {
+            color: #ffd700;
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .night-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .night-info small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .share-night-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-night-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
         .profile-tab-btn.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -5510,6 +5614,9 @@
             <div class="social-actions">
                 <button class="btn primary-btn" onclick="showCreatePostModal()">
                     <i class="fas fa-plus"></i> Create Post
+                </button>
+                <button class="btn secondary-btn" onclick="shareMySavedNights()">
+                    <i class="fas fa-share"></i> Share My Nights
                 </button>
                 <button class="btn secondary-btn" onclick="refreshFeed()">
                     <i class="fas fa-sync-alt"></i> Refresh
@@ -12914,8 +13021,14 @@
             console.log('📊 Input drink data:', drinkData);
             try {
                 const posts = [];
+                const currentUserId = getCurrentUser()?.id || getCurrentUser()?._id;
+                console.log('👤 Current user ID:', currentUserId);
                 
                 for (const drink of drinkData) {
+                    console.log('🍺 Processing drink:', drink);
+                    console.log('🍺 Drink user ID:', drink.userId);
+                    console.log('🍺 Is this my drink?', drink.userId === currentUserId);
+                    
                     // Get user info for this drink
                     const user = await getUserInfo(drink.userId);
                     
@@ -12932,12 +13045,14 @@
                         drinkId: drink.drinkId,
                         image: drink.image,
                         likes: [],
-                        comments: []
+                        comments: [],
+                        isMyPost: drink.userId === currentUserId
                     };
                     
                     posts.push(post);
                 }
                 
+                console.log('📝 Final converted posts:', posts);
                 return posts;
             } catch (error) {
                 console.error('Error converting drink data:', error);
@@ -12978,6 +13093,9 @@
                             </button>
                             <button class="btn secondary-btn" onclick="showPage('dashboard-page')">
                                 <i class="fas fa-chart-line"></i> Track Your Night
+                            </button>
+                            <button class="btn secondary-btn" onclick="showPage('history-page')">
+                                <i class="fas fa-history"></i> Share Saved Nights
                             </button>
                         </div>
                         <div class="empty-state-tips">
@@ -13133,6 +13251,79 @@
 
         function shareDrinkSession(postId) {
             showNotification('Sharing drink sessions coming soon!', 'info');
+        }
+
+        // Function to share your saved nights
+        function shareMySavedNights() {
+            const savedNights = JSON.parse(localStorage.getItem('savedNights') || '[]');
+            
+            if (savedNights.length === 0) {
+                showNotification('No saved nights found. Use the Night Tracker first!', 'error');
+                return;
+            }
+
+            // Show a modal to select which night to share
+            const modal = document.createElement('div');
+            modal.className = 'share-nights-modal';
+            modal.innerHTML = `
+                <div class="share-nights-content">
+                    <h2><i class="fas fa-share"></i> Share Your Nights</h2>
+                    <p>Select a saved night to share to the social feed:</p>
+                    
+                    <div class="saved-nights-list">
+                        ${savedNights.map((night, index) => {
+                            const date = new Date(night.date);
+                            const formattedDate = date.toLocaleDateString('en-AU', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            
+                            return `
+                                <div class="saved-night-item" onclick="shareSavedNight('${night.id}')">
+                                    <div class="night-info">
+                                        <h4>Night Session ${index + 1}</h4>
+                                        <p>${formattedDate}</p>
+                                        <small>${night.sessionData.drinks.length} drinks • ${night.sessionData.totalStandards.toFixed(1)} standards</small>
+                                    </div>
+                                    <button class="share-night-btn">
+                                        <i class="fas fa-share"></i> Share
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <button class="btn secondary-btn" onclick="this.closest('.share-nights-modal').remove()">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+            
+            document.body.appendChild(modal);
+        }
+
+        function shareSavedNight(nightId) {
+            // Find the saved night
+            const savedNights = JSON.parse(localStorage.getItem('savedNights') || '[]');
+            const night = savedNights.find(n => n.id === nightId);
+            
+            if (!night) {
+                showNotification('Night session not found', 'error');
+                return;
+            }
+
+            // Show the share night modal
+            showShareNightModal(nightId);
+            
+            // Remove the selection modal
+            const modal = document.querySelector('.share-nights-modal');
+            if (modal) modal.remove();
         }
 
         // Comments Function
