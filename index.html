@@ -1775,6 +1775,22 @@
             }
         }
 
+        /* Error Post Styles */
+        .error-post {
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+        }
+
+        .error-post .post-content {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .error-post .post-content i {
+            color: #ef4444;
+            margin-right: 8px;
+        }
+
         .profile-tab-btn.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -12112,54 +12128,148 @@
 
         // Social Feed Functions
         async function loadSocialFeed() {
-            if (!currentUser) {
-                await initializeSocial();
-            }
-
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
             try {
+                // Check if user is logged in
+                if (!isLoggedIn()) {
+                    showNotification('Please log in to view the social feed', 'error');
+                    return;
+                }
+
+                // Initialize social if needed
+                if (!currentUser) {
+                    await initializeSocial();
+                }
+
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showNotification('Authentication required', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const container = document.getElementById('feed-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading social feed...</p>
+                        </div>
+                    `;
+                }
+
+                console.log('🌐 Loading social feed from:', `${API_BASE_URL}/social/feed`);
+
                 const response = await fetch(`${API_BASE_URL}/social/feed`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
+
+                console.log('📡 Response status:', response.status);
 
                 if (response.ok) {
                     const data = await response.json();
-                    feedPosts = data.posts;
+                    console.log('📊 Feed data received:', data);
+                    
+                    if (data.posts && Array.isArray(data.posts)) {
+                        feedPosts = data.posts;
+                        renderFeed();
+                    } else {
+                        console.warn('⚠️ No posts array in response:', data);
+                        feedPosts = [];
+                        renderFeed();
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', response.status, errorText);
+                    
+                    if (response.status === 401) {
+                        showNotification('Please log in again', 'error');
+                    } else if (response.status === 404) {
+                        showNotification('Social feed not available', 'error');
+                    } else {
+                        showNotification(`Error loading feed (${response.status})`, 'error');
+                    }
+                    
+                    // Show empty state
+                    feedPosts = [];
                     renderFeed();
                 }
             } catch (error) {
-                console.error('Error loading feed:', error);
-                showNotification('Error loading social feed', 'error');
+                console.error('❌ Error loading feed:', error);
+                showNotification('Network error loading social feed', 'error');
+                
+                // Show empty state with retry button
+                const container = document.getElementById('feed-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Connection Error</h3>
+                            <p>Unable to load social feed. Please check your connection.</p>
+                            <button class="btn primary-btn" onclick="loadSocialFeed()">
+                                <i class="fas fa-sync-alt"></i> Try Again
+                            </button>
+                        </div>
+                    `;
+                }
             }
         }
 
         function renderFeed() {
             const container = document.getElementById('feed-container');
-            if (!container) return;
-
-            if (feedPosts.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
-                        <h3>No posts yet</h3>
-                        <p>Be the first to share your drink experiences!</p>
-                        <button class="btn primary-btn" onclick="showCreatePostModal()">
-                            <i class="fas fa-plus"></i> Create First Post
-                        </button>
-                    </div>
-                `;
+            if (!container) {
+                console.error('❌ Feed container not found');
                 return;
             }
 
-            container.innerHTML = feedPosts.map(post => {
-                if (post.type === 'night_share') {
-                    return renderNightSharePost(post);
-                } else {
-                    return renderRegularPost(post);
+            try {
+                if (!feedPosts || feedPosts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No posts yet</h3>
+                            <p>Be the first to share your drink experiences!</p>
+                            <button class="btn primary-btn" onclick="showCreatePostModal()">
+                                <i class="fas fa-plus"></i> Create First Post
+                            </button>
+                        </div>
+                    `;
+                    return;
                 }
-            }).join('');
+
+                container.innerHTML = feedPosts.map(post => {
+                    try {
+                        if (post.type === 'night_share') {
+                            return renderNightSharePost(post);
+                        } else {
+                            return renderRegularPost(post);
+                        }
+                    } catch (postError) {
+                        console.error('❌ Error rendering post:', postError, post);
+                        return `
+                            <div class="post error-post">
+                                <div class="post-content">
+                                    <p><i class="fas fa-exclamation-triangle"></i> Error loading post</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+            } catch (error) {
+                console.error('❌ Error rendering feed:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error Loading Feed</h3>
+                        <p>Something went wrong while loading the social feed.</p>
+                        <button class="btn primary-btn" onclick="loadSocialFeed()">
+                            <i class="fas fa-sync-alt"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         async function refreshFeed() {
@@ -12168,32 +12278,53 @@
         }
 
         function renderRegularPost(post) {
+            // Validate post data
+            if (!post || !post.user || !post.user.name) {
+                console.warn('⚠️ Invalid post data:', post);
+                return `
+                    <div class="post error-post">
+                        <div class="post-content">
+                            <p><i class="fas fa-exclamation-triangle"></i> Invalid post data</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const userName = post.user.name || 'Unknown User';
+            const userInitial = userName.charAt(0).toUpperCase();
+            const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
+            const postContent = post.content || '';
+            const likes = post.likes || [];
+            const comments = post.comments || [];
+            const drinks = post.drinks || [];
+            const isLiked = likes.includes(currentUser?.id || currentUser?._id);
+
             return `
                 <div class="post">
                     <div class="post-header">
-                        <div class="post-avatar">${post.user.name.charAt(0).toUpperCase()}</div>
+                        <div class="post-avatar">${userInitial}</div>
                         <div class="post-user-info">
-                            <h4>${post.user.name}</h4>
-                            <span>${formatDate(post.createdAt)}</span>
+                            <h4>${userName}</h4>
+                            <span>${postDate}</span>
                         </div>
                     </div>
                     <div class="post-content">
-                        <p>${post.content}</p>
-                        ${post.drinks && post.drinks.length > 0 ? `
+                        <p>${postContent}</p>
+                        ${drinks.length > 0 ? `
                             <div class="post-drinks">
-                                ${post.drinks.map(drink => `
-                                    <span class="drink-tag">${drink.drinkName}</span>
+                                ${drinks.map(drink => `
+                                    <span class="drink-tag">${drink.drinkName || drink.name || 'Unknown Drink'}</span>
                                 `).join('')}
                             </div>
                         ` : ''}
                     </div>
                     <div class="post-actions">
-                        <button class="action-btn ${post.likes.includes(currentUser?.id) ? 'liked' : ''}" 
+                        <button class="action-btn ${isLiked ? 'liked' : ''}" 
                                 onclick="toggleLike('${post._id}')">
-                            <i class="fas fa-heart"></i> ${post.likes.length}
+                            <i class="fas fa-heart"></i> ${likes.length}
                         </button>
                         <button class="action-btn" onclick="showComments('${post._id}')">
-                            <i class="fas fa-comment"></i> ${post.comments.length}
+                            <i class="fas fa-comment"></i> ${comments.length}
                         </button>
                     </div>
                 </div>
@@ -12201,7 +12332,38 @@
         }
 
         function renderNightSharePost(post) {
+            // Validate post data
+            if (!post || !post.user || !post.user.name || !post.nightData) {
+                console.warn('⚠️ Invalid night share post data:', post);
+                return `
+                    <div class="post error-post">
+                        <div class="post-content">
+                            <p><i class="fas fa-exclamation-triangle"></i> Invalid night share data</p>
+                        </div>
+                    </div>
+                `;
+            }
+
             const nightData = post.nightData;
+            const userName = post.user.name || 'Unknown User';
+            const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
+            const postContent = post.content || '';
+            const likes = post.likes || [];
+            const comments = post.comments || [];
+            const isLiked = likes.includes(currentUser?.id || currentUser?._id);
+
+            // Validate night data
+            if (!nightData.sessionDuration || !nightData.sessionStart) {
+                console.warn('⚠️ Invalid night data:', nightData);
+                return `
+                    <div class="post error-post">
+                        <div class="post-content">
+                            <p><i class="fas fa-exclamation-triangle"></i> Invalid night session data</p>
+                        </div>
+                    </div>
+                `;
+            }
+
             const duration = formatSessionDuration(nightData.sessionDuration);
             const sessionDate = new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
                 weekday: 'long',
@@ -12217,8 +12379,8 @@
                             <i class="fas fa-moon"></i>
                         </div>
                         <div class="post-user-info">
-                            <h4>${post.user.name}</h4>
-                            <span>${formatDate(post.createdAt)}</span>
+                            <h4>${userName}</h4>
+                            <span>${postDate}</span>
                             <div class="night-share-badge">
                                 <i class="fas fa-share"></i> Shared Night Session
                             </div>
@@ -12226,7 +12388,7 @@
                     </div>
                     
                     <div class="post-content">
-                        ${post.content ? `<p class="night-share-message">${post.content}</p>` : ''}
+                        ${postContent ? `<p class="night-share-message">${postContent}</p>` : ''}
                         
                         <div class="night-share-card">
                             <div class="night-share-header">
@@ -12280,12 +12442,12 @@
                     </div>
                     
                     <div class="post-actions">
-                        <button class="action-btn ${post.likes.includes(currentUser?.id) ? 'liked' : ''}" 
+                        <button class="action-btn ${isLiked ? 'liked' : ''}" 
                                 onclick="toggleLike('${post._id}')">
-                            <i class="fas fa-heart"></i> ${post.likes.length}
+                            <i class="fas fa-heart"></i> ${likes.length}
                         </button>
                         <button class="action-btn" onclick="showComments('${post._id}')">
-                            <i class="fas fa-comment"></i> ${post.comments.length}
+                            <i class="fas fa-comment"></i> ${comments.length}
                         </button>
                         <button class="action-btn" onclick="showNightDetails('${post._id}')">
                             <i class="fas fa-info-circle"></i> Details
@@ -12407,6 +12569,18 @@
             content.onclick = (e) => e.stopPropagation();
             
             document.body.appendChild(modal);
+        }
+
+        // Comments Function
+        function showComments(postId) {
+            // For now, show a simple notification
+            // This can be expanded later to show a comments modal
+            showNotification('Comments feature coming soon!', 'info');
+            
+            // TODO: Implement comments modal
+            // - Show comments for the post
+            // - Allow adding new comments
+            // - Real-time updates
         }
 
         // Friends Functions
