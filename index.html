@@ -2676,6 +2676,125 @@
             border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
+        /* Measurement Tabs Styles */
+        .measurement-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .measurement-tab {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .measurement-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .measurement-tab.active {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-color: #ffd700;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .measurement-tab i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .measurement-tab span {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .measurement-tab small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .measurement-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .measurement-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .measurement-info-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .measurement-info-value {
+            color: #ffd700;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .measurement-info-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .measurement-nutrition {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 15px;
+        }
+
+        .measurement-nutrition h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .measurement-nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .measurement-nutrition-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .measurement-nutrition-value {
+            color: #ffd700;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .measurement-nutrition-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+        }
+
         .drink-actions {
             display: flex;
             gap: 15px;
@@ -2741,6 +2860,34 @@
 
             .search-dropdown {
                 max-height: 250px;
+            }
+
+            .measurement-tabs {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .measurement-tab {
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 12px 15px;
+                text-align: left;
+            }
+
+            .measurement-tab i {
+                margin-bottom: 0;
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+
+            .measurement-info {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .measurement-nutrition-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
         }
 
@@ -10682,11 +10829,26 @@
                     </div>
 
                     <div class="drink-detail-section">
-                        <h3><i class="fas fa-tags"></i> Tags</h3>
-                        <div class="drink-tags">
-                            ${drink.tags.map(tag => 
-                                `<span class="drink-tag">${tag}</span>`
-                            ).join('')}
+                        <h3><i class="fas fa-glass-whiskey"></i> Drink Measurements</h3>
+                        <div class="measurement-tabs">
+                            <button class="measurement-tab active" data-measurement="schooner" onclick="showMeasurementDetails('${drinkKey}', 'schooner')">
+                                <i class="fas fa-beer"></i>
+                                <span>Schooner</span>
+                                <small>425ml</small>
+                            </button>
+                            <button class="measurement-tab" data-measurement="pint" onclick="showMeasurementDetails('${drinkKey}', 'pint')">
+                                <i class="fas fa-pint-glass"></i>
+                                <span>Pint</span>
+                                <small>570ml</small>
+                            </button>
+                            <button class="measurement-tab" data-measurement="jug" onclick="showMeasurementDetails('${drinkKey}', 'jug')">
+                                <i class="fas fa-jug"></i>
+                                <span>Jug</span>
+                                <small>1.14L</small>
+                            </button>
+                        </div>
+                        <div class="measurement-details" id="measurement-details">
+                            <!-- Measurement details will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -10703,6 +10865,80 @@
 
             // Show the drink detail page
             showPage('drink-detail-page');
+            
+            // Initialize with schooner measurement details
+            showMeasurementDetails(drinkKey, 'schooner');
+        }
+
+        function showMeasurementDetails(drinkKey, measurement) {
+            const drink = drinkDatabase[drinkKey];
+            if (!drink) return;
+
+            // Update active tab
+            document.querySelectorAll('.measurement-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-measurement="${measurement}"]`).classList.add('active');
+
+            // Define measurement sizes in ml
+            const measurementSizes = {
+                schooner: 425,
+                pint: 570,
+                jug: 1140
+            };
+
+            const originalSize = parseInt(drink.nutrition.servingSize);
+            const newSize = measurementSizes[measurement];
+            const ratio = newSize / originalSize;
+
+            // Calculate new standard drinks
+            const originalStandardDrinks = parseFloat(drink.standardDrinks);
+            const newStandardDrinks = (originalStandardDrinks * ratio).toFixed(1);
+
+            // Calculate new nutrition values
+            const newNutrition = {
+                calories: Math.round(drink.nutrition.calories * ratio),
+                carbs: (drink.nutrition.carbs * ratio).toFixed(1),
+                protein: (drink.nutrition.protein * ratio).toFixed(1),
+                fat: (drink.nutrition.fat * ratio).toFixed(1),
+                sugar: (drink.nutrition.sugar * ratio).toFixed(1)
+            };
+
+            // Update measurement details
+            const detailsContainer = document.getElementById('measurement-details');
+            detailsContainer.innerHTML = `
+                <div class="measurement-info">
+                    <div class="measurement-info-item">
+                        <div class="measurement-info-value">${newSize}ml</div>
+                        <div class="measurement-info-label">Serving Size</div>
+                    </div>
+                    <div class="measurement-info-item">
+                        <div class="measurement-info-value">${newStandardDrinks}</div>
+                        <div class="measurement-info-label">Standard Drinks</div>
+                    </div>
+                </div>
+                <div class="measurement-nutrition">
+                    <h4><i class="fas fa-chart-bar"></i> Nutrition (per ${newSize}ml)</h4>
+                    <div class="measurement-nutrition-grid">
+                        <div class="measurement-nutrition-item">
+                            <div class="measurement-nutrition-value">${newNutrition.calories}</div>
+                            <div class="measurement-nutrition-label">Calories</div>
+                        </div>
+                        <div class="measurement-nutrition-item">
+                            <div class="measurement-nutrition-value">${newNutrition.carbs}g</div>
+                            <div class="measurement-nutrition-label">Carbs</div>
+                        </div>
+                        <div class="measurement-nutrition-item">
+                            <div class="measurement-nutrition-value">${newNutrition.protein}g</div>
+                            <div class="measurement-nutrition-label">Protein</div>
+                        </div>
+                        <div class="measurement-nutrition-item">
+                            <div class="measurement-nutrition-value">${newNutrition.sugar}g</div>
+                            <div class="measurement-nutrition-label">Sugar</div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function addDrinkToNightTracker(drinkKey) {
