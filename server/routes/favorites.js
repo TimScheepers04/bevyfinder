@@ -4,6 +4,35 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+// @route   GET /api/favorites
+// @desc    Get user's favorites
+// @access  Private
+router.get('/', protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: {
+                favorites: user.profile.preferences.favoriteDrinks,
+                totalFavorites: user.stats.favorites
+            }
+        });
+    } catch (error) {
+        console.error('Get favorites error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
 // @route   POST /api/favorites/add
 // @desc    Add drink to favorites
 // @access  Private
