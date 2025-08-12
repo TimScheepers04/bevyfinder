@@ -12373,6 +12373,7 @@
 
         // Social Feed Functions
         async function loadSocialFeed() {
+            console.log('🚀 Loading social feed - Version 2.0 (Drink Session Display)');
             try {
                 // Check if user is logged in
                 if (!isLoggedIn()) {
@@ -12418,10 +12419,14 @@
                     console.log('📊 Feed data received:', data);
                     
                     if (data.posts && Array.isArray(data.posts)) {
+                        console.log('🔍 Raw posts data:', data.posts);
+                        
                         // Check if the posts are actually valid post objects
                         const validPosts = data.posts.filter(post => 
                             post && (post.content || post.type === 'night_share')
                         );
+                        
+                        console.log('✅ Valid posts found:', validPosts.length);
                         
                         if (validPosts.length > 0) {
                             feedPosts = validPosts;
@@ -12434,11 +12439,21 @@
                                 item && item.sessionStats && item.userId
                             );
                             
+                            console.log('🍺 Drink data found:', drinkData.length, 'items');
+                            
                             if (drinkData.length > 0) {
                                 console.log('🍺 Converting drink data to display format:', drinkData);
-                                feedPosts = convertDrinkDataToPosts(drinkData);
-                                renderFeed();
+                                // Use async/await properly
+                                convertDrinkDataToPosts(drinkData).then(posts => {
+                                    console.log('🔄 Converted posts:', posts);
+                                    feedPosts = posts;
+                                    renderFeed();
+                                }).catch(error => {
+                                    console.error('❌ Error converting drink data:', error);
+                                    showEmptyFeedWithCreateButton();
+                                });
                             } else {
+                                console.log('❌ No drink data found, showing empty state');
                                 showEmptyFeedWithCreateButton();
                             }
                         }
@@ -12899,6 +12914,8 @@
 
         // Convert drink tracking data to displayable posts
         async function convertDrinkDataToPosts(drinkData) {
+            console.log('🔄 Starting drink data conversion...');
+            console.log('📊 Input drink data:', drinkData);
             try {
                 const posts = [];
                 
