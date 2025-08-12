@@ -1847,6 +1847,195 @@
             }
         }
 
+        /* Drink Session Post Styles */
+        .drink-session-post {
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(22, 163, 74, 0.05));
+        }
+
+        .drink-session-avatar {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drink-session-badge {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .drink-session-message {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #22c55e;
+        }
+
+        .drink-session-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .drink-session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .drink-session-header h3 {
+            color: #ffd700;
+            font-size: 1.3rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drink-session-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .drink-session-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .drink-session-stat i {
+            color: #ffd700;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .drink-session-stat div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drink-session-image {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .drink-session-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Drink Details Modal Styles */
+        .drink-details-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .drink-details-modal {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .drink-details-content h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drink-details-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .drink-details-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .drink-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .drink-detail-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .drink-details-image {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .drink-details-image h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .drink-session-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .drink-session-stat {
+                padding: 10px;
+            }
+        }
+
         .profile-tab-btn.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -12239,8 +12428,19 @@
                             console.log('📝 Valid posts to render:', feedPosts);
                             renderFeed();
                         } else {
-                            console.warn('⚠️ No valid posts in response:', data.posts);
-                            showEmptyFeedWithCreateButton();
+                            console.warn('⚠️ No valid posts in response, but found drink data:', data.posts);
+                            // Convert drink data to displayable format
+                            const drinkData = data.posts.filter(item => 
+                                item && item.sessionStats && item.userId
+                            );
+                            
+                            if (drinkData.length > 0) {
+                                console.log('🍺 Converting drink data to display format:', drinkData);
+                                feedPosts = convertDrinkDataToPosts(drinkData);
+                                renderFeed();
+                            } else {
+                                showEmptyFeedWithCreateButton();
+                            }
                         }
                     } else {
                         console.warn('⚠️ No posts array in response:', data);
@@ -12309,6 +12509,8 @@
                     try {
                         if (post.type === 'night_share') {
                             return renderNightSharePost(post);
+                        } else if (post.type === 'drink_session') {
+                            return renderDrinkSessionPost(post);
                         } else {
                             return renderRegularPost(post);
                         }
@@ -12695,6 +12897,59 @@
             document.body.appendChild(modal);
         }
 
+        // Convert drink tracking data to displayable posts
+        async function convertDrinkDataToPosts(drinkData) {
+            try {
+                const posts = [];
+                
+                for (const drink of drinkData) {
+                    // Get user info for this drink
+                    const user = await getUserInfo(drink.userId);
+                    
+                    const post = {
+                        _id: drink._id,
+                        type: 'drink_session',
+                        user: {
+                            name: user ? user.name : 'Unknown User',
+                            email: user ? user.email : 'unknown@example.com'
+                        },
+                        createdAt: drink.createdAt || drink.date || new Date(),
+                        content: `Had a drink session with ${drink.sessionStats.totalDrinks} drinks`,
+                        sessionStats: drink.sessionStats,
+                        drinkId: drink.drinkId,
+                        image: drink.image,
+                        likes: [],
+                        comments: []
+                    };
+                    
+                    posts.push(post);
+                }
+                
+                return posts;
+            } catch (error) {
+                console.error('Error converting drink data:', error);
+                return [];
+            }
+        }
+
+        // Get user info by ID
+        async function getUserInfo(userId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.user;
+                }
+            } catch (error) {
+                console.error('Error getting user info:', error);
+            }
+            return null;
+        }
+
         // Helper function to show empty feed with create button
         function showEmptyFeedWithCreateButton() {
             const container = document.getElementById('feed-container');
@@ -12724,6 +12979,147 @@
                     </div>
                 `;
             }
+        }
+
+        function renderDrinkSessionPost(post) {
+            // Debug: Log the actual post structure
+            console.log('🔍 Rendering drink session post:', post);
+            
+            const userName = post.user.name || 'Unknown User';
+            const userInitial = userName.charAt(0).toUpperCase();
+            const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
+            const sessionStats = post.sessionStats || {};
+            
+            return `
+                <div class="post drink-session-post">
+                    <div class="post-header">
+                        <div class="post-avatar drink-session-avatar">
+                            <i class="fas fa-wine-glass-alt"></i>
+                        </div>
+                        <div class="post-user-info">
+                            <h4>${userName}</h4>
+                            <span>${postDate}</span>
+                            <div class="drink-session-badge">
+                                <i class="fas fa-chart-line"></i> Drink Session
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content">
+                        <p class="drink-session-message">${post.content}</p>
+                        
+                        <div class="drink-session-card">
+                            <div class="drink-session-header">
+                                <h3><i class="fas fa-wine-glass-alt"></i> Session Stats</h3>
+                            </div>
+                            
+                            <div class="drink-session-stats">
+                                <div class="drink-session-stat">
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    <div>
+                                        <span class="stat-label">Total Drinks</span>
+                                        <span class="stat-value">${sessionStats.totalDrinks || 0}</span>
+                                    </div>
+                                </div>
+                                <div class="drink-session-stat">
+                                    <i class="fas fa-tint"></i>
+                                    <div>
+                                        <span class="stat-label">BAC</span>
+                                        <span class="stat-value">${(sessionStats.totalBAC || 0).toFixed(3)}%</span>
+                                    </div>
+                                </div>
+                                <div class="drink-session-stat">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <span class="stat-label">Duration</span>
+                                        <span class="stat-value">${formatSessionDuration(sessionStats.sessionDuration || 0)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${post.image && post.image.url ? `
+                                <div class="drink-session-image">
+                                    <img src="${post.image.url}" alt="Drink" style="max-width: 100%; border-radius: 10px;">
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="showDrinkDetails('${post._id}')">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                        <button class="action-btn" onclick="shareDrinkSession('${post._id}')">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showDrinkDetails(postId) {
+            const post = feedPosts.find(p => p._id === postId);
+            if (!post || post.type !== 'drink_session') {
+                showNotification('Drink details not found', 'error');
+                return;
+            }
+
+            const sessionStats = post.sessionStats || {};
+            
+            const detailsHTML = `
+                <div class="drink-details-modal">
+                    <div class="drink-details-content">
+                        <h2><i class="fas fa-wine-glass-alt"></i> Drink Session Details</h2>
+                        <p class="drink-details-date">${formatDate(post.createdAt)}</p>
+                        
+                        <div class="drink-details-grid">
+                            <div class="drink-detail-item">
+                                <i class="fas fa-wine-glass-alt"></i>
+                                <div>
+                                    <span class="detail-label">Total Drinks</span>
+                                    <span class="detail-value">${sessionStats.totalDrinks || 0}</span>
+                                </div>
+                            </div>
+                            <div class="drink-detail-item">
+                                <i class="fas fa-tint"></i>
+                                <div>
+                                    <span class="detail-label">BAC Level</span>
+                                    <span class="detail-value">${(sessionStats.totalBAC || 0).toFixed(3)}%</span>
+                                </div>
+                            </div>
+                            <div class="drink-detail-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <span class="detail-label">Session Duration</span>
+                                    <span class="detail-value">${formatSessionDuration(sessionStats.sessionDuration || 0)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${post.image && post.image.url ? `
+                            <div class="drink-details-image">
+                                <h3>Drink Image</h3>
+                                <img src="${post.image.url}" alt="Drink" style="max-width: 100%; border-radius: 10px;">
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'drink-details-overlay';
+            modal.innerHTML = detailsHTML;
+            modal.onclick = () => modal.remove();
+            
+            const content = modal.querySelector('.drink-details-content');
+            content.onclick = (e) => e.stopPropagation();
+            
+            document.body.appendChild(modal);
+        }
+
+        function shareDrinkSession(postId) {
+            showNotification('Sharing drink sessions coming soon!', 'info');
         }
 
         // Comments Function
