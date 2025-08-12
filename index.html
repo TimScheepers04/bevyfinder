@@ -10806,32 +10806,17 @@
                         </div>
                     </div>
 
-                    <div class="drink-detail-section">
-                        <h3><i class="fas fa-chart-bar"></i> Nutrition (per ${drink.nutrition.servingSize})</h3>
-                        <div class="nutrition-grid">
-                            <div class="nutrition-item">
-                                <div class="nutrition-value">${drink.nutrition.calories}</div>
-                                <div class="nutrition-label">Calories</div>
-                            </div>
-                            <div class="nutrition-item">
-                                <div class="nutrition-value">${drink.nutrition.carbs}g</div>
-                                <div class="nutrition-label">Carbs</div>
-                            </div>
-                            <div class="nutrition-item">
-                                <div class="nutrition-value">${drink.nutrition.protein}g</div>
-                                <div class="nutrition-label">Protein</div>
-                            </div>
-                            <div class="nutrition-item">
-                                <div class="nutrition-value">${drink.nutrition.sugar}g</div>
-                                <div class="nutrition-label">Sugar</div>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div class="drink-detail-section">
                         <h3><i class="fas fa-glass-whiskey"></i> Drink Measurements</h3>
                         <div class="measurement-tabs">
-                            <button class="measurement-tab active" data-measurement="schooner" onclick="showMeasurementDetails('${drinkKey}', 'schooner')">
+                            <button class="measurement-tab active" data-measurement="cans-bottles" onclick="showMeasurementDetails('${drinkKey}', 'cans-bottles')">
+                                <i class="fas fa-wine-bottle"></i>
+                                <span>Cans/Bottles</span>
+                                <small>${drink.nutrition.servingSize}</small>
+                            </button>
+                            <button class="measurement-tab" data-measurement="schooner" onclick="showMeasurementDetails('${drinkKey}', 'schooner')">
                                 <i class="fas fa-beer"></i>
                                 <span>Schooner</span>
                                 <small>425ml</small>
@@ -10866,8 +10851,8 @@
             // Show the drink detail page
             showPage('drink-detail-page');
             
-            // Initialize with schooner measurement details
-            showMeasurementDetails(drinkKey, 'schooner');
+            // Initialize with cans/bottles measurement details
+            showMeasurementDetails(drinkKey, 'cans-bottles');
         }
 
         function showMeasurementDetails(drinkKey, measurement) {
@@ -10882,6 +10867,7 @@
 
             // Define measurement sizes in ml
             const measurementSizes = {
+                'cans-bottles': parseInt(drink.nutrition.servingSize),
                 schooner: 425,
                 pint: 570,
                 jug: 1140
