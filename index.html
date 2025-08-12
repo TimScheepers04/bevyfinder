@@ -1169,6 +1169,612 @@
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
+        /* Share Night Modal Styles */
+        .share-night-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .share-night-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .share-night-modal-content {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .share-night-modal.show .share-night-modal-content {
+            transform: scale(1);
+        }
+
+        .close-share-night-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-share-night-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .share-night-modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .share-night-modal-header h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .share-night-modal-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .share-night-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .share-night-preview h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .share-night-preview-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .share-night-preview-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .share-night-preview-stat h4 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .share-night-preview-stat p {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .share-night-preview-drinks {
+            margin-top: 15px;
+        }
+
+        .share-night-preview-drinks h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .share-night-preview-drinks-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .share-night-preview-drink {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .share-night-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .share-night-form label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .share-night-form textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .share-night-form textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .char-count {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .share-privacy-options {
+            margin-bottom: 25px;
+        }
+
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .privacy-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .privacy-option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .privacy-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .privacy-label i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .privacy-label strong {
+            display: block;
+            font-size: 1rem;
+        }
+
+        .privacy-label small {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .share-night-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .share-night-btn-primary, .share-night-btn-secondary {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .share-night-btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .share-night-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .share-night-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .share-night-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Share button styles for saved nights */
+        .share-night-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-night-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .saved-night-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Night Share Post Styles */
+        .night-share-post {
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        }
+
+        .night-share-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .night-share-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .night-share-message {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .night-share-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .night-share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .night-share-header h3 {
+            color: #ffd700;
+            font-size: 1.3rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .night-share-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .night-share-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .night-share-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .night-share-stat i {
+            color: #ffd700;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .night-share-stat div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .night-share-drinks {
+            margin-top: 15px;
+        }
+
+        .night-share-drinks h4 {
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .night-share-drinks-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .night-share-drink {
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .night-share-drink i {
+            color: #ffd700;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .night-share-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .night-share-stat {
+                padding: 10px;
+            }
+
+            .night-share-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .night-share-drinks-list {
+                gap: 6px;
+            }
+
+            .night-share-drink {
+                font-size: 0.8rem;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Night Details Modal Styles */
+        .night-details-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .night-details-modal {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .night-details-content h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .night-details-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .night-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .night-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .night-detail-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .night-detail-item div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .night-details-drinks h3 {
+            color: #ffd700;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .drink-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .drink-timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .drink-timeline-time {
+            color: #ffd700;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 80px;
+        }
+
+        .drink-timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .drink-name {
+            color: white;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .drink-standards {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .night-details-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .night-detail-item {
+                padding: 12px;
+            }
+
+            .drink-timeline-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .drink-timeline-time {
+                min-width: auto;
+            }
+        }
+
         .profile-tab-btn.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -4164,6 +4770,66 @@
                     Dashboard
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Share Night Modal -->
+    <div class="share-night-modal" id="share-night-modal" onclick="closeShareNightModal()">
+        <div class="share-night-modal-content" onclick="event.stopPropagation()">
+            <button class="close-share-night-btn" onclick="closeShareNightModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="share-night-modal-header">
+                <h2><i class="fas fa-share"></i> Share Your Night</h2>
+                <p>Share your drinking session with your friends</p>
+            </div>
+            
+            <div class="share-night-preview" id="share-night-preview">
+                <!-- Night preview will be loaded here -->
+            </div>
+            
+            <form class="share-night-form" id="share-night-form">
+                <div class="form-group">
+                    <label for="share-message">Add a message (optional)</label>
+                    <textarea id="share-message" placeholder="What was the highlight of your night? Any funny stories to share?" rows="3" maxlength="500"></textarea>
+                    <div class="char-count">
+                        <span id="share-message-count">0</span>/500
+                    </div>
+                </div>
+                
+                <div class="share-privacy-options">
+                    <label class="privacy-option">
+                        <input type="radio" name="share-privacy" value="friends" checked>
+                        <span class="privacy-label">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Friends Only</strong>
+                                <small>Only your friends can see this post</small>
+                            </div>
+                        </span>
+                    </label>
+                    <label class="privacy-option">
+                        <input type="radio" name="share-privacy" value="public">
+                        <span class="privacy-label">
+                            <i class="fas fa-globe"></i>
+                            <div>
+                                <strong>Public</strong>
+                                <small>Everyone can see this post</small>
+                            </div>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="share-night-actions">
+                    <button type="submit" class="share-night-btn-primary">
+                        <i class="fas fa-share"></i> Share to Feed
+                    </button>
+                    <button type="button" class="share-night-btn-secondary" onclick="closeShareNightModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -9665,6 +10331,9 @@
                         </div>
                         
                         <div class="saved-night-actions">
+                            <button class="share-night-btn" onclick="showShareNightModal('${night.id}')">
+                                <i class="fas fa-share"></i> Share
+                            </button>
                             <button class="delete-night-btn" onclick="deleteSavedNight('${night.id}')">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
@@ -9680,6 +10349,199 @@
                 savedNights = savedNights.filter(night => night.id !== nightId);
                 localStorage.setItem('savedNights', JSON.stringify(savedNights));
                 loadSavedNights();
+            }
+        }
+
+        // Share Night Functions
+        let currentSharingNight = null;
+
+        function showShareNightModal(nightId) {
+            // Check if user is logged in
+            if (!isLoggedIn()) {
+                showNotification('Please log in to share your nights', 'error');
+                return;
+            }
+
+            // Find the night data
+            const savedNights = JSON.parse(localStorage.getItem('savedNights') || '[]');
+            const night = savedNights.find(n => n.id === nightId);
+            
+            if (!night) {
+                showNotification('Night session not found', 'error');
+                return;
+            }
+
+            currentSharingNight = night;
+            
+            // Load night preview
+            loadNightPreview(night);
+            
+            // Show modal
+            const modal = document.getElementById('share-night-modal');
+            modal.classList.add('show');
+            
+            // Reset form
+            document.getElementById('share-message').value = '';
+            document.getElementById('share-message-count').textContent = '0';
+            document.querySelector('input[name="share-privacy"][value="friends"]').checked = true;
+            
+            // Add event listeners
+            document.getElementById('share-message').addEventListener('input', updateCharCount);
+            document.getElementById('share-night-form').addEventListener('submit', handleShareNightSubmit);
+        }
+
+        function closeShareNightModal() {
+            const modal = document.getElementById('share-night-modal');
+            modal.classList.remove('show');
+            currentSharingNight = null;
+            
+            // Remove event listeners
+            const messageInput = document.getElementById('share-message');
+            const form = document.getElementById('share-night-form');
+            if (messageInput) {
+                messageInput.removeEventListener('input', updateCharCount);
+            }
+            if (form) {
+                form.removeEventListener('submit', handleShareNightSubmit);
+            }
+        }
+
+        function loadNightPreview(night) {
+            const preview = document.getElementById('share-night-preview');
+            const sessionData = night.sessionData;
+            const date = new Date(night.date);
+            const formattedDate = date.toLocaleDateString('en-AU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const duration = formatSessionDuration(sessionData.sessionDuration);
+            
+            preview.innerHTML = `
+                <h3>Night Session Preview</h3>
+                <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 15px;">${formattedDate}</p>
+                
+                <div class="share-night-preview-stats">
+                    <div class="share-night-preview-stat">
+                        <h4>Duration</h4>
+                        <p>${duration}</p>
+                    </div>
+                    <div class="share-night-preview-stat">
+                        <h4>Drinks</h4>
+                        <p>${sessionData.drinks.length}</p>
+                    </div>
+                    <div class="share-night-preview-stat">
+                        <h4>Standards</h4>
+                        <p>${sessionData.totalStandards.toFixed(1)}</p>
+                    </div>
+                    <div class="share-night-preview-stat">
+                        <h4>Final BAC</h4>
+                        <p>${sessionData.finalBAC.toFixed(3)}%</p>
+                    </div>
+                </div>
+                
+                <div class="share-night-preview-drinks">
+                    <h4>Drinks Consumed</h4>
+                    <div class="share-night-preview-drinks-list">
+                        ${sessionData.drinks.map(drink => `
+                            <span class="share-night-preview-drink">${drink.name}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('share-message');
+            const count = document.getElementById('share-message-count');
+            const currentLength = textarea.value.length;
+            count.textContent = currentLength;
+            
+            if (currentLength > 450) {
+                count.style.color = '#ff6b6b';
+            } else if (currentLength > 400) {
+                count.style.color = '#ffd700';
+            } else {
+                count.style.color = 'rgba(255, 255, 255, 0.6)';
+            }
+        }
+
+        async function handleShareNightSubmit(event) {
+            event.preventDefault();
+            
+            if (!currentSharingNight) {
+                showNotification('No night session to share', 'error');
+                return;
+            }
+
+            const message = document.getElementById('share-message').value.trim();
+            const privacy = document.querySelector('input[name="share-privacy"]:checked').value;
+            
+            try {
+                // Show loading state
+                const submitBtn = event.target.querySelector('.share-night-btn-primary');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing...';
+                submitBtn.disabled = true;
+
+                // Create the post data
+                const postData = {
+                    type: 'night_share',
+                    content: message,
+                    privacy: privacy,
+                    nightData: {
+                        sessionDuration: currentSharingNight.sessionData.sessionDuration,
+                        totalDrinks: currentSharingNight.sessionData.drinks.length,
+                        totalStandards: currentSharingNight.sessionData.totalStandards,
+                        finalBAC: currentSharingNight.sessionData.finalBAC,
+                        totalCalories: currentSharingNight.sessionData.totalCalories,
+                        totalCarbs: currentSharingNight.sessionData.totalCarbs,
+                        totalLiquid: currentSharingNight.sessionData.totalLiquid,
+                        drinks: currentSharingNight.sessionData.drinks.map(drink => ({
+                            name: drink.name,
+                            time: drink.time,
+                            standardDrinks: drink.standardDrinks
+                        })),
+                        sessionStart: currentSharingNight.sessionData.sessionStart,
+                        sessionEnd: currentSharingNight.sessionData.sessionEnd
+                    }
+                };
+
+                // Send to backend
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                if (response.ok) {
+                    showNotification('Night shared successfully!', 'success');
+                    closeShareNightModal();
+                    
+                    // Refresh social feed if it's currently open
+                    if (document.getElementById('social-feed-page').classList.contains('active')) {
+                        loadSocialFeed();
+                    }
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Error sharing night', 'error');
+                }
+            } catch (error) {
+                console.error('Error sharing night:', error);
+                showNotification('Error sharing night', 'error');
+            } finally {
+                // Reset button state
+                const submitBtn = event.target.querySelector('.share-night-btn-primary');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         }
 
@@ -11291,7 +12153,22 @@
                 return;
             }
 
-            container.innerHTML = feedPosts.map(post => `
+            container.innerHTML = feedPosts.map(post => {
+                if (post.type === 'night_share') {
+                    return renderNightSharePost(post);
+                } else {
+                    return renderRegularPost(post);
+                }
+            }).join('');
+        }
+
+        async function refreshFeed() {
+            await loadSocialFeed();
+            showNotification('Feed refreshed!', 'success');
+        }
+
+        function renderRegularPost(post) {
+            return `
                 <div class="post">
                     <div class="post-header">
                         <div class="post-avatar">${post.user.name.charAt(0).toUpperCase()}</div>
@@ -11302,7 +12179,7 @@
                     </div>
                     <div class="post-content">
                         <p>${post.content}</p>
-                        ${post.drinks.length > 0 ? `
+                        ${post.drinks && post.drinks.length > 0 ? `
                             <div class="post-drinks">
                                 ${post.drinks.map(drink => `
                                     <span class="drink-tag">${drink.drinkName}</span>
@@ -11320,12 +12197,216 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
         }
 
-        async function refreshFeed() {
-            await loadSocialFeed();
-            showNotification('Feed refreshed!', 'success');
+        function renderNightSharePost(post) {
+            const nightData = post.nightData;
+            const duration = formatSessionDuration(nightData.sessionDuration);
+            const sessionDate = new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            return `
+                <div class="post night-share-post">
+                    <div class="post-header">
+                        <div class="post-avatar night-share-avatar">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="post-user-info">
+                            <h4>${post.user.name}</h4>
+                            <span>${formatDate(post.createdAt)}</span>
+                            <div class="night-share-badge">
+                                <i class="fas fa-share"></i> Shared Night Session
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content">
+                        ${post.content ? `<p class="night-share-message">${post.content}</p>` : ''}
+                        
+                        <div class="night-share-card">
+                            <div class="night-share-header">
+                                <h3><i class="fas fa-moon"></i> Night Session</h3>
+                                <span class="night-share-date">${sessionDate}</span>
+                            </div>
+                            
+                            <div class="night-share-stats">
+                                <div class="night-share-stat">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <span class="stat-label">Duration</span>
+                                        <span class="stat-value">${duration}</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    <div>
+                                        <span class="stat-label">Drinks</span>
+                                        <span class="stat-value">${nightData.totalDrinks}</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-chart-line"></i>
+                                    <div>
+                                        <span class="stat-label">Standards</span>
+                                        <span class="stat-value">${nightData.totalStandards.toFixed(1)}</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-tint"></i>
+                                    <div>
+                                        <span class="stat-label">Final BAC</span>
+                                        <span class="stat-value">${nightData.finalBAC.toFixed(3)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="night-share-drinks">
+                                <h4>Drinks Consumed</h4>
+                                <div class="night-share-drinks-list">
+                                    ${nightData.drinks.map(drink => `
+                                        <span class="night-share-drink">
+                                            <i class="fas fa-wine-glass-alt"></i>
+                                            ${drink.name}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="action-btn ${post.likes.includes(currentUser?.id) ? 'liked' : ''}" 
+                                onclick="toggleLike('${post._id}')">
+                            <i class="fas fa-heart"></i> ${post.likes.length}
+                        </button>
+                        <button class="action-btn" onclick="showComments('${post._id}')">
+                            <i class="fas fa-comment"></i> ${post.comments.length}
+                        </button>
+                        <button class="action-btn" onclick="showNightDetails('${post._id}')">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showNightDetails(postId) {
+            const post = feedPosts.find(p => p._id === postId);
+            if (!post || post.type !== 'night_share') {
+                showNotification('Night details not found', 'error');
+                return;
+            }
+
+            const nightData = post.nightData;
+            const sessionStart = new Date(nightData.sessionStart);
+            const sessionEnd = new Date(nightData.sessionEnd);
+            
+            const detailsHTML = `
+                <div class="night-details-modal">
+                    <div class="night-details-content">
+                        <h2><i class="fas fa-moon"></i> Night Session Details</h2>
+                        <p class="night-details-date">${sessionStart.toLocaleDateString('en-AU', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}</p>
+                        
+                        <div class="night-details-grid">
+                            <div class="night-detail-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <span class="detail-label">Start Time</span>
+                                    <span class="detail-value">${sessionStart.toLocaleTimeString()}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <span class="detail-label">End Time</span>
+                                    <span class="detail-value">${sessionEnd.toLocaleTimeString()}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-hourglass-half"></i>
+                                <div>
+                                    <span class="detail-label">Duration</span>
+                                    <span class="detail-value">${formatSessionDuration(nightData.sessionDuration)}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-wine-glass-alt"></i>
+                                <div>
+                                    <span class="detail-label">Total Drinks</span>
+                                    <span class="detail-value">${nightData.totalDrinks}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-chart-line"></i>
+                                <div>
+                                    <span class="detail-label">Standard Drinks</span>
+                                    <span class="detail-value">${nightData.totalStandards.toFixed(1)}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-tint"></i>
+                                <div>
+                                    <span class="detail-label">Final BAC</span>
+                                    <span class="detail-value">${nightData.finalBAC.toFixed(3)}%</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-fire"></i>
+                                <div>
+                                    <span class="detail-label">Calories</span>
+                                    <span class="detail-value">${nightData.totalCalories}</span>
+                                </div>
+                            </div>
+                            <div class="night-detail-item">
+                                <i class="fas fa-bread-slice"></i>
+                                <div>
+                                    <span class="detail-label">Carbs</span>
+                                    <span class="detail-value">${nightData.totalCarbs}g</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="night-details-drinks">
+                            <h3>Drink Timeline</h3>
+                            <div class="drink-timeline">
+                                ${nightData.drinks.map((drink, index) => {
+                                    const drinkTime = new Date(drink.time);
+                                    return `
+                                        <div class="drink-timeline-item">
+                                            <div class="drink-timeline-time">${drinkTime.toLocaleTimeString()}</div>
+                                            <div class="drink-timeline-content">
+                                                <span class="drink-name">${drink.name}</span>
+                                                <span class="drink-standards">${drink.standardDrinks} standards</span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'night-details-overlay';
+            modal.innerHTML = detailsHTML;
+            modal.onclick = () => modal.remove();
+            
+            const content = modal.querySelector('.night-details-content');
+            content.onclick = (e) => e.stopPropagation();
+            
+            document.body.appendChild(modal);
         }
 
         // Friends Functions
