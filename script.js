@@ -1,9 +1,12 @@
 // Test if JavaScript is running
 console.log('Script.js loaded successfully!');
 
+// API Base URL - Must be at the top to avoid temporal dead zone issues
+const API_BASE_URL = 'http://localhost:3000/api';
+
 // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
 // This bypasses all authentication requirements so you can test features
-const TEMP_AUTH_BYPASS = false;
+const TEMP_AUTH_BYPASS = true;
 const TEMP_USER = {
     id: 'temp-user-123',
     name: 'Test User',
@@ -89,7 +92,9 @@ function signOut() {
 
 function getToken() {
     if (TEMP_AUTH_BYPASS) {
-        return 'mock-token-123';
+        // For testing, we'll use a real token from one of our test users
+        // This token is from the test user we created earlier
+        return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWFiNmIxZmMwYzVkYmMxNjJlYTlkMCIsImlhdCI6MTc1NDk2OTc3NywiZXhwIjoxNzU1NTc0NTc3fQ.3aqXejwIA0bXKecSE5xpYtQhXkkaMUHTHuDP3n49gWE';
     }
     return null;
 }
@@ -9266,5 +9271,871 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ===== SOCIAL FEATURES IMPLEMENTATION =====
+
 // Final test - if you see this, the script loaded completely
 console.log('Script.js finished loading!');
+
+// Social Feed Functions
+async function loadSocialFeed() {
+    const feedContainer = document.getElementById('feed-container');
+    const loadingSpinner = document.getElementById('feed-loading');
+    
+    if (!feedContainer) return;
+    
+    try {
+        // Show loading
+        if (loadingSpinner) loadingSpinner.style.display = 'block';
+        
+        const token = getToken();
+        if (!token) {
+            feedContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h3>Sign In Required</h3>
+                    <p>Please sign in to view the social feed</p>
+                    <button class="btn primary-btn" onclick="showProfileModal()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/feed`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displaySocialFeed(data.posts);
+        } else {
+            throw new Error('Failed to load social feed');
+        }
+    } catch (error) {
+        // If server is not running, show demo data
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Server not running, showing demo social feed');
+            displaySocialFeed(getDemoPosts());
+            return;
+        }
+        console.error('Error loading social feed:', error);
+        feedContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Feed</h3>
+                <p>Unable to load social feed. Please try again later.</p>
+                <button class="btn primary-btn" onclick="loadSocialFeed()">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+    } finally {
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    }
+}
+
+function displaySocialFeed(posts) {
+    const feedContainer = document.getElementById('feed-container');
+    
+    if (!posts || posts.length === 0) {
+        feedContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <h3>No Posts Yet</h3>
+                <p>Be the first to share your beverage experience!</p>
+                <button class="btn primary-btn" onclick="showCreatePostModal()">
+                    <i class="fas fa-plus"></i> Create Post
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    feedContainer.innerHTML = posts.map(post => `
+        <div class="post" data-post-id="${post._id}">
+            <div class="post-header">
+                <div class="post-avatar">
+                    ${post.author.profile?.avatar || post.author.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="post-user-info">
+                    <h4>${post.author.name}</h4>
+                    <span>${new Date(post.createdAt).toLocaleDateString()}</span>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>${post.content}</p>
+                ${post.drinks && post.drinks.length > 0 ? `
+                    <div class="post-drinks">
+                        ${post.drinks.map(drink => `
+                            <span class="drink-tag">${drink.name}</span>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+            <div class="post-actions">
+                <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post._id}')">
+                    <i class="fas fa-heart"></i>
+                    <span>${post.likes || 0}</span>
+                </button>
+                <button class="action-btn" onclick="showComments('${post._id}')">
+                    <i class="fas fa-comment"></i>
+                    <span>${post.comments || 0}</span>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Friends Functions
+async function loadFriends() {
+    const friendsContainer = document.getElementById('friends-container');
+    
+    if (!friendsContainer) return;
+    
+    try {
+        const token = getToken();
+        if (!token) {
+            friendsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h3>Sign In Required</h3>
+                    <p>Please sign in to view your friends</p>
+                    <button class="btn primary-btn" onclick="showProfileModal()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/friends`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayFriends(data.friends);
+        } else {
+            throw new Error('Failed to load friends');
+        }
+    } catch (error) {
+        // If server is not running, show demo data
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Server not running, showing demo friends');
+            displayFriends(getDemoFriends());
+            return;
+        }
+        console.error('Error loading friends:', error);
+        friendsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Friends</h3>
+                <p>Unable to load friends list. Please try again later.</p>
+                <button class="btn primary-btn" onclick="loadFriends()">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+function displayFriends(friends) {
+    const friendsContainer = document.getElementById('friends-container');
+    
+    if (!friends || friends.length === 0) {
+        friendsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No Friends Yet</h3>
+                <p>Start connecting with other BevyFinder users!</p>
+                <button class="btn primary-btn" onclick="switchToFindFriends()">
+                    <i class="fas fa-search"></i> Find Friends
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    friendsContainer.innerHTML = friends.map(friend => `
+        <div class="friend-item">
+            <div class="friend-info">
+                <div class="friend-avatar">
+                    ${friend.profile?.avatar || friend.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="friend-details">
+                    <h4>${friend.name}</h4>
+                    <span>${friend.email}</span>
+                </div>
+            </div>
+            <div class="friend-actions">
+                <button class="btn secondary-btn" onclick="viewFriendProfile('${friend._id}')">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn secondary-btn" onclick="removeFriend('${friend._id}')">
+                    <i class="fas fa-user-minus"></i> Remove
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Friend Requests Functions
+async function loadFriendRequests() {
+    const requestsContainer = document.getElementById('requests-container');
+    
+    if (!requestsContainer) return;
+    
+    try {
+        const token = getToken();
+        if (!token) {
+            requestsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h3>Sign In Required</h3>
+                    <p>Please sign in to view friend requests</p>
+                    <button class="btn primary-btn" onclick="showProfileModal()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/friend-requests`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayFriendRequests(data.friendRequests);
+        } else {
+            throw new Error('Failed to load friend requests');
+        }
+    } catch (error) {
+        // If server is not running, show demo data
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Server not running, showing demo friend requests');
+            displayFriendRequests(getDemoFriendRequests());
+            return;
+        }
+        console.error('Error loading friend requests:', error);
+        requestsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Requests</h3>
+                <p>Unable to load friend requests. Please try again later.</p>
+                <button class="btn primary-btn" onclick="loadFriendRequests()">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+function displayFriendRequests(requests) {
+    const requestsContainer = document.getElementById('requests-container');
+    
+    if (!requests || requests.length === 0) {
+        requestsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-user-plus"></i>
+                <h3>No Friend Requests</h3>
+                <p>You don't have any pending friend requests</p>
+            </div>
+        `;
+        return;
+    }
+    
+    requestsContainer.innerHTML = requests.map(request => `
+        <div class="request-item">
+            <div class="friend-info">
+                <div class="friend-avatar">
+                    ${request.from.profile?.avatar || request.from.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="friend-details">
+                    <h4>${request.from.name}</h4>
+                    <span>${request.from.email}</span>
+                </div>
+            </div>
+            <div class="friend-actions">
+                <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id}')">
+                    <i class="fas fa-check"></i> Accept
+                </button>
+                <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from._id}')">
+                    <i class="fas fa-times"></i> Decline
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Friend Request Actions
+async function acceptFriendRequest(fromUserId) {
+    try {
+        const token = getToken();
+        if (!token) {
+            showNotification('Please sign in to accept friend requests', 'error');
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/friend-request/accept`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fromUserId })
+        });
+        
+        if (response.ok) {
+            showNotification('Friend request accepted!', 'success');
+            loadFriendRequests();
+            loadFriends();
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Error accepting friend request', 'error');
+        }
+    } catch (error) {
+        console.error('Error accepting friend request:', error);
+        showNotification('Error accepting friend request', 'error');
+    }
+}
+
+async function declineFriendRequest(fromUserId) {
+    try {
+        const token = getToken();
+        if (!token) {
+            showNotification('Please sign in to decline friend requests', 'error');
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/friend-request/decline`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fromUserId })
+        });
+        
+        if (response.ok) {
+            showNotification('Friend request declined', 'success');
+            loadFriendRequests();
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Error declining friend request', 'error');
+        }
+    } catch (error) {
+        console.error('Error declining friend request:', error);
+        showNotification('Error declining friend request', 'error');
+    }
+}
+
+// Search Users Function
+async function searchUsers() {
+    const searchInput = document.getElementById('friend-search');
+    const searchResults = document.getElementById('search-results');
+    
+    if (!searchInput || !searchResults) return;
+    
+    const query = searchInput.value.trim();
+    if (!query) {
+        showNotification('Please enter a search term', 'error');
+        return;
+    }
+    
+    try {
+        const token = getToken();
+        if (!token) {
+            showNotification('Please sign in to search for users', 'error');
+            return;
+        }
+        
+        console.log('🔍 Making search request to:', `${API_BASE_URL}/social/search-users?query=${encodeURIComponent(query)}`);
+        console.log('🔑 Using token:', token ? token.substring(0, 20) + '...' : 'No token');
+        
+        const response = await fetch(`${API_BASE_URL}/social/search-users?query=${encodeURIComponent(query)}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response ok:', response.ok);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Search successful, data:', data);
+            displaySearchResults(data.users);
+        } else {
+            const errorData = await response.json();
+            console.error('❌ Search failed, error data:', errorData);
+            throw new Error(`Failed to search users: ${errorData.message || response.statusText}`);
+        }
+    } catch (error) {
+        // If server is not running, show demo search results
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Server not running, showing demo search results');
+            const demoUsers = getDemoFriends().filter(user => 
+                user.name.toLowerCase().includes(query.toLowerCase()) ||
+                user.email.toLowerCase().includes(query.toLowerCase())
+            );
+            displaySearchResults(demoUsers);
+            return;
+        }
+        console.error('Error searching users:', error);
+        searchResults.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Search Error</h3>
+                <p>Unable to search for users. Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+function displaySearchResults(users) {
+    const searchResults = document.getElementById('search-results');
+    
+    if (!users || users.length === 0) {
+        searchResults.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>No Users Found</h3>
+                <p>Try searching with a different term</p>
+            </div>
+        `;
+        return;
+    }
+    
+    searchResults.innerHTML = users.map(user => `
+        <div class="user-item">
+            <div class="friend-info">
+                <div class="friend-avatar">
+                    ${user.profile?.avatar || user.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="friend-details">
+                    <h4>${user.name}</h4>
+                    <span>${user.email}</span>
+                </div>
+            </div>
+            <div class="friend-actions">
+                ${user.isFriend ? `
+                    <button class="btn secondary-btn" disabled>
+                        <i class="fas fa-check"></i> Friends
+                    </button>
+                ` : user.hasSentRequest ? `
+                    <button class="btn secondary-btn" disabled>
+                        <i class="fas fa-clock"></i> Request Sent
+                    </button>
+                ` : user.hasReceivedRequest ? `
+                    <button class="btn primary-btn" onclick="acceptFriendRequest('${user.id}')">
+                        <i class="fas fa-check"></i> Accept
+                    </button>
+                ` : `
+                    <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
+                        <i class="fas fa-user-plus"></i> Add Friend
+                    </button>
+                `}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Send Friend Request
+async function sendFriendRequest(targetUserId) {
+    try {
+        console.log('🚀 Sending friend request to:', targetUserId);
+        
+        const token = getToken();
+        if (!token) {
+            console.log('❌ No token available');
+            showNotification('Please sign in to send friend requests', 'error');
+            return;
+        }
+        
+        console.log('🔑 Using token:', token.substring(0, 20) + '...');
+        console.log('📡 Request body:', JSON.stringify({ targetUserId }));
+        
+        const response = await fetch(`${API_BASE_URL}/social/friend-request/send`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ targetUserId })
+        });
+        
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response ok:', response.ok);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Friend request successful:', data);
+            showNotification('Friend request sent!', 'success');
+            // Refresh search results to update button states
+            searchUsers();
+        } else {
+            const error = await response.json();
+            console.error('❌ Friend request failed:', error);
+            showNotification(error.message || 'Error sending friend request', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Friend request error:', error);
+        console.error('📄 Error details:', error.message);
+        if (error.stack) {
+            console.error('📄 Stack trace:', error.stack);
+        }
+        showNotification('Error sending friend request', 'error');
+    }
+}
+
+// Leaderboard Functions
+async function loadLeaderboard(type = 'totalDrinks') {
+    const leaderboardContainer = document.getElementById('leaderboard-container');
+    
+    if (!leaderboardContainer) return;
+    
+    try {
+        const token = getToken();
+        if (!token) {
+            leaderboardContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h3>Sign In Required</h3>
+                    <p>Please sign in to view leaderboards</p>
+                    <button class="btn primary-btn" onclick="showProfileModal()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/social/leaderboard?type=${type}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayLeaderboard(data.leaderboard, type);
+        } else {
+            throw new Error('Failed to load leaderboard');
+        }
+    } catch (error) {
+        // If server is not running, show demo data
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Server not running, showing demo leaderboard');
+            displayLeaderboard(getDemoLeaderboard(), type);
+            return;
+        }
+        console.error('Error loading leaderboard:', error);
+        leaderboardContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Leaderboard</h3>
+                <p>Unable to load leaderboard. Please try again later.</p>
+                <button class="btn primary-btn" onclick="loadLeaderboard('${type}')">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+function displayLeaderboard(leaderboard, type) {
+    const leaderboardContainer = document.getElementById('leaderboard-container');
+    
+    if (!leaderboard || leaderboard.length === 0) {
+        leaderboardContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <h3>No Leaderboard Data</h3>
+                <p>Start tracking your drinks to appear on the leaderboard!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const typeLabels = {
+        totalDrinks: 'Total Drinks',
+        totalSessions: 'Total Sessions',
+        longestSession: 'Longest Session',
+        searches: 'Most Searches'
+    };
+    
+    leaderboardContainer.innerHTML = `
+        <div class="leaderboard-header">
+            <h3>${typeLabels[type] || 'Leaderboard'}</h3>
+        </div>
+        ${leaderboard.map((user, index) => `
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank rank-${index < 3 ? index + 1 : 'other'}">
+                    ${index + 1}
+                </div>
+                <div class="leaderboard-user">
+                    <div class="friend-avatar">
+                        ${user.profile?.avatar || user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="friend-details">
+                        <h4>${user.name}</h4>
+                        <span>${user.email}</span>
+                    </div>
+                </div>
+                <div class="leaderboard-stats">
+                    <div class="stat-value">${user.stats[type] || 0}</div>
+                    <div class="stat-label">${typeLabels[type]}</div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+// Post Creation Functions
+function showCreatePostModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Create Post</h3>
+                <button class="close-modal-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-post-form">
+                    <div class="form-group">
+                        <label for="post-content">What's on your mind?</label>
+                        <textarea id="post-content" placeholder="Share your beverage experience..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-drinks">Drinks (optional)</label>
+                        <input type="text" id="post-drinks" placeholder="e.g., Margarita, Guinness">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('create-post-form').addEventListener('submit', handleCreatePost);
+}
+
+async function handleCreatePost(event) {
+    event.preventDefault();
+    
+    const content = document.getElementById('post-content').value;
+    const drinks = document.getElementById('post-drinks').value;
+    
+    try {
+        const token = getToken();
+        if (!token) {
+            showNotification('Please sign in to create posts', 'error');
+            return;
+        }
+        
+        const postData = {
+            content,
+            drinks: drinks ? drinks.split(',').map(d => d.trim()) : []
+        };
+        
+        const response = await fetch(`${API_BASE_URL}/social/posts`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        });
+        
+        if (response.ok) {
+            showNotification('Post created successfully!', 'success');
+            closeModal();
+            loadSocialFeed();
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Error creating post', 'error');
+        }
+    } catch (error) {
+        console.error('Error creating post:', error);
+        showNotification('Error creating post', 'error');
+    }
+}
+
+// Utility Functions
+function refreshFeed() {
+    loadSocialFeed();
+    showNotification('Feed refreshed!', 'success');
+}
+
+function switchToFindFriends() {
+    const findFriendsTab = document.querySelector('[data-tab="find-friends"]');
+    if (findFriendsTab) {
+        findFriendsTab.click();
+    }
+}
+
+function toggleLike(postId) {
+    // Implementation for liking/unliking posts
+    showNotification('Like functionality coming soon!', 'info');
+}
+
+function showComments(postId) {
+    // Implementation for showing comments
+    showNotification('Comments functionality coming soon!', 'info');
+}
+
+function viewFriendProfile(friendId) {
+    // Implementation for viewing friend profiles
+    showNotification('Friend profile view coming soon!', 'info');
+}
+
+function removeFriend(friendId) {
+    if (confirm('Are you sure you want to remove this friend?')) {
+        // Implementation for removing friends
+        showNotification('Remove friend functionality coming soon!', 'info');
+    }
+}
+
+// Helper function to close modals
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Demo data for offline mode
+function getDemoPosts() {
+    return [
+        {
+            _id: 'demo-1',
+            content: 'Just discovered this amazing craft beer! The flavor profile is incredible.',
+            author: {
+                name: 'Sarah Johnson',
+                profile: { avatar: 'S' }
+            },
+            drinks: [{ name: 'Craft IPA' }],
+            likes: 12,
+            comments: 3,
+            createdAt: new Date(Date.now() - 3600000).toISOString(),
+            liked: false
+        },
+        {
+            _id: 'demo-2',
+            content: 'Perfect margarita for a Friday night! 🍹',
+            author: {
+                name: 'Mike Chen',
+                profile: { avatar: 'M' }
+            },
+            drinks: [{ name: 'Margarita' }],
+            likes: 8,
+            comments: 1,
+            createdAt: new Date(Date.now() - 7200000).toISOString(),
+            liked: true
+        },
+        {
+            _id: 'demo-3',
+            content: 'Wine tasting night with friends. This Pinot Noir is exceptional!',
+            author: {
+                name: 'Emma Davis',
+                profile: { avatar: 'E' }
+            },
+            drinks: [{ name: 'Pinot Noir' }],
+            likes: 15,
+            comments: 5,
+            createdAt: new Date(Date.now() - 10800000).toISOString(),
+            liked: false
+        }
+    ];
+}
+
+function getDemoFriends() {
+    return [
+        {
+            _id: 'friend-1',
+            name: 'Sarah Johnson',
+            email: 'sarah@example.com',
+            profile: { avatar: 'S' }
+        },
+        {
+            _id: 'friend-2',
+            name: 'Mike Chen',
+            email: 'mike@example.com',
+            profile: { avatar: 'M' }
+        },
+        {
+            _id: 'friend-3',
+            name: 'Emma Davis',
+            email: 'emma@example.com',
+            profile: { avatar: 'E' }
+        }
+    ];
+}
+
+function getDemoFriendRequests() {
+    return [
+        {
+            from: {
+                _id: 'user-1',
+                name: 'Alex Wilson',
+                email: 'alex@example.com',
+                profile: { avatar: 'A' }
+            }
+        },
+        {
+            from: {
+                _id: 'user-2',
+                name: 'Jessica Brown',
+                email: 'jessica@example.com',
+                profile: { avatar: 'J' }
+            }
+        }
+    ];
+}
+
+function getDemoLeaderboard() {
+    return [
+        {
+            _id: 'user-1',
+            name: 'Sarah Johnson',
+            email: 'sarah@example.com',
+            profile: { avatar: 'S' },
+            stats: { totalDrinks: 45, totalSessions: 12, longestSession: 180, searches: 89 }
+        },
+        {
+            _id: 'user-2',
+            name: 'Mike Chen',
+            email: 'mike@example.com',
+            profile: { avatar: 'M' },
+            stats: { totalDrinks: 38, totalSessions: 10, longestSession: 150, searches: 67 }
+        },
+        {
+            _id: 'user-3',
+            name: 'Emma Davis',
+            email: 'emma@example.com',
+            profile: { avatar: 'E' },
+            stats: { totalDrinks: 32, totalSessions: 8, longestSession: 120, searches: 54 }
+        }
+    ];
+}

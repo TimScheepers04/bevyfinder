@@ -2,10 +2,28 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Post = require('../models/Post');
-const { authenticateToken } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
+
+// Test route
+router.get('/test', (req, res) => {
+    console.log('Social test route hit!');
+    res.json({
+        success: true,
+        message: 'Social routes are working!'
+    });
+});
+
+// Test route without auth
+router.get('/ping', (req, res) => {
+    console.log('Social ping route hit!');
+    res.json({
+        success: true,
+        message: 'Social ping successful!'
+    });
+});
 
 // Get user's friends list
-router.get('/friends', authenticateToken, async (req, res) => {
+router.get('/friends', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate('friends', 'name email profile.avatar stats.lastActive');
         
@@ -23,7 +41,7 @@ router.get('/friends', authenticateToken, async (req, res) => {
 });
 
 // Get friend requests
-router.get('/friend-requests', authenticateToken, async (req, res) => {
+router.get('/friend-requests', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id)
             .populate('friendRequests.from', 'name email profile.avatar');
@@ -42,7 +60,7 @@ router.get('/friend-requests', authenticateToken, async (req, res) => {
 });
 
 // Send friend request
-router.post('/friend-request/send', authenticateToken, async (req, res) => {
+router.post('/friend-request/send', protect, async (req, res) => {
     try {
         const { targetUserId } = req.body;
         
@@ -70,7 +88,7 @@ router.post('/friend-request/send', authenticateToken, async (req, res) => {
 });
 
 // Accept friend request
-router.post('/friend-request/accept', authenticateToken, async (req, res) => {
+router.post('/friend-request/accept', protect, async (req, res) => {
     try {
         const { fromUserId } = req.body;
         
@@ -98,7 +116,7 @@ router.post('/friend-request/accept', authenticateToken, async (req, res) => {
 });
 
 // Decline friend request
-router.post('/friend-request/decline', authenticateToken, async (req, res) => {
+router.post('/friend-request/decline', protect, async (req, res) => {
     try {
         const { fromUserId } = req.body;
         
@@ -126,7 +144,7 @@ router.post('/friend-request/decline', authenticateToken, async (req, res) => {
 });
 
 // Remove friend
-router.delete('/friends/:friendId', authenticateToken, async (req, res) => {
+router.delete('/friends/:friendId', protect, async (req, res) => {
     try {
         const { friendId } = req.params;
         
@@ -147,7 +165,7 @@ router.delete('/friends/:friendId', authenticateToken, async (req, res) => {
 });
 
 // Search users
-router.get('/search-users', authenticateToken, async (req, res) => {
+router.get('/search-users', protect, async (req, res) => {
     try {
         const { query } = req.query;
         
@@ -158,6 +176,8 @@ router.get('/search-users', authenticateToken, async (req, res) => {
             });
         }
 
+        const currentUser = await User.findById(req.user.id);
+        
         const users = await User.find({
             $or: [
                 { name: { $regex: query, $options: 'i' } },
@@ -168,9 +188,27 @@ router.get('/search-users', authenticateToken, async (req, res) => {
         .select('name email profile.avatar stats.lastActive')
         .limit(10);
 
+        // Transform users to include friend status information
+        const transformedUsers = users.map(user => {
+            const isFriend = currentUser.friends.includes(user._id);
+            const hasSentRequest = currentUser.sentFriendRequests.some(req => req.to.toString() === user._id.toString());
+            const hasReceivedRequest = currentUser.friendRequests.some(req => req.from.toString() === user._id.toString());
+            
+            return {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                profile: user.profile,
+                stats: user.stats,
+                isFriend,
+                hasSentRequest,
+                hasReceivedRequest
+            };
+        });
+
         res.json({
             success: true,
-            users: users
+            users: transformedUsers
         });
     } catch (error) {
         console.error('Error searching users:', error);
@@ -182,7 +220,7 @@ router.get('/search-users', authenticateToken, async (req, res) => {
 });
 
 // Create post
-router.post('/posts', authenticateToken, async (req, res) => {
+router.post('/posts', protect, async (req, res) => {
     try {
         const { content, drinks, location, privacy, sessionStats } = req.body;
         
@@ -227,7 +265,7 @@ router.post('/posts', authenticateToken, async (req, res) => {
 });
 
 // Get social feed
-router.get('/feed', authenticateToken, async (req, res) => {
+router.get('/feed', protect, async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
         
@@ -247,7 +285,7 @@ router.get('/feed', authenticateToken, async (req, res) => {
 });
 
 // Get user posts
-router.get('/users/:userId/posts', authenticateToken, async (req, res) => {
+router.get('/users/:userId/posts', protect, async (req, res) => {
     try {
         const { userId } = req.params;
         const { page = 1, limit = 10 } = req.query;
@@ -268,7 +306,7 @@ router.get('/users/:userId/posts', authenticateToken, async (req, res) => {
 });
 
 // Like/unlike post
-router.post('/posts/:postId/like', authenticateToken, async (req, res) => {
+router.post('/posts/:postId/like', protect, async (req, res) => {
     try {
         const { postId } = req.params;
         
@@ -303,7 +341,7 @@ router.post('/posts/:postId/like', authenticateToken, async (req, res) => {
 });
 
 // Add comment to post
-router.post('/posts/:postId/comments', authenticateToken, async (req, res) => {
+router.post('/posts/:postId/comments', protect, async (req, res) => {
     try {
         const { postId } = req.params;
         const { text } = req.body;
@@ -340,7 +378,7 @@ router.post('/posts/:postId/comments', authenticateToken, async (req, res) => {
 });
 
 // Get leaderboards
-router.get('/leaderboards', authenticateToken, async (req, res) => {
+router.get('/leaderboards', protect, async (req, res) => {
     try {
         const { type = 'totalDrinks', limit = 10 } = req.query;
         
@@ -376,7 +414,7 @@ router.get('/leaderboards', authenticateToken, async (req, res) => {
 });
 
 // Get user profile (public)
-router.get('/users/:userId/profile', authenticateToken, async (req, res) => {
+router.get('/users/:userId/profile', protect, async (req, res) => {
     try {
         const { userId } = req.params;
         

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CACHE BUST: v2 - Updated API URL to localhost -->
+<!-- CACHE BUST: v3 - Fixed API URL to localhost:3000 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -4013,8 +4013,10 @@
     </div>
 
     <script>
+        console.log('🚀 Script loading - CACHE BUST v3 -', new Date().toISOString());
         // 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
-        const TEMP_AUTH_BYPASS = false;
+        let TEMP_AUTH_BYPASS = true;
+        let FORCE_LOGOUT = localStorage.getItem('FORCE_LOGOUT') === 'true'; // Persist logout state
         const TEMP_USER = {
             _id: 'temp-user-123',
             name: 'Test User',
@@ -4039,12 +4041,35 @@
 
         // Mock authentication functions
         function isAuthenticated() {
-            return TEMP_AUTH_BYPASS;
+            return TEMP_AUTH_BYPASS && !FORCE_LOGOUT;
+        }
+
+        function getToken() {
+            if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
+                // For testing, we'll use a real token from one of our test users
+                // This token is from the test user we created earlier
+                return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWFiNmIxZmMwYzVkYmMxNjJlYTlkMCIsImlhdCI6MTc1NDk2OTc3NywiZXhwIjoxNzU1NTc0NTc3fQ.3aqXejwIA0bXKecSE5xpYtQhXkkaMUHTHuDP3n49gWE';
+            }
+            return null;
         }
 
         // Note: getCurrentUser function is defined later in the file
 
         console.log('🔓 Authentication bypass enabled - all features available for testing');
+        console.log('🚪 Logout state:', FORCE_LOGOUT ? 'LOGGED OUT' : 'LOGGED IN');
+        
+        // Function to re-enable authentication bypass for testing
+        function enableTestMode() {
+            FORCE_LOGOUT = false;
+            localStorage.removeItem('FORCE_LOGOUT'); // Clear logout state
+            currentUser = TEMP_USER;
+            localStorage.setItem('currentUser', JSON.stringify(TEMP_USER));
+            updateProfileButton();
+            console.log('🔓 Test mode re-enabled');
+            if (typeof showNotification === 'function') {
+                showNotification('Test mode enabled - logged in as test@bevyfinder.com', 'success');
+            }
+        }
 
         // Simple page management
         function showPage(pageId) {
@@ -8214,20 +8239,41 @@
         let currentUser = null;
         // Dynamic API URL detection
         let API_BASE_URL;
+        console.log('🔍 Hostname detection:', {
+            hostname: window.location.hostname,
+            href: window.location.href,
+            protocol: window.location.protocol,
+            isLocalhost: window.location.hostname === 'localhost',
+            is127: window.location.hostname === '127.0.0.1'
+        });
+        
+        // Force localhost for testing - CACHE BUST v3
+        API_BASE_URL = 'http://localhost:3000/api';
+        console.log('🏠 Forced to use localhost API for testing - CACHE BUST v3');
+        console.log('🕐 Cache bust timestamp:', new Date().toISOString());
+        
+        // Original logic (commented out for now)
+        /*
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            API_BASE_URL = 'http://localhost:8080/api'; // Local development
+            API_BASE_URL = 'http://localhost:3000/api'; // Local development - Updated to match our server
+            console.log('🏠 Using localhost API');
         } else {
             API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Production
+            console.log('🌍 Using production API');
         }
+        */
         console.log('🌐 Using API URL:', API_BASE_URL);
         
-        // Initialize currentUser with TEMP_USER if bypass is enabled
-        if (TEMP_AUTH_BYPASS) {
+        // Initialize currentUser with TEMP_USER if bypass is enabled and not logged out
+        if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
             currentUser = TEMP_USER;
             console.log('🚀 TEMP_AUTH_BYPASS enabled, setting currentUser to:', currentUser);
             // Also store in localStorage to ensure consistency
             localStorage.setItem('currentUser', JSON.stringify(TEMP_USER));
             console.log('💾 Stored TEMP_USER in localStorage');
+        } else if (FORCE_LOGOUT) {
+            console.log('🚪 Logout state detected - keeping currentUser as null');
+            currentUser = null;
         }
 
         function toggleProfileDropdown() {
@@ -8624,13 +8670,38 @@
         }
 
         function logout() {
+            console.log('🚪 Logout function called');
+            
+            // Set logout flag to disable authentication bypass
+            FORCE_LOGOUT = true;
+            localStorage.setItem('FORCE_LOGOUT', 'true'); // Persist logout state
+            
+            // Clear user data completely
             currentUser = null;
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
+            
+            // Hide UI elements
             hideProfileDropdown();
-            updateProfileButton();
             closeProfileModal();
-            alert('Logged out successfully!');
+            
+            // Show logout message
+            if (typeof showNotification === 'function') {
+                showNotification('Logged out successfully!', 'success');
+            } else {
+                alert('Logged out successfully!');
+            }
+            
+            // Update the UI to reflect logged out state
+            updateProfileButton();
+            
+            console.log('✅ Logout completed - authentication bypass disabled');
+            
+            // Force page reload to ensure clean state
+            setTimeout(() => {
+                console.log('🔄 Reloading page to ensure clean logout state...');
+                window.location.reload();
+            }, 1500);
         }
 
         function updateProfileButton() {
@@ -9063,8 +9134,8 @@
                 return currentUser;
             }
             
-            // Only return TEMP_USER if bypass is enabled
-            if (TEMP_AUTH_BYPASS) {
+            // Only return TEMP_USER if bypass is enabled and not logged out
+            if (TEMP_AUTH_BYPASS && !FORCE_LOGOUT) {
                 return TEMP_USER;
             }
             
@@ -9609,7 +9680,8 @@
                 return;
             }
 
-            const token = localStorage.getItem('token');
+            // Use the working authentication bypass
+            const token = getToken();
             if (!token) {
                 showNotification('Please log in to access social features.', 'error');
                 return;
@@ -9636,7 +9708,11 @@
                 await initializeSocial();
             }
 
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+            }
             if (!token) return;
 
             try {
@@ -9716,7 +9792,14 @@
                 await initializeSocial();
             }
 
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for loading friends');
+            } else {
+                console.log('🔑 Using test token for loading friends');
+            }
             if (!token) return;
 
             try {
@@ -9740,7 +9823,14 @@
                 await initializeSocial();
             }
 
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for loading friend requests');
+            } else {
+                console.log('🔑 Using test token for loading friend requests');
+            }
             if (!token) return;
 
             try {
@@ -9823,10 +9913,10 @@
                         </div>
                     </div>
                     <div class="friend-actions">
-                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from.id}')">
+                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id || request.from.id}')">
                             <i class="fas fa-check"></i> Accept
                         </button>
-                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from.id}')">
+                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from._id || request.from.id}')">
                             <i class="fas fa-times"></i> Decline
                         </button>
                     </div>
@@ -9835,29 +9925,68 @@
         }
 
         async function searchUsers() {
-            const query = document.getElementById('friend-search').value.trim();
+            console.log('🚀 searchUsers function called');
+            
+            const searchInput = document.getElementById('friend-search');
+            if (!searchInput) {
+                console.error('❌ Search input element not found');
+                return;
+            }
+            
+            const query = searchInput.value.trim();
             console.log('🔍 Searching for users with query:', query);
             
             if (query.length < 2) {
-                showNotification('Please enter at least 2 characters', 'error');
+                console.log('❌ Query too short');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please enter at least 2 characters', 'error');
+                } else {
+                    alert('Please enter at least 2 characters');
+                }
                 return;
             }
 
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            console.log('🔍 Test token result:', token ? 'Found' : 'Not found');
+            
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔍 Real account token from localStorage:', token ? 'Found' : 'Not found');
+                if (token) {
+                    console.log('🔑 Using real account token from localStorage');
+                }
+            } else {
+                console.log('🔑 Using test token');
+            }
+            
+            // Debug: Check all localStorage items
+            console.log('🔍 All localStorage keys:', Object.keys(localStorage));
+            console.log('🔍 currentUser from localStorage:', localStorage.getItem('currentUser'));
+            
+            console.log('🔑 Token available:', !!token);
             if (!token) {
                 console.error('❌ No token found for search');
+                console.error('❌ Check if you are properly logged in');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please log in to search users', 'error');
+                } else {
+                    alert('Please log in to search users');
+                }
                 return;
             }
 
             try {
                 const url = `${API_BASE_URL}/social/search-users?query=${encodeURIComponent(query)}`;
                 console.log('📤 Searching users at:', url);
+                console.log('🔑 Using token:', token.substring(0, 20) + '...');
                 
                 const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 console.log('📥 Search response status:', response.status);
+                console.log('📥 Search response ok:', response.ok);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -9866,11 +9995,23 @@
                 } else {
                     const error = await response.json();
                     console.error('❌ Search error:', error);
-                    showNotification('Error searching users', 'error');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Error searching users', 'error');
+                    } else {
+                        alert('Error searching users');
+                    }
                 }
             } catch (error) {
                 console.error('❌ Error searching users:', error);
-                showNotification('Error searching users', 'error');
+                console.error('📄 Error details:', error.message);
+                if (error.stack) {
+                    console.error('📄 Stack trace:', error.stack);
+                }
+                if (typeof showNotification === 'function') {
+                    showNotification('Error searching users', 'error');
+                } else {
+                    alert('Error searching users');
+                }
             }
         }
 
@@ -9909,7 +10050,14 @@
 
         // Leaderboard Functions
         async function loadLeaderboard(type = 'totalDrinks') {
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for loading leaderboard');
+            } else {
+                console.log('🔑 Using test token for loading leaderboard');
+            }
             if (!token) return;
 
             try {
@@ -9974,9 +10122,23 @@
         // Social Action Functions
         async function sendFriendRequest(userId) {
             console.log('🔍 sendFriendRequest called with userId:', userId);
-            const token = localStorage.getItem('token');
+            
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
             if (!token) {
-                console.error('❌ No token found');
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for friend request');
+            } else {
+                console.log('🔑 Using test token for friend request');
+            }
+            
+            if (!token) {
+                console.error('❌ No token found for friend request');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please log in to send friend requests', 'error');
+                } else {
+                    alert('Please log in to send friend requests');
+                }
                 return;
             }
 
@@ -10010,8 +10172,38 @@
         }
 
         async function acceptFriendRequest(userId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
+            console.log('🚀 acceptFriendRequest called with userId:', userId);
+            console.log('🔍 userId type:', typeof userId);
+            console.log('🔍 userId value:', userId);
+            
+            if (!userId || userId === 'undefined' || userId === 'null') {
+                console.error('❌ Invalid userId provided:', userId);
+                if (typeof showNotification === 'function') {
+                    showNotification('Error: Invalid user ID', 'error');
+                } else {
+                    alert('Error: Invalid user ID');
+                }
+                return;
+            }
+            
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for accepting friend request');
+            } else {
+                console.log('🔑 Using test token for accepting friend request');
+            }
+            
+            if (!token) {
+                console.error('❌ No token found for accepting friend request');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please log in to accept friend requests', 'error');
+                } else {
+                    alert('Please log in to accept friend requests');
+                }
+                return;
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/accept`, {
@@ -10038,8 +10230,24 @@
         }
 
         async function declineFriendRequest(userId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for declining friend request');
+            } else {
+                console.log('🔑 Using test token for declining friend request');
+            }
+            
+            if (!token) {
+                console.error('❌ No token found for declining friend request');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please log in to decline friend requests', 'error');
+                } else {
+                    alert('Please log in to decline friend requests');
+                }
+                return;
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/decline`, {
@@ -10067,8 +10275,24 @@
         async function removeFriend(userId) {
             if (!confirm('Are you sure you want to remove this friend?')) return;
 
-            const token = localStorage.getItem('token');
-            if (!token) return;
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for removing friend');
+            } else {
+                console.log('🔑 Using test token for removing friend');
+            }
+            
+            if (!token) {
+                console.error('❌ No token found for removing friend');
+                if (typeof showNotification === 'function') {
+                    showNotification('Please log in to remove friends', 'error');
+                } else {
+                    alert('Please log in to remove friends');
+                }
+                return;
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friends/${userId}`, {
@@ -10090,7 +10314,14 @@
         }
 
         async function toggleLike(postId) {
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for toggling like');
+            } else {
+                console.log('🔑 Using test token for toggling like');
+            }
             if (!token) return;
 
             try {
@@ -10155,7 +10386,14 @@
         }
 
         async function createPost(content) {
-            const token = localStorage.getItem('token');
+            // Try to get token from multiple sources
+            let token = getToken(); // Try test token first
+            if (!token) {
+                token = localStorage.getItem('token'); // Try real account token
+                console.log('🔑 Using real account token for creating post');
+            } else {
+                console.log('🔑 Using test token for creating post');
+            }
             if (!token) return;
 
             try {
