@@ -3074,23 +3074,366 @@
         }
 
         .search-friends-container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
-        }
-
-        .search-results {
-            margin-top: 20px;
-        }
-
-        .user-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
             padding: 20px;
-            margin-bottom: 15px;
+        }
+
+        /* Enhanced Search Header */
+        .search-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-header-content h2 {
+            margin: 15px 0 10px 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-header-content p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .search-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .search-icon-wrapper i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        /* Enhanced Search Input */
+        .search-input-container {
+            margin-bottom: 30px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper:focus-within {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-input-icon {
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            padding: 15px 0;
+            outline: none;
+        }
+
+        .search-input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .search-tips {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .tip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+
+        .tip i {
+            color: #fbbf24;
+        }
+
+        /* Enhanced Search Results */
+        .search-results {
+            margin-top: 30px;
+        }
+
+        .search-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .placeholder-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .placeholder-icon i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+
+        .search-placeholder h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .search-placeholder p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Enhanced User Items */
+        .user-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .user-item .friend-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-item .friend-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .user-item .friend-details h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-item .friend-details span {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .user-item .friend-actions .btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-item .friend-actions .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Recent Searches */
+        .recent-searches {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recent-searches h3 {
+            margin: 0 0 20px 0;
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recent-searches-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .recent-search-tag {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .recent-search-tag:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Search Results Header */
+        .search-results-header {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-results-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-results-header h3 i {
+            color: #10b981;
+        }
+
+        /* User Stats */
+        .user-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .user-stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .user-stats .stat i {
+            color: #10b981;
+        }
+
+        /* Search Suggestions */
+        .search-suggestions {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-suggestions p {
+            margin: 0 0 10px 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .search-suggestions ul {
+            margin: 0;
+            padding-left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-suggestions li {
+            margin-bottom: 5px;
+        }
+
+        /* Loading State */
+        .search-loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .leaderboard-container {
@@ -3192,6 +3535,79 @@
 
             .post-actions {
                 justify-content: space-around;
+            }
+
+            /* Enhanced mobile styles for find friends */
+            .search-friends-container {
+                padding: 15px;
+            }
+
+            .search-header {
+                padding: 20px 15px;
+                margin-bottom: 30px;
+            }
+
+            .search-header-content h2 {
+                font-size: 1.8rem;
+            }
+
+            .search-header-content p {
+                font-size: 1rem;
+            }
+
+            .search-icon-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+
+            .search-icon-wrapper i {
+                font-size: 1.5rem;
+            }
+
+            .search-input-wrapper {
+                border-radius: 25px;
+            }
+
+            .search-input-wrapper input {
+                font-size: 1rem;
+                padding: 12px 0;
+            }
+
+            .search-btn {
+                width: 45px;
+                height: 45px;
+            }
+
+            .user-item {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .user-item .friend-info {
+                gap: 15px;
+            }
+
+            .user-item .friend-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .user-item .friend-details h4 {
+                font-size: 1.1rem;
+            }
+
+            .user-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .recent-searches {
+                padding: 20px;
+            }
+
+            .recent-searches-list {
+                justify-content: center;
             }
         }
     </style>
@@ -3968,13 +4384,57 @@
             
             <div class="tab-content" id="find-friends-tab">
                 <div class="search-friends-container">
-                    <div class="input-group">
-                        <input type="text" id="friend-search" placeholder="Search by name or email...">
-                        <button class="btn primary-btn" onclick="searchUsers()">
-                            <i class="fas fa-search"></i> Search
-                        </button>
+                    <!-- Enhanced Search Header -->
+                    <div class="search-header">
+                        <div class="search-header-content">
+                            <div class="search-icon-wrapper">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h2>Find New Friends</h2>
+                            <p>Connect with other BevyFinder users and expand your social circle</p>
+                        </div>
                     </div>
-                    <div class="search-results" id="search-results"></div>
+
+                    <!-- Enhanced Search Input -->
+                    <div class="search-input-container">
+                        <div class="search-input-wrapper">
+                            <div class="search-input-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="friend-search" 
+                                placeholder="Search by name or email..."
+                                onkeypress="if(event.key === 'Enter') searchUsers()"
+                            >
+                            <button class="search-btn" onclick="searchUsers()">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="search-tips">
+                            <span class="tip">
+                                <i class="fas fa-lightbulb"></i>
+                                Try searching by first name, last name, or email address
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Search Results with Enhanced Design -->
+                    <div class="search-results" id="search-results">
+                        <div class="search-placeholder">
+                            <div class="placeholder-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Ready to Find Friends?</h3>
+                            <p>Enter a name or email above to start searching for new connections</p>
+                        </div>
+                    </div>
+
+                    <!-- Recent Searches Section -->
+                    <div class="recent-searches" id="recent-searches" style="display: none;">
+                        <h3><i class="fas fa-history"></i> Recent Searches</h3>
+                        <div class="recent-searches-list" id="recent-searches-list"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -9928,6 +10388,8 @@
             console.log('🚀 searchUsers function called');
             
             const searchInput = document.getElementById('friend-search');
+            const resultsContainer = document.getElementById('search-results');
+            
             if (!searchInput) {
                 console.error('❌ Search input element not found');
                 return;
@@ -9944,6 +10406,16 @@
                     alert('Please enter at least 2 characters');
                 }
                 return;
+            }
+
+            // Show loading state
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div class="search-loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Searching for users...</p>
+                    </div>
+                `;
             }
 
             // Try to get token from multiple sources
@@ -10019,33 +10491,96 @@
             const container = document.getElementById('search-results');
             if (!container) return;
 
+            // Save search to recent searches
+            const searchInput = document.getElementById('friend-search');
+            if (searchInput && searchInput.value.trim()) {
+                saveRecentSearch(searchInput.value.trim());
+            }
+
             if (users.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-search"></i>
+                        <div class="placeholder-icon">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
                         <h3>No users found</h3>
-                        <p>Try searching with a different name or email.</p>
+                        <p>Try searching with a different name or email address.</p>
+                        <div class="search-suggestions">
+                            <p><strong>Suggestions:</strong></p>
+                            <ul>
+                                <li>Check the spelling of the name</li>
+                                <li>Try searching by first name only</li>
+                                <li>Try searching by email address</li>
+                            </ul>
+                        </div>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = users.map(user => `
-                <div class="user-item">
-                    <div class="friend-info">
-                        <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                        <div class="friend-details">
-                            <h4>${user.name}</h4>
-                            <span>${user.email}</span>
+            container.innerHTML = `
+                <div class="search-results-header">
+                    <h3><i class="fas fa-users"></i> Found ${users.length} user${users.length === 1 ? '' : 's'}</h3>
+                </div>
+                ${users.map(user => `
+                    <div class="user-item">
+                        <div class="friend-info">
+                            <div class="friend-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                            <div class="friend-details">
+                                <h4>${user.name}</h4>
+                                <span><i class="fas fa-envelope"></i> ${user.email}</span>
+                                ${user.stats ? `
+                                    <div class="user-stats">
+                                        <span class="stat"><i class="fas fa-beer"></i> ${user.stats.searches || 0} searches</span>
+                                        <span class="stat"><i class="fas fa-heart"></i> ${user.stats.favorites || 0} favorites</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
+                                <i class="fas fa-user-plus"></i> Add Friend
+                            </button>
                         </div>
                     </div>
-                    <div class="friend-actions">
-                        <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
-                            <i class="fas fa-user-plus"></i> Add Friend
-                        </button>
-                    </div>
-                </div>
+                `).join('')}
+            `;
+        }
+
+        function saveRecentSearch(query) {
+            let recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+            if (!recentSearches.includes(query)) {
+                recentSearches.unshift(query);
+                recentSearches = recentSearches.slice(0, 5); // Keep only last 5 searches
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+            }
+            updateRecentSearches();
+        }
+
+        function updateRecentSearches() {
+            const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+            const container = document.getElementById('recent-searches');
+            const list = document.getElementById('recent-searches-list');
+            
+            if (recentSearches.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = recentSearches.map(query => `
+                <span class="recent-search-tag" onclick="searchForQuery('${query}')">
+                    <i class="fas fa-search"></i> ${query}
+                </span>
             `).join('');
+        }
+
+        function searchForQuery(query) {
+            const searchInput = document.getElementById('friend-search');
+            if (searchInput) {
+                searchInput.value = query;
+                searchUsers();
+            }
         }
 
         // Leaderboard Functions
@@ -10375,6 +10910,9 @@
             
             document.querySelector('[data-tab="find-friends"]').classList.add('active');
             document.getElementById('find-friends-tab').classList.add('active');
+            
+            // Initialize recent searches
+            updateRecentSearches();
         }
 
         function showCreatePostModal() {
