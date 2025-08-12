@@ -1,7 +1,7 @@
 {
-  "name": "BevyFinder",
+  "name": "BevyFinder - Drink Database",
   "short_name": "BevyFinder",
-  "description": "Ultimate drink database for beer, wine & cocktail information",
+  "description": "Ultimate drink database for beer, wine & cocktail information with BAC tracking and social features",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",
@@ -9,16 +9,16 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["food", "lifestyle", "utilities"],
+  "categories": ["food", "lifestyle", "utilities", "health"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='60' text-anchor='middle' x='50' fill='white'>🍺</text></svg>",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='60' text-anchor='middle' x='50' fill='white'>🍺</text></svg>",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -32,7 +32,7 @@
       "url": "/?action=search",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>",
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='50' text-anchor='middle' x='50' fill='white'>🔍</text></svg>",
           "sizes": "96x96"
         }
       ]
@@ -44,19 +44,31 @@
       "url": "/?action=favorites",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>",
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='50' text-anchor='middle' x='50' fill='white'>⭐</text></svg>",
           "sizes": "96x96"
         }
       ]
     },
     {
-      "name": "Featured",
-      "short_name": "Featured",
-      "description": "Top liked drinks",
-      "url": "/?action=featured",
+      "name": "Social Feed",
+      "short_name": "Social",
+      "description": "View social feed",
+      "url": "/?action=social",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>",
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='50' text-anchor='middle' x='50' fill='white'>👥</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "BAC Tracker",
+      "short_name": "BAC",
+      "description": "Track your BAC",
+      "url": "/?action=bac",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.9em' font-size='50' text-anchor='middle' x='50' fill='white'>📊</text></svg>",
           "sizes": "96x96"
         }
       ]
@@ -77,5 +89,10 @@
       "form_factor": "narrow",
       "label": "BevyFinder Mobile View"
     }
-  ]
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 } 
