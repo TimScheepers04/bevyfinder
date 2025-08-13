@@ -13644,6 +13644,10 @@
                 };
                 
                 console.log('🧪 Creating test post with data:', postData);
+                console.log('🧪 Post type:', postData.type);
+                console.log('🧪 Session stats:', postData.sessionStats);
+                
+                console.log('🧪 Creating test post with data:', postData);
                 
                 const response = await fetch(`${API_BASE_URL}/social/posts`, {
                     method: 'POST',
@@ -13800,12 +13804,17 @@
                 console.log(`  - totalLiquid: ${night.sessionData.totalLiquid}`);
                 
                 try {
+                    // Calculate session duration from start and end times
+                    const sessionStart = new Date(night.sessionData.sessionStart);
+                    const sessionEnd = new Date(night.sessionData.sessionEnd);
+                    const calculatedDuration = sessionEnd - sessionStart;
+                    
                     const postData = {
                         type: 'night_share',
                         content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
                         privacy: 'friends',
                         sessionStats: {
-                            sessionDuration: night.sessionData.sessionDuration,
+                            sessionDuration: calculatedDuration,
                             totalDrinks: night.sessionData.drinks.length,
                             totalStandards: night.sessionData.totalStandards,
                             finalBAC: night.sessionData.finalBAC,
@@ -13818,7 +13827,10 @@
                                 standardDrinks: drink.standardDrinks
                             })),
                             sessionStart: night.sessionData.sessionStart,
-                            sessionEnd: night.sessionData.sessionEnd
+                            sessionEnd: night.sessionData.sessionEnd,
+                            // Add these fields that the renderer expects
+                            totalBAC: night.sessionData.finalBAC,
+                            totalStandards: night.sessionData.totalStandards
                         }
                     };
                     
