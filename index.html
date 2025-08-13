@@ -12922,25 +12922,37 @@
             const comments = post.comments || [];
             const isLiked = likes.includes(currentUser?.id || currentUser?._id);
 
-            // Validate night data
-            if (!nightData.sessionDuration || !nightData.sessionStart) {
-                console.warn('⚠️ Invalid night data:', nightData);
+            // Validate night data - be more flexible
+            console.log('🌙 Night data validation:', {
+                hasSessionDuration: !!nightData.sessionDuration,
+                hasSessionStart: !!nightData.sessionStart,
+                hasTotalDrinks: !!nightData.totalDrinks,
+                hasFinalBAC: !!nightData.finalBAC,
+                hasTotalStandards: !!nightData.totalStandards,
+                sessionDuration: nightData.sessionDuration,
+                totalDrinks: nightData.totalDrinks,
+                finalBAC: nightData.finalBAC
+            });
+            
+            if (!nightData.sessionDuration && !nightData.totalDrinks) {
+                console.warn('⚠️ Invalid night data - missing both sessionDuration and totalDrinks:', nightData);
                 return `
                     <div class="post error-post">
                         <div class="post-content">
                             <p><i class="fas fa-exclamation-triangle"></i> Invalid night session data</p>
+                            <small style="color: rgba(255,255,255,0.6);">Debug: ${JSON.stringify(nightData).substring(0, 200)}...</small>
                         </div>
                     </div>
                 `;
             }
 
-            const duration = formatSessionDuration(nightData.sessionDuration);
-            const sessionDate = new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
+            const duration = nightData.sessionDuration ? formatSessionDuration(nightData.sessionDuration) : 'Unknown duration';
+            const sessionDate = nightData.sessionStart ? new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
-            });
+            }) : 'Unknown date';
             
             return `
                 <div class="post night-share-post">
@@ -12978,21 +12990,21 @@
                                     <i class="fas fa-wine-glass-alt"></i>
                                     <div>
                                         <span class="stat-label">Drinks</span>
-                                        <span class="stat-value">${nightData.totalDrinks}</span>
+                                        <span class="stat-value">${nightData.totalDrinks || 0}</span>
                                     </div>
                                 </div>
                                 <div class="night-share-stat">
                                     <i class="fas fa-chart-line"></i>
                                     <div>
                                         <span class="stat-label">Standards</span>
-                                        <span class="stat-value">${nightData.totalStandards.toFixed(1)}</span>
+                                        <span class="stat-value">${(nightData.totalStandards || 0).toFixed(1)}</span>
                                     </div>
                                 </div>
                                 <div class="night-share-stat">
                                     <i class="fas fa-tint"></i>
                                     <div>
                                         <span class="stat-label">Final BAC</span>
-                                        <span class="stat-value">${nightData.finalBAC.toFixed(3)}%</span>
+                                        <span class="stat-value">${(nightData.finalBAC || 0).toFixed(3)}%</span>
                                     </div>
                                 </div>
                             </div>
@@ -13562,7 +13574,10 @@
                             standardDrinks: drink.standardDrinks
                         })),
                         sessionStart: night.sessionData.sessionStart,
-                        sessionEnd: night.sessionData.sessionEnd
+                        sessionEnd: night.sessionData.sessionEnd,
+                        // Add these fields that the renderer expects
+                        totalBAC: night.sessionData.finalBAC,
+                        totalStandards: night.sessionData.totalStandards
                     }
                 };
 
