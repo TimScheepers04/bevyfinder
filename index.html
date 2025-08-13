@@ -5679,6 +5679,9 @@
                 <button class="btn secondary-btn" onclick="shareMySavedNights()">
                     <i class="fas fa-share"></i> Share My Nights
                 </button>
+                <button class="btn primary-btn" style="background: #10b981; color: white; border: 2px solid #10b981;" onclick="shareAllSavedNights()">
+                    <i class="fas fa-upload"></i> Share ALL Saved Nights
+                </button>
                 <button class="btn secondary-btn" onclick="refreshFeed()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
@@ -13469,6 +13472,9 @@
                                 <button class="btn primary-btn" onclick="testShareNight()">
                                     <i class="fas fa-share"></i> Test Share First Night
                                 </button>
+                                <button class="btn primary-btn" onclick="shareAllSavedNights()">
+                                    <i class="fas fa-upload"></i> Share ALL Saved Nights
+                                </button>
                                 <button class="btn secondary-btn" onclick="forceRefreshFeed()">
                                     <i class="fas fa-sync-alt"></i> Force Refresh Feed
                                 </button>
@@ -13505,9 +13511,10 @@
             console.log('🧪 Testing night share with:', night);
 
             try {
+                // Create a simple post with all the night data
                 const postData = {
                     type: 'night_share',
-                    content: 'Test share from debug function',
+                    content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
                     privacy: 'friends',
                     nightData: {
                         sessionDuration: night.sessionData.sessionDuration,
@@ -13550,7 +13557,10 @@
                     const modal = document.querySelector('.debug-modal');
                     if (modal) modal.remove();
                     
-                    loadSocialFeed();
+                    // Force refresh the feed
+                    setTimeout(() => {
+                        loadSocialFeed();
+                    }, 1000);
                 } else {
                     const error = await response.json();
                     console.error('❌ Test share failed:', error);
@@ -13568,6 +13578,76 @@
             feedPosts = []; // Clear current posts
             await loadSocialFeed();
             showNotification('Feed refreshed!', 'success');
+        }
+
+        // Share all saved nights function
+        async function shareAllSavedNights() {
+            const savedNights = JSON.parse(localStorage.getItem('savedNights') || '[]');
+            if (savedNights.length === 0) {
+                showNotification('No saved nights to share', 'error');
+                return;
+            }
+
+            console.log('📤 Sharing all saved nights:', savedNights.length);
+            showNotification(`Sharing ${savedNights.length} saved nights...`, 'info');
+
+            const token = localStorage.getItem('token');
+            let successCount = 0;
+
+            for (let i = 0; i < savedNights.length; i++) {
+                const night = savedNights[i];
+                try {
+                    const postData = {
+                        type: 'night_share',
+                        content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
+                        privacy: 'friends',
+                        nightData: {
+                            sessionDuration: night.sessionData.sessionDuration,
+                            totalDrinks: night.sessionData.drinks.length,
+                            totalStandards: night.sessionData.totalStandards,
+                            finalBAC: night.sessionData.finalBAC,
+                            totalCalories: night.sessionData.totalCalories,
+                            totalCarbs: night.sessionData.totalCarbs,
+                            totalLiquid: night.sessionData.totalLiquid,
+                            drinks: night.sessionData.drinks.map(drink => ({
+                                name: drink.name,
+                                time: drink.time,
+                                standardDrinks: drink.standardDrinks
+                            })),
+                            sessionStart: night.sessionData.sessionStart,
+                            sessionEnd: night.sessionData.sessionEnd
+                        }
+                    };
+
+                    const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                        console.log(`✅ Shared night ${i + 1}/${savedNights.length}`);
+                    } else {
+                        console.error(`❌ Failed to share night ${i + 1}:`, response.status);
+                    }
+
+                    // Small delay between requests
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (error) {
+                    console.error(`❌ Error sharing night ${i + 1}:`, error);
+                }
+            }
+
+            showNotification(`Successfully shared ${successCount}/${savedNights.length} nights!`, 'success');
+            
+            // Refresh the feed
+            setTimeout(() => {
+                loadSocialFeed();
+            }, 1000);
         }
 
         // Comments Function
