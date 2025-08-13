@@ -13012,7 +13012,7 @@
                             <div class="night-share-drinks">
                                 <h4>Drinks Consumed</h4>
                                 <div class="night-share-drinks-list">
-                                    ${nightData.drinks.map(drink => `
+                                    ${(nightData.drinks || []).map(drink => `
                                         <span class="night-share-drink">
                                             <i class="fas fa-wine-glass-alt"></i>
                                             ${drink.name}
@@ -13123,7 +13123,7 @@
                         <div class="night-details-drinks">
                             <h3>Drink Timeline</h3>
                             <div class="drink-timeline">
-                                ${nightData.drinks.map((drink, index) => {
+                                ${(nightData.drinks || []).map((drink, index) => {
                                     const drinkTime = new Date(drink.time);
                                     return `
                                         <div class="drink-timeline-item">
