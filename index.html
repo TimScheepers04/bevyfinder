@@ -12946,7 +12946,7 @@
                 `;
             }
 
-            const duration = nightData.sessionDuration ? formatSessionDuration(nightData.sessionDuration) : 'Unknown duration';
+            const duration = nightData.sessionDuration ? formatSessionDuration(Math.round(nightData.sessionDuration / (1000 * 60))) : 'Unknown duration';
             const sessionDate = nightData.sessionStart ? new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
                 weekday: 'long',
                 year: 'numeric',
@@ -13080,7 +13080,7 @@
                                 <i class="fas fa-hourglass-half"></i>
                                 <div>
                                     <span class="detail-label">Duration</span>
-                                    <span class="detail-value">${formatSessionDuration(nightData.sessionDuration)}</span>
+                                    <span class="detail-value">${formatSessionDuration(Math.round(nightData.sessionDuration / (1000 * 60)))}</span>
                                 </div>
                             </div>
                             <div class="night-detail-item">
@@ -13301,7 +13301,7 @@
                                     <i class="fas fa-clock"></i>
                                     <div>
                                         <span class="stat-label">Duration</span>
-                                        <span class="stat-value">${formatSessionDuration(sessionStats.sessionDuration || 0)}</span>
+                                        <span class="stat-value">${formatSessionDuration(Math.round((sessionStats.sessionDuration || 0) / (1000 * 60)))}</span>
                                     </div>
                                 </div>
                             </div>
@@ -13360,7 +13360,7 @@
                                 <i class="fas fa-clock"></i>
                                 <div>
                                     <span class="detail-label">Session Duration</span>
-                                    <span class="detail-value">${formatSessionDuration(sessionStats.sessionDuration || 0)}</span>
+                                    <span class="detail-value">${formatSessionDuration(Math.round((sessionStats.sessionDuration || 0) / (1000 * 60)))}</span>
                                 </div>
                             </div>
                         </div>
