@@ -5467,8 +5467,8 @@
                         <i class="fas fa-wine-glass-alt"></i>
                     </div>
                     <div class="card-content">
-                        <h4>Total Alcohol</h4>
-                        <p><span id="total-alcohol">0</span> <span class="unit">g</span></p>
+                        <h4>Total Volume</h4>
+                        <p><span id="total-alcohol">0</span> <span class="unit">ml</span></p>
                     </div>
                 </div>
                 <div class="summary-card calories-card">
@@ -10330,7 +10330,10 @@
                 };
                 
                 drinks.push(drinkEntry);
-                totalAlcohol += parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
+                // Calculate total volume by extracting ml from servingSize
+                const volumeMatch = drink.servingSize.match(/(\d+)ml/);
+                const volume = volumeMatch ? parseInt(volumeMatch[1]) : 0;
+                totalAlcohol += volume; // Now represents total volume in ml
                 totalCalories += drink.nutrition.calories;
                 totalStandards += parseFloat(drink.standardDrinks);
                 totalCarbs += drink.nutrition.carbs;
@@ -10347,7 +10350,10 @@
             const drinkIndex = drinks.findIndex(d => d.id === drinkId);
             if (drinkIndex !== -1) {
                 const drink = drinks[drinkIndex];
-                totalAlcohol -= parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
+                // Calculate total volume by extracting ml from servingSize
+                const volumeMatch = drink.servingSize.match(/(\d+)ml/);
+                const volume = volumeMatch ? parseInt(volumeMatch[1]) : 0;
+                totalAlcohol -= volume; // Now represents total volume in ml
                 totalCalories -= drink.nutrition.calories;
                 totalStandards -= parseFloat(drink.standardDrinks);
                 totalCarbs -= drink.nutrition.carbs;
@@ -10362,7 +10368,7 @@
         }
 
         function updateDisplay() {
-            document.getElementById('total-alcohol').textContent = totalAlcohol.toFixed(1);
+            document.getElementById('total-alcohol').textContent = Math.round(totalAlcohol);
             document.getElementById('total-calories').textContent = totalCalories.toFixed(0);
             document.getElementById('total-standards').textContent = totalStandards.toFixed(1);
             document.getElementById('total-carbs').textContent = totalCarbs.toFixed(1) + 'g';
