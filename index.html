@@ -10916,10 +10916,12 @@
             const message = document.getElementById('share-message').value.trim();
             const privacy = document.querySelector('input[name="share-privacy"]:checked').value;
             
+            // Get button and original text before try block
+            const submitBtn = event.target.querySelector('.share-night-btn-primary');
+            const originalText = submitBtn.innerHTML;
+            
             try {
                 // Show loading state
-                const submitBtn = event.target.querySelector('.share-night-btn-primary');
-                const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing...';
                 submitBtn.disabled = true;
 
@@ -10983,9 +10985,10 @@
                 showNotification('Error sharing night', 'error');
             } finally {
                 // Reset button state
-                const submitBtn = event.target.querySelector('.share-night-btn-primary');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                if (submitBtn && originalText) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
             }
         }
 
