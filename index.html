@@ -12629,6 +12629,17 @@
                             post && (post.content || post.type === 'night_share' || post.type === 'regular')
                         );
                         
+                        // Separate night share posts from regular posts
+                        const nightSharePosts = validPosts.filter(post => 
+                            post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'))
+                        );
+                        const regularPosts = validPosts.filter(post => 
+                            !nightSharePosts.includes(post)
+                        );
+                        
+                        console.log('🌙 Night share posts found:', nightSharePosts.length);
+                        console.log('📝 Regular posts found:', regularPosts.length);
+                        
                         console.log('✅ Valid posts found:', validPosts.length);
                         
                         // Always check for drink data, even if we have valid posts
@@ -12644,12 +12655,13 @@
                             const convertedDrinkPosts = await convertDrinkDataToPosts(drinkData);
                             console.log('🔄 Converted drink posts:', convertedDrinkPosts);
                             
-                            // Combine valid posts with converted drink posts
-                            feedPosts = [...validPosts, ...convertedDrinkPosts];
+                            // Combine all posts: night shares, regular posts, and drink sessions
+                            feedPosts = [...nightSharePosts, ...regularPosts, ...convertedDrinkPosts];
                             console.log('📝 Combined posts to render:', feedPosts);
                             renderFeed();
                         } else if (validPosts.length > 0) {
-                            feedPosts = validPosts;
+                            // Combine night shares and regular posts
+                            feedPosts = [...nightSharePosts, ...regularPosts];
                             console.log('📝 Valid posts to render:', feedPosts);
                             renderFeed();
                         } else {
@@ -12725,11 +12737,20 @@
 
                 container.innerHTML = feedPosts.map(post => {
                     try {
-                        if (post.type === 'night_share') {
+                        console.log('🎨 Rendering post:', {
+                            type: post.type,
+                            hasSessionStats: !!post.sessionStats,
+                            content: post.content ? post.content.substring(0, 30) + '...' : 'No content'
+                        });
+                        
+                        if (post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'))) {
+                            console.log('🌙 Rendering as night share post');
                             return renderNightSharePost(post);
                         } else if (post.type === 'drink_session') {
+                            console.log('🍺 Rendering as drink session post');
                             return renderDrinkSessionPost(post);
                         } else {
+                            console.log('📝 Rendering as regular post');
                             return renderRegularPost(post);
                         }
                     } catch (postError) {
@@ -12877,8 +12898,9 @@
                 }
             }
             
-            // Check for night data
-            if (!post.nightData) {
+            // Check for night data (either nightData or sessionStats)
+            const nightData = post.nightData || post.sessionStats;
+            if (!nightData) {
                 console.warn('⚠️ No night data in post:', post);
                 return `
                     <div class="post error-post">
@@ -12889,8 +12911,6 @@
                     </div>
                 `;
             }
-
-            const nightData = post.nightData;
             // Use the already extracted userName
             const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
             const postContent = post.content || '';
@@ -13524,7 +13544,7 @@
                     type: 'night_share',
                     content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
                     privacy: 'friends',
-                    nightData: {
+                    sessionStats: {
                         sessionDuration: night.sessionData.sessionDuration,
                         totalDrinks: night.sessionData.drinks.length,
                         totalStandards: night.sessionData.totalStandards,
