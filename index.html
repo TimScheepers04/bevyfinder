@@ -10905,6 +10905,9 @@
         async function handleShareNightSubmit(event) {
             event.preventDefault();
             
+            console.log('🔄 === SHARING NIGHT SESSION ===');
+            console.log('📊 Current sharing night:', currentSharingNight);
+            
             if (!currentSharingNight) {
                 showNotification('No night session to share', 'error');
                 return;
@@ -10945,6 +10948,9 @@
 
                 // Send to backend
                 const token = localStorage.getItem('token');
+                console.log('📤 Sending post data to backend:', postData);
+                console.log('🌐 API URL:', `${API_BASE_URL}/social/posts`);
+                
                 const response = await fetch(`${API_BASE_URL}/social/posts`, {
                     method: 'POST',
                     headers: {
@@ -10954,16 +10960,22 @@
                     body: JSON.stringify(postData)
                 });
 
+                console.log('📡 Response status:', response.status);
+                
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Night shared successfully!', result);
                     showNotification('Night shared successfully!', 'success');
                     closeShareNightModal();
                     
                     // Refresh social feed if it's currently open
                     if (document.getElementById('social-feed-page').classList.contains('active')) {
+                        console.log('🔄 Refreshing social feed...');
                         loadSocialFeed();
                     }
                 } else {
                     const error = await response.json();
+                    console.error('❌ Error sharing night:', error);
                     showNotification(error.message || 'Error sharing night', 'error');
                 }
             } catch (error) {
@@ -12591,6 +12603,18 @@
                     
                     if (data.posts && Array.isArray(data.posts)) {
                         console.log('🔍 Raw posts data:', data.posts);
+                        
+                        // Debug: Log all post types
+                        console.log('🔍 === POST TYPE ANALYSIS ===');
+                        data.posts.forEach((post, index) => {
+                            console.log(`📝 Post ${index}:`, {
+                                type: post.type,
+                                hasContent: !!post.content,
+                                hasSessionStats: !!post.sessionStats,
+                                hasUserId: !!post.userId,
+                                id: post._id || post.id
+                            });
+                        });
                         
                         // Check if the posts are actually valid post objects
                         const validPosts = data.posts.filter(post => 
