@@ -13636,6 +13636,7 @@
             }
 
             console.log('📤 Sharing all saved nights:', savedNights.length);
+            console.log('🌙 Saved nights data:', savedNights);
             showNotification(`Sharing ${savedNights.length} saved nights...`, 'info');
 
             const token = localStorage.getItem('token');
@@ -13643,12 +13644,15 @@
 
             for (let i = 0; i < savedNights.length; i++) {
                 const night = savedNights[i];
+                console.log(`🌙 Processing night ${i + 1}:`, night);
+                console.log(`🌙 Session data:`, night.sessionData);
+                
                 try {
                     const postData = {
                         type: 'night_share',
                         content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
                         privacy: 'friends',
-                        nightData: {
+                        sessionStats: {
                             sessionDuration: night.sessionData.sessionDuration,
                             totalDrinks: night.sessionData.drinks.length,
                             totalStandards: night.sessionData.totalStandards,
@@ -13665,6 +13669,8 @@
                             sessionEnd: night.sessionData.sessionEnd
                         }
                     };
+                    
+                    console.log(`📤 Post data for night ${i + 1}:`, postData);
 
                     const response = await fetch(`${API_BASE_URL}/social/posts`, {
                         method: 'POST',
