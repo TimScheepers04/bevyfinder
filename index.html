@@ -13556,12 +13556,17 @@
 
                             try {
                     // Create a simple post with all the night data
+                    // Calculate session duration from start and end times
+                    const sessionStart = new Date(night.sessionData.sessionStart);
+                    const sessionEnd = new Date(night.sessionData.sessionEnd);
+                    const calculatedDuration = sessionEnd - sessionStart;
+                    
                     const postData = {
                         type: 'night_share',
                         content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
                         privacy: 'friends',
                         sessionStats: {
-                            sessionDuration: night.sessionData.sessionDuration,
+                            sessionDuration: calculatedDuration,
                             totalDrinks: night.sessionData.drinks.length,
                             totalStandards: night.sessionData.totalStandards,
                             finalBAC: night.sessionData.finalBAC,
@@ -13691,6 +13696,7 @@
                     };
                     
                     console.log(`📤 Post data for night ${i + 1}:`, postData);
+                    console.log(`📤 Session stats being sent:`, postData.sessionStats);
 
                     const response = await fetch(`${API_BASE_URL}/social/posts`, {
                         method: 'POST',
