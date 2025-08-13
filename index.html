@@ -12871,7 +12871,8 @@
             // Debug: Log the actual post structure
             console.log('🌙 === RENDERING NIGHT SHARE POST ===');
             console.log('📊 Post data:', post);
-            console.log('🌙 Night data:', post.nightData);
+            console.log('🌙 Night data (nightData):', post.nightData);
+            console.log('🌙 Session stats (sessionStats):', post.sessionStats);
             
             // More flexible validation - check for different possible user structures
             let userName = 'Unknown User';
@@ -12900,8 +12901,11 @@
             
             // Check for night data (either nightData or sessionStats)
             const nightData = post.nightData || post.sessionStats;
+            console.log('🌙 Using night data:', nightData);
+            
             if (!nightData) {
                 console.warn('⚠️ No night data in post:', post);
+                console.log('📊 Available post properties:', Object.keys(post));
                 return `
                     <div class="post error-post">
                         <div class="post-content">
