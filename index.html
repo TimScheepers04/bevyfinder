@@ -10342,7 +10342,8 @@
                 
                 updateDisplay();
                 updateDrinkList();
-                console.log('Drink added:', drink.name);
+                console.log('Drink added:', drink.name, 'Volume:', volume, 'Total volume now:', totalAlcohol);
+                console.log('Total standards:', totalStandards, 'Estimated BAC:', calculateBAC());
             }
         }
 
@@ -10368,6 +10369,8 @@
         }
 
         function updateDisplay() {
+            console.log('Updating display - Total volume:', totalAlcohol, 'Total standards:', totalStandards);
+            
             document.getElementById('total-alcohol').textContent = Math.round(totalAlcohol);
             document.getElementById('total-calories').textContent = totalCalories.toFixed(0);
             document.getElementById('total-standards').textContent = totalStandards.toFixed(1);
@@ -10378,6 +10381,8 @@
             // Calculate estimated BAC using the accurate calculator
             const estimatedBAC = calculateBAC();
             document.getElementById('estimated-bac').textContent = estimatedBAC.toFixed(3);
+            
+            console.log('Estimated BAC:', estimatedBAC);
             
             // Update driving status
             updateDrivingStatus(estimatedBAC);
@@ -10394,7 +10399,7 @@
             return parseFloat(estimateBAC(totalStandards, userData.weight, userData.gender, timeElapsed));
         }
 
-        function estimateBAC(drinks, weightKg, sex, timeElapsed) {
+        function estimateBAC(standardDrinks, weightKg, sex, timeElapsed) {
             // Set alcohol distribution ratio based on biological sex
             let r = (sex.toLowerCase() === 'male') ? 0.68 : 0.55;
 
@@ -10402,7 +10407,7 @@
             let bodyWeightGrams = weightKg * 1000;
 
             // Each Australian standard drink = 10g of alcohol
-            let gramsAlcohol = drinks * 10;
+            let gramsAlcohol = standardDrinks * 10;
 
             // Convert time to hours (handles minutes properly)
             let hours = timeElapsed;
@@ -10411,7 +10416,7 @@
             let bac = ((gramsAlcohol * 100) / (bodyWeightGrams * r)) - (hours * 0.015);
 
             // BAC can't be negative
-            return Math.max(bac, 0).toFixed(4);  // returns BAC as a string like "0.0412"
+            return Math.max(bac, 0);  // returns BAC as a number
         }
 
         function updateDrinkList() {
@@ -10431,9 +10436,9 @@
                         <div class="drink-info">
                             <div class="drink-name">${drink.name}</div>
                             <div class="drink-details">
-                                ${drink.abv} ABV • ${drink.nutrition.calories} kcal • ${drink.standardDrinks} standards
+                                ${drink.abv} ABV • ${drink.nutrition.calories} kcal • ${drink.standardDrinks} standards • ${drink.servingSize}
                             </div>
-                            <div class="drink-time">${drink.time.toLocaleTimeString()}</div>
+                            <div class="drink-time">${new Date(drink.time).toLocaleTimeString()}</div>
                         </div>
                         <button class="drink-remove" onclick="removeDrink(${drink.id})">
                             <i class="fas fa-times"></i>
