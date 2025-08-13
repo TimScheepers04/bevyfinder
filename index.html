@@ -5682,8 +5682,8 @@
                 <button class="btn secondary-btn" onclick="refreshFeed()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
-                <button class="btn secondary-btn" onclick="debugMyData()">
-                    <i class="fas fa-bug"></i> Debug Data
+                <button class="btn" style="background: #ff6b6b; color: white; border: 2px solid #ff6b6b;" onclick="debugMyData()">
+                    <i class="fas fa-bug"></i> 🐛 DEBUG DATA
                 </button>
             </div>
             
@@ -13396,6 +13396,7 @@
         // Debug function to check your data
         function debugMyData() {
             console.log('🔍 === DEBUGGING YOUR DATA ===');
+            console.log('🐛 Debug button clicked! Function is working.');
             
             // Check current user
             const currentUser = getCurrentUser();
