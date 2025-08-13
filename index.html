@@ -13586,6 +13586,9 @@
                                 <button class="btn danger-btn" onclick="clearOldPosts()">
                                     <i class="fas fa-trash"></i> Clear Old Posts
                                 </button>
+                                <button class="btn primary-btn" onclick="createTestPost()">
+                                    <i class="fas fa-flask"></i> Create Test Post (30s)
+                                </button>
                             </div>
                             
                             <button class="btn primary-btn" onclick="this.closest('.debug-modal').remove()">
@@ -13604,6 +13607,66 @@
                 document.body.appendChild(modal);
             } else {
                 showNotification('No saved nights found. Use the Night Tracker first!', 'info');
+            }
+        }
+
+        // Test function to create a post with known duration
+        async function createTestPost() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showNotification('Please sign in first', 'error');
+                return;
+            }
+            
+            try {
+                // Create a test post with a known duration (30 seconds)
+                const postData = {
+                    type: 'night_share',
+                    content: 'Test post with 30 second duration',
+                    privacy: 'friends',
+                    sessionStats: {
+                        sessionDuration: 30000, // 30 seconds in milliseconds
+                        totalDrinks: 2,
+                        totalStandards: 2.5,
+                        finalBAC: 0.045,
+                        totalCalories: 300,
+                        totalCarbs: 25,
+                        totalLiquid: 750,
+                        sessionStart: new Date(Date.now() - 30000).toISOString(),
+                        sessionEnd: new Date().toISOString(),
+                        totalBAC: 0.045,
+                        totalStandards: 2.5,
+                        drinks: [
+                            { name: 'Test Beer', time: new Date().toISOString(), standardDrinks: 1.2 },
+                            { name: 'Test Wine', time: new Date().toISOString(), standardDrinks: 1.3 }
+                        ]
+                    }
+                };
+                
+                console.log('🧪 Creating test post with data:', postData);
+                
+                const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                if (response.ok) {
+                    showNotification('Test post created successfully!', 'success');
+                    setTimeout(() => {
+                        loadSocialFeed();
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Error creating test post:', error);
+                    showNotification('Error creating test post', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error creating test post:', error);
+                showNotification('Error creating test post', 'error');
             }
         }
 
