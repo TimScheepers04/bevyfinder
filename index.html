@@ -13655,6 +13655,18 @@
                 console.log(`🌙 Processing night ${i + 1}:`, night);
                 console.log(`🌙 Session data:`, night.sessionData);
                 
+                // Add field mapping debug
+                console.log(`🔍 Field mapping debug for night ${i + 1}:`);
+                console.log(`  - sessionDuration: ${night.sessionData.sessionDuration}`);
+                console.log(`  - totalStandards: ${night.sessionData.totalStandards}`);
+                console.log(`  - finalBAC: ${night.sessionData.finalBAC}`);
+                console.log(`  - drinks.length: ${night.sessionData.drinks.length}`);
+                console.log(`  - sessionStart: ${night.sessionData.sessionStart}`);
+                console.log(`  - sessionEnd: ${night.sessionData.sessionEnd}`);
+                console.log(`  - totalCalories: ${night.sessionData.totalCalories}`);
+                console.log(`  - totalCarbs: ${night.sessionData.totalCarbs}`);
+                console.log(`  - totalLiquid: ${night.sessionData.totalLiquid}`);
+                
                 try {
                     const postData = {
                         type: 'night_share',
