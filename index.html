@@ -13554,35 +13554,43 @@
             const night = savedNights[0]; // Use the first saved night
             console.log('🧪 Testing night share with:', night);
 
-            try {
-                // Create a simple post with all the night data
-                const postData = {
-                    type: 'night_share',
-                    content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
-                    privacy: 'friends',
-                    sessionStats: {
-                        sessionDuration: night.sessionData.sessionDuration,
-                        totalDrinks: night.sessionData.drinks.length,
-                        totalStandards: night.sessionData.totalStandards,
-                        finalBAC: night.sessionData.finalBAC,
-                        totalCalories: night.sessionData.totalCalories,
-                        totalCarbs: night.sessionData.totalCarbs,
-                        totalLiquid: night.sessionData.totalLiquid,
-                        drinks: night.sessionData.drinks.map(drink => ({
-                            name: drink.name,
-                            time: drink.time,
-                            standardDrinks: drink.standardDrinks
-                        })),
-                        sessionStart: night.sessionData.sessionStart,
-                        sessionEnd: night.sessionData.sessionEnd,
-                        // Add these fields that the renderer expects
-                        totalBAC: night.sessionData.finalBAC,
-                        totalStandards: night.sessionData.totalStandards
-                    }
-                };
+                            try {
+                    // Create a simple post with all the night data
+                    const postData = {
+                        type: 'night_share',
+                        content: `Shared my night out from ${new Date(night.date).toLocaleDateString()}`,
+                        privacy: 'friends',
+                        sessionStats: {
+                            sessionDuration: night.sessionData.sessionDuration,
+                            totalDrinks: night.sessionData.drinks.length,
+                            totalStandards: night.sessionData.totalStandards,
+                            finalBAC: night.sessionData.finalBAC,
+                            totalCalories: night.sessionData.totalCalories,
+                            totalCarbs: night.sessionData.totalCarbs,
+                            totalLiquid: night.sessionData.totalLiquid,
+                            drinks: night.sessionData.drinks.map(drink => ({
+                                name: drink.name,
+                                time: drink.time,
+                                standardDrinks: drink.standardDrinks
+                            })),
+                            sessionStart: night.sessionData.sessionStart,
+                            sessionEnd: night.sessionData.sessionEnd,
+                            // Add these fields that the renderer expects
+                            totalBAC: night.sessionData.finalBAC,
+                            totalStandards: night.sessionData.totalStandards
+                        }
+                    };
+                    
+                    console.log(`🔍 Field mapping debug for night ${i + 1}:`);
+                    console.log(`  - sessionDuration: ${night.sessionData.sessionDuration}`);
+                    console.log(`  - totalStandards: ${night.sessionData.totalStandards}`);
+                    console.log(`  - finalBAC: ${night.sessionData.finalBAC}`);
+                    console.log(`  - drinks.length: ${night.sessionData.drinks.length}`);
+                    console.log(`  - sessionStart: ${night.sessionData.sessionStart}`);
+                    console.log(`  - sessionEnd: ${night.sessionData.sessionEnd}`);
 
-                const token = localStorage.getItem('token');
-                console.log('🧪 Sending test post:', postData);
+                    const token = localStorage.getItem('token');
+                    console.log(`📤 Post data for night ${i + 1}:`, postData);
 
                 const response = await fetch(`${API_BASE_URL}/social/posts`, {
                     method: 'POST',
