@@ -11,6 +11,11 @@ const postSchema = new mongoose.Schema({
         maxlength: [1000, 'Post content cannot exceed 1000 characters'],
         required: true
     },
+    type: {
+        type: String,
+        enum: ['regular', 'night_share', 'drink_session'],
+        default: 'regular'
+    },
     drinks: [{
         drinkKey: {
             type: String,
@@ -66,7 +71,38 @@ const postSchema = new mongoose.Schema({
         sessionDuration: {
             type: Number,
             default: 0
-        }
+        },
+        totalStandards: {
+            type: Number,
+            default: 0
+        },
+        finalBAC: {
+            type: Number,
+            default: 0
+        },
+        totalCalories: {
+            type: Number,
+            default: 0
+        },
+        totalCarbs: {
+            type: Number,
+            default: 0
+        },
+        totalLiquid: {
+            type: Number,
+            default: 0
+        },
+        sessionStart: {
+            type: Date
+        },
+        sessionEnd: {
+            type: Date
+        },
+        drinks: [{
+            name: String,
+            time: Date,
+            standardDrinks: Number
+        }]
     }
 }, {
     timestamps: true
