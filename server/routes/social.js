@@ -468,4 +468,40 @@ router.get('/users/:userId/profile', protect, async (req, res) => {
     }
 });
 
+// Delete a post
+router.delete('/posts/:postId', protect, async (req, res) => {
+    try {
+        const { postId } = req.params;
+        
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            });
+        }
+
+        // Check if user owns the post or is admin
+        if (post.user.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'You can only delete your own posts'
+            });
+        }
+
+        await Post.findByIdAndDelete(postId);
+        
+        res.json({
+            success: true,
+            message: 'Post deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting post'
+        });
+    }
+});
+
 module.exports = router;
