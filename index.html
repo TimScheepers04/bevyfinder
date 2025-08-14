@@ -6504,10 +6504,10 @@
                                     </div>
                                 </div>
                                 <div class="friend-actions">
-                                    <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id}')">
+                                    <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id || request.from.id}')">
                                         <i class="fas fa-check"></i> Accept
                                     </button>
-                                    <button class="btn danger-btn" onclick="declineFriendRequest('${request.from._id}')">
+                                    <button class="btn danger-btn" onclick="declineFriendRequest('${request.from._id || request.from.id}')">
                                         <i class="fas fa-times"></i> Decline
                                     </button>
                                 </div>
@@ -6588,7 +6588,7 @@
                                     </div>
                                 </div>
                                 <div class="friend-actions">
-                                    <button class="btn primary-btn" onclick="sendFriendRequest('${user._id}')">
+                                    <button class="btn primary-btn" onclick="sendFriendRequest('${user._id || user.id}')">
                                         <i class="fas fa-user-plus"></i> Add Friend
                                     </button>
                                 </div>
@@ -14484,10 +14484,10 @@
                         </div>
                     </div>
                     <div class="friend-actions">
-                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from.id}')">
+                        <button class="btn primary-btn" onclick="acceptFriendRequest('${request.from._id || request.from.id}')">
                             <i class="fas fa-check"></i> Accept
                         </button>
-                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from.id}')">
+                        <button class="btn secondary-btn" onclick="declineFriendRequest('${request.from._id || request.from.id}')">
                             <i class="fas fa-times"></i> Decline
                         </button>
                     </div>
@@ -14560,7 +14560,7 @@
                         </div>
                     </div>
                     <div class="friend-actions">
-                        <button class="btn primary-btn" onclick="sendFriendRequest('${user.id}')">
+                        <button class="btn primary-btn" onclick="sendFriendRequest('${user._id || user.id}')">
                             <i class="fas fa-user-plus"></i> Add Friend
                         </button>
                     </div>
@@ -14641,6 +14641,13 @@
                 return;
             }
 
+            // Validate ObjectId format
+            if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+                console.error('Invalid userId format:', userId);
+                showNotification('Invalid user ID format', 'error');
+                return;
+            }
+
             try {
                 console.log('📤 Sending friend request to:', userId);
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/send`, {
@@ -14674,6 +14681,13 @@
             const token = localStorage.getItem('token');
             if (!token) return;
 
+            // Validate ObjectId format
+            if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+                console.error('Invalid userId format:', userId);
+                showNotification('Invalid user ID format', 'error');
+                return;
+            }
+
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/accept`, {
                     method: 'POST',
@@ -14701,6 +14715,13 @@
         async function declineFriendRequest(userId) {
             const token = localStorage.getItem('token');
             if (!token) return;
+
+            // Validate ObjectId format
+            if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+                console.error('Invalid userId format:', userId);
+                showNotification('Invalid user ID format', 'error');
+                return;
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friend-request/decline`, {
@@ -14730,6 +14751,13 @@
 
             const token = localStorage.getItem('token');
             if (!token) return;
+
+            // Validate ObjectId format
+            if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+                console.error('Invalid userId format:', userId);
+                showNotification('Invalid user ID format', 'error');
+                return;
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/social/friends/${userId}`, {
