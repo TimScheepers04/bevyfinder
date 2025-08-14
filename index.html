@@ -2782,17 +2782,22 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .session-info h3 {
             color: #ffd700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .session-info p {
             color: rgba(255, 255, 255, 0.9);
             font-size: 1rem;
+            font-weight: 500;
         }
 
         .session-buttons {
@@ -2998,6 +3003,65 @@
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
         }
 
+        .add-drink-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .add-drink-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .quick-add-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-add-section h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-add-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-add-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .quick-add-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quick-add-btn i {
+            font-size: 1rem;
+        }
+
         .drink-suggestions {
             max-height: 200px;
             overflow-y: auto;
@@ -3006,18 +3070,58 @@
         }
 
         .drink-suggestion {
-            padding: 12px 15px;
+            padding: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .drink-suggestion:hover {
             background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
         }
 
         .drink-suggestion:last-child {
             border-bottom: none;
+        }
+
+        .drink-suggestion-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #333;
+            flex-shrink: 0;
+        }
+
+        .drink-suggestion-content {
+            flex: 1;
+        }
+
+        .drink-suggestion-name {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 1rem;
+        }
+
+        .drink-suggestion-details {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .no-suggestions {
+            padding: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
         }
 
         .drink-list-section {
@@ -3326,13 +3430,47 @@
                 width: 100%;
             }
 
+            .quick-add-section {
+                margin-top: 15px;
+                padding-top: 15px;
+            }
+
+            .quick-add-section h4 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .quick-add-buttons {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .quick-add-btn {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
             .drink-suggestions {
                 max-height: 150px;
             }
 
             .drink-suggestion {
-                padding: 15px;
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .drink-suggestion-icon {
+                width: 35px;
+                height: 35px;
                 font-size: 1rem;
+            }
+
+            .drink-suggestion-name {
+                font-size: 0.9rem;
+            }
+
+            .drink-suggestion-details {
+                font-size: 0.8rem;
             }
 
             /* Drink list mobile optimization */
@@ -3471,11 +3609,6 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1.3rem;
-            }
-
-            .pinboard-item h3 {
-                font-size: 1.1rem;
-                margin-bottom: 8px;
             }
 
             .pinboard-item p {
@@ -3830,6 +3963,128 @@
             opacity: 0.8;
         }
 
+        /* ABV Tabs Styles */
+        .abv-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .abv-tab {
+            flex: 1;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .abv-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .abv-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .abv-tab i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        .abv-tab span {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .abv-tab small {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* ABV Details Styles */
+        .abv-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .abv-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .abv-info-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .abv-info-value {
+            color: #ffd700;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .abv-info-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .abv-nutrition {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 15px;
+        }
+
+        .abv-nutrition h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .abv-nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .abv-nutrition-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .abv-nutrition-value {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .abv-nutrition-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+        }
+
         .measurement-details {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
@@ -3990,6 +4245,35 @@
             }
 
             .measurement-nutrition-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .abv-tabs {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .abv-tab {
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 12px 15px;
+                text-align: left;
+                min-width: auto;
+            }
+
+            .abv-tab i {
+                margin-bottom: 0;
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+
+            .abv-info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .abv-nutrition-grid {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
@@ -5494,7 +5778,7 @@
         <div class="container">
             <div class="header">
                 <h1><i class="fas fa-chart-line"></i> Night Tracker</h1>
-                <p>Monitor your BAC and track your drinking session</p>
+                <p>Monitor your BAC and track your drinking session safely</p>
             </div>
             
             <!-- Session Controls -->
@@ -5502,6 +5786,9 @@
                 <div class="session-info">
                     <h3><i class="fas fa-clock"></i> Session Status</h3>
                     <p id="session-status">No active session</p>
+                    <p id="session-timer" style="display: none; color: #10b981; font-size: 0.9rem; margin-top: 5px;">
+                        <i class="fas fa-stopwatch"></i> <span id="timer-display">00:00:00</span>
+                    </p>
                 </div>
                 <div class="session-buttons">
                     <button class="session-btn start-session-btn" id="start-session-btn">
@@ -5550,16 +5837,39 @@
                 </div>
             </div>
             
-            <!-- Add Drink Section -->
+            <!-- Improved Add Drink Section -->
             <div class="add-drink-section">
                 <h3><i class="fas fa-plus-circle"></i> Add Drink</h3>
                 <div class="add-drink-input">
-                    <input type="text" id="drink-search" placeholder="Search for a drink or scan barcode...">
-                    <button class="add-drink-btn" id="add-drink-btn">
+                    <input type="text" id="drink-search" placeholder="Search for a drink (e.g., 'beer', 'wine', 'cocktail')...">
+                    <button class="add-drink-btn" id="add-drink-btn" disabled>
                         <i class="fas fa-plus"></i> Add
                     </button>
                 </div>
                 <div class="drink-suggestions" id="drink-suggestions"></div>
+                <div class="quick-add-section">
+                    <h4><i class="fas fa-bolt"></i> Quick Add Popular Drinks</h4>
+                    <div class="quick-add-buttons">
+                        <button class="quick-add-btn" onclick="addDrink('heineken')">
+                            <i class="fas fa-beer"></i> Heineken
+                        </button>
+                        <button class="quick-add-btn" onclick="addDrink('corona')">
+                            <i class="fas fa-beer"></i> Corona
+                        </button>
+                        <button class="quick-add-btn" onclick="addDrink('red_wine_13_5')">
+                            <i class="fas fa-wine-glass"></i> Red Wine
+                        </button>
+                        <button class="quick-add-btn" onclick="addDrink('white_wine_12_5')">
+                            <i class="fas fa-wine-glass"></i> White Wine
+                        </button>
+                        <button class="quick-add-btn" onclick="addDrink('vodka')">
+                            <i class="fas fa-cocktail"></i> Vodka
+                        </button>
+                        <button class="quick-add-btn" onclick="addDrink('gin')">
+                            <i class="fas fa-cocktail"></i> Gin
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- Drink List -->
@@ -7144,41 +7454,270 @@
                 tags: ['Beer', 'Wheat Ale', 'Hazy', 'Smooth', 'Refreshing']
             },
 
-            // Wines
-            'red_wine': {
-                name: 'Red Wine (175ml)',
+            // Wines - Red Wine with ABV variants
+            'red_wine_12': {
+                name: 'Red Wine (150ml)',
                 type: 'Wine',
                 alcohol: 'Red Wine',
-                abv: '13.5%',
-                standardDrinks: '1.9',
+                abv: '12.0%',
+                standardDrinks: '1.4',
                 ingredients: ['Red grapes', 'Yeast'],
-                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 175ml glass contains 1.9 standard drinks.',
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.4 standard drinks.',
                 nutrition: {
-                    calories: 125,
-                    carbs: 4,
+                    calories: 107,
+                    carbs: 3.4,
                     protein: 0.1,
                     fat: 0,
-                    sugar: 1,
-                    servingSize: '175ml'
+                    sugar: 0.9,
+                    servingSize: '150ml'
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
             },
-            'white_wine': {
-                name: 'White Wine (175ml)',
+            'red_wine_12_5': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '12.5%',
+                standardDrinks: '1.5',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.5 standard drinks.',
+                nutrition: {
+                    calories: 112,
+                    carbs: 3.6,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.9,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            'red_wine_13': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '13.0%',
+                standardDrinks: '1.6',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 116,
+                    carbs: 3.7,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.9,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            'red_wine_13_5': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '13.5%',
+                standardDrinks: '1.6',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 120,
+                    carbs: 3.8,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 1.0,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            'red_wine_14': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '14.0%',
+                standardDrinks: '1.7',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 125,
+                    carbs: 4.0,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 1.0,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            'red_wine_14_5': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '14.5%',
+                standardDrinks: '1.7',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 129,
+                    carbs: 4.1,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 1.0,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            'red_wine_15': {
+                name: 'Red Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'Red Wine',
+                abv: '15.0%',
+                standardDrinks: '1.8',
+                ingredients: ['Red grapes', 'Yeast'],
+                description: 'A classic red wine with rich, complex flavors. Features notes of dark fruit, tannins, and subtle oak character. Medium to full-bodied with smooth tannins and a rich, velvety mouthfeel. The finish is long and complex, with lingering notes of fruit and spice. One 150ml glass contains 1.8 standard drinks.',
+                nutrition: {
+                    calories: 133,
+                    carbs: 4.3,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 1.1,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'Red', 'Rich', 'Complex', 'Tannic']
+            },
+            // White Wine with ABV variants
+            'white_wine_12': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '12.0%',
+                standardDrinks: '1.4',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.4 standard drinks.',
+                nutrition: {
+                    calories: 103,
+                    carbs: 3.3,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.7,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_12_5': {
+                name: 'White Wine (150ml)',
                 type: 'Wine',
                 alcohol: 'White Wine',
                 abv: '12.5%',
-                standardDrinks: '1.8',
+                standardDrinks: '1.5',
                 ingredients: ['White grapes', 'Yeast'],
-                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 175ml glass contains 1.8 standard drinks.',
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.5 standard drinks.',
+                nutrition: {
+                    calories: 107,
+                    carbs: 3.4,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.7,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_13': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '13.0%',
+                standardDrinks: '1.6',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 112,
+                    carbs: 3.6,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.8,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_13_5': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '13.5%',
+                standardDrinks: '1.6',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.6 standard drinks.',
+                nutrition: {
+                    calories: 116,
+                    carbs: 3.7,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.8,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_14': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '14.0%',
+                standardDrinks: '1.7',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.7 standard drinks.',
                 nutrition: {
                     calories: 120,
                     carbs: 3.8,
                     protein: 0.1,
                     fat: 0,
                     sugar: 0.8,
-                    servingSize: '175ml'
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_14_5': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '14.5%',
+                standardDrinks: '1.7',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.7 standard drinks.',
+                nutrition: {
+                    calories: 124,
+                    carbs: 4.0,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.9,
+                    servingSize: '150ml'
+                },
+                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+                tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
+            },
+            'white_wine_15': {
+                name: 'White Wine (150ml)',
+                type: 'Wine',
+                alcohol: 'White Wine',
+                abv: '15.0%',
+                standardDrinks: '1.8',
+                ingredients: ['White grapes', 'Yeast'],
+                description: 'A crisp white wine with bright, refreshing flavors. Features notes of citrus, green apple, and subtle floral character. Light to medium-bodied with bright acidity and a smooth, refreshing mouthfeel. The finish is clean and slightly acidic, with lingering notes of citrus and stone fruit. One 150ml glass contains 1.8 standard drinks.',
+                nutrition: {
+                    calories: 128,
+                    carbs: 4.1,
+                    protein: 0.1,
+                    fat: 0,
+                    sugar: 0.9,
+                    servingSize: '150ml'
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Wine', 'White', 'Crisp', 'Refreshing', 'Citrus']
@@ -7437,15 +7976,15 @@
                 type: 'Beer',
                 alcohol: 'Australian Pale Ale',
                 abv: '4.5%',
-                standardDrinks: '1.0',
+                standardDrinks: '1.2',
                 ingredients: ['Malted barley', 'Cascade hops', 'Water', 'Yeast'],
-                description: 'A refreshing pale ale inspired by surf culture with bright, citrusy flavors. Features notes of Cascade hops, citrus fruits, and a balanced bitterness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, with lingering notes of citrus and tropical fruits. One 330ml bottle contains 1.0 standard drinks.',
+                description: 'A refreshing pale ale inspired by surf culture with bright, citrusy flavors. Features notes of Cascade hops, citrus fruits, and a balanced bitterness. Light to medium-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, with lingering notes of citrus and tropical fruits. One 330ml bottle contains 1.2 standard drinks.',
                 nutrition: {
-                    calories: 130,
-                    carbs: 12.1,
-                    protein: 1.2,
+                    calories: 156,
+                    carbs: 14.5,
+                    protein: 1.4,
                     fat: 0,
-                    sugar: 0.5,
+                    sugar: 0.6,
                     servingSize: '330ml'
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
@@ -9313,25 +9852,6 @@
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Pale Ale', 'Australian', 'Refreshing', 'Citrus']
             },
-            'james_squire_amber_ale': {
-                name: 'James Squire Amber Ale (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Amber Ale',
-                abv: '4.5%',
-                standardDrinks: '1.2',
-                ingredients: ['Malted barley', 'Crystal malt', 'Hops', 'Water', 'Yeast'],
-                description: 'A rich amber ale with caramel and toffee flavors. Features notes of caramel, toffee, pale malt, and subtle hop bitterness. Medium-bodied with smooth carbonation and a velvety mouthfeel. The finish is smooth and slightly sweet, with lingering notes of caramel and malt. One 330ml bottle contains 1.2 standard drinks.',
-                nutrition: {
-                    calories: 145,
-                    carbs: 13.1,
-                    protein: 1.2,
-                    fat: 0,
-                    sugar: 0.6,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Amber Ale', 'Australian', 'Rich', 'Caramel']
-            },
             'james_squire_ipa': {
                 name: 'James Squire IPA (330ml)',
                 type: 'Beer',
@@ -10332,8 +10852,13 @@
             sessionActive = true;
             sessionStartTime = new Date();
             document.getElementById('session-status').textContent = 'Session active - Started at ' + sessionStartTime.toLocaleTimeString();
+            document.getElementById('session-timer').style.display = 'block';
             document.getElementById('start-session-btn').style.display = 'none';
             document.getElementById('end-session-btn').style.display = 'inline-flex';
+            
+            // Start the timer
+            startSessionTimer();
+            
             console.log('Session started');
             
             // Track session start
@@ -10347,8 +10872,12 @@
             const sessionDuration = sessionStartTime ? (Date.now() - sessionStartTime.getTime()) / 1000 / 60 : 0; // in minutes
             
             document.getElementById('session-status').textContent = 'Session ended';
+            document.getElementById('session-timer').style.display = 'none';
             document.getElementById('start-session-btn').style.display = 'inline-flex';
             document.getElementById('end-session-btn').style.display = 'none';
+            
+            // Stop the timer
+            stopSessionTimer();
             
             // Show session summary popup
             showSessionSummary();
@@ -10377,6 +10906,7 @@
             totalProtein = 0;
             
             document.getElementById('session-status').textContent = 'No active session';
+            document.getElementById('session-timer').style.display = 'none';
             document.getElementById('start-session-btn').style.display = 'inline-flex';
             document.getElementById('end-session-btn').style.display = 'none';
             document.getElementById('total-alcohol').textContent = '0';
@@ -10389,6 +10919,9 @@
             
             // Reset driving status
             updateDrivingStatus(0);
+            
+            // Stop the timer
+            stopSessionTimer();
             
             updateDrinkList();
             console.log('Session reset');
@@ -10524,18 +11057,83 @@
 
         function showDrinkSuggestions(query) {
             const suggestions = document.getElementById('drink-suggestions');
+            const addDrinkBtn = document.getElementById('add-drink-btn');
+            
+            if (query.length < 2) {
+                suggestions.innerHTML = '';
+                addDrinkBtn.disabled = true;
+                return;
+            }
+            
             const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
                 drinkDatabase[key].name.toLowerCase().includes(query.toLowerCase())
             );
             
-            if (query.length > 0 && matchingDrinks.length > 0) {
-                suggestions.innerHTML = matchingDrinks.map(key => `
-                    <div class="drink-suggestion" onclick="addDrink('${key}'); document.getElementById('drink-search').value = ''; suggestions.innerHTML = '';">
-                        ${drinkDatabase[key].name}
+            if (matchingDrinks.length > 0) {
+                suggestions.innerHTML = matchingDrinks.slice(0, 8).map(key => `
+                    <div class="drink-suggestion" onclick="selectDrink('${key}')">
+                        <div class="drink-suggestion-icon">
+                            <i class="fas fa-glass-whiskey"></i>
+                        </div>
+                        <div class="drink-suggestion-content">
+                            <div class="drink-suggestion-name">${drinkDatabase[key].name}</div>
+                            <div class="drink-suggestion-details">${drinkDatabase[key].abv} • ${drinkDatabase[key].standardDrinks} standards</div>
+                        </div>
                     </div>
                 `).join('');
+                addDrinkBtn.disabled = false;
             } else {
-                suggestions.innerHTML = '';
+                suggestions.innerHTML = '<div class="no-suggestions">No drinks found. Try a different search term.</div>';
+                addDrinkBtn.disabled = true;
+            }
+        }
+
+        function selectDrink(drinkKey) {
+            const drinkSearch = document.getElementById('drink-search');
+            const suggestions = document.getElementById('drink-suggestions');
+            const addDrinkBtn = document.getElementById('add-drink-btn');
+            
+            drinkSearch.value = drinkDatabase[drinkKey].name;
+            suggestions.innerHTML = '';
+            addDrinkBtn.disabled = false;
+            
+            // Store the selected drink key for the add button
+            addDrinkBtn.dataset.selectedDrink = drinkKey;
+        }
+
+        // Session Timer Functions
+        let sessionTimerInterval = null;
+
+        function startSessionTimer() {
+            if (sessionTimerInterval) {
+                clearInterval(sessionTimerInterval);
+            }
+            
+            sessionTimerInterval = setInterval(() => {
+                if (sessionStartTime) {
+                    const elapsed = Date.now() - sessionStartTime.getTime();
+                    const hours = Math.floor(elapsed / (1000 * 60 * 60));
+                    const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+                    
+                    const timerDisplay = document.getElementById('timer-display');
+                    if (timerDisplay) {
+                        timerDisplay.textContent = 
+                            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopSessionTimer() {
+            if (sessionTimerInterval) {
+                clearInterval(sessionTimerInterval);
+                sessionTimerInterval = null;
+            }
+            
+            const timerDisplay = document.getElementById('timer-display');
+            if (timerDisplay) {
+                timerDisplay.textContent = '00:00:00';
             }
         }
 
@@ -12150,14 +12748,13 @@
                 
                 drinkSearch.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
-                        const query = e.target.value.toLowerCase();
-                        const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
-                            drinkDatabase[key].name.toLowerCase().includes(query)
-                        );
-                        if (matchingDrinks.length > 0) {
-                            addDrink(matchingDrinks[0]);
-                            e.target.value = '';
+                        const addDrinkBtn = document.getElementById('add-drink-btn');
+                        if (!addDrinkBtn.disabled && addDrinkBtn.dataset.selectedDrink) {
+                            addDrink(addDrinkBtn.dataset.selectedDrink);
+                            drinkSearch.value = '';
                             document.getElementById('drink-suggestions').innerHTML = '';
+                            addDrinkBtn.dataset.selectedDrink = '';
+                            addDrinkBtn.disabled = true;
                         }
                     }
                 });
@@ -12166,14 +12763,12 @@
             const addDrinkBtn = document.getElementById('add-drink-btn');
             if (addDrinkBtn) {
                 addDrinkBtn.addEventListener('click', function() {
-                    const query = drinkSearch.value.toLowerCase();
-                    const matchingDrinks = Object.keys(drinkDatabase).filter(key => 
-                        drinkDatabase[key].name.toLowerCase().includes(query)
-                    );
-                    if (matchingDrinks.length > 0) {
-                        addDrink(matchingDrinks[0]);
+                    if (this.dataset.selectedDrink) {
+                        addDrink(this.dataset.selectedDrink);
                         drinkSearch.value = '';
                         document.getElementById('drink-suggestions').innerHTML = '';
+                        this.dataset.selectedDrink = '';
+                        this.disabled = true;
                     }
                 });
             }
@@ -12447,7 +13042,49 @@
 
 
                     <div class="drink-detail-section">
-                        <h3><i class="fas fa-glass-whiskey"></i> Drink Measurements</h3>
+                        <h3><i class="fas fa-glass-whiskey"></i> ${drink.type === 'Wine' ? 'Wine ABV Options' : 'Drink Measurements'}</h3>
+                        ${drink.type === 'Wine' ? `
+                        <div class="abv-tabs">
+                            <button class="abv-tab active" data-abv="12" onclick="showWineABVDetails('${drinkKey}', '12')">
+                                <i class="fas fa-percentage"></i>
+                                <span>12%</span>
+                                <small>1.4 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="12.5" onclick="showWineABVDetails('${drinkKey}', '12.5')">
+                                <i class="fas fa-percentage"></i>
+                                <span>12.5%</span>
+                                <small>1.5 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="13" onclick="showWineABVDetails('${drinkKey}', '13')">
+                                <i class="fas fa-percentage"></i>
+                                <span>13%</span>
+                                <small>1.6 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="13.5" onclick="showWineABVDetails('${drinkKey}', '13.5')">
+                                <i class="fas fa-percentage"></i>
+                                <span>13.5%</span>
+                                <small>1.6 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="14" onclick="showWineABVDetails('${drinkKey}', '14')">
+                                <i class="fas fa-percentage"></i>
+                                <span>14%</span>
+                                <small>1.7 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="14.5" onclick="showWineABVDetails('${drinkKey}', '14.5')">
+                                <i class="fas fa-percentage"></i>
+                                <span>14.5%</span>
+                                <small>1.7 standards</small>
+                            </button>
+                            <button class="abv-tab" data-abv="15" onclick="showWineABVDetails('${drinkKey}', '15')">
+                                <i class="fas fa-percentage"></i>
+                                <span>15%</span>
+                                <small>1.8 standards</small>
+                            </button>
+                        </div>
+                        <div class="abv-details" id="abv-details">
+                            <!-- ABV details will be populated here -->
+                        </div>
+                        ` : `
                         <div class="measurement-tabs">
                             <button class="measurement-tab active" data-measurement="cans-bottles" onclick="showMeasurementDetails('${drinkKey}', 'cans-bottles')">
                                 <i class="fas fa-wine-bottle"></i>
@@ -12469,10 +13106,11 @@
                                 <span>Jug</span>
                                 <small>1.14L</small>
                             </button>
-                            </div>
+                        </div>
                         <div class="measurement-details" id="measurement-details">
                             <!-- Measurement details will be populated here -->
-                            </div>
+                        </div>
+                        `}
                     </div>
                 </div>
 
@@ -12489,8 +13127,81 @@
             // Show the drink detail page
             showPage('drink-detail-page');
             
-            // Initialize with cans/bottles measurement details
-            showMeasurementDetails(drinkKey, 'cans-bottles');
+            // Initialize with appropriate details based on drink type
+            if (drink.type === 'Wine') {
+                showWineABVDetails(drinkKey, '13.5');
+            } else {
+                showMeasurementDetails(drinkKey, 'cans-bottles');
+            }
+        }
+
+        function showWineABVDetails(drinkKey, abv) {
+            const drink = drinkDatabase[drinkKey];
+            if (!drink) return;
+
+            // Update active tab
+            document.querySelectorAll('.abv-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-abv="${abv}"]`).classList.add('active');
+
+            // Get the wine variant based on ABV
+            const wineType = drinkKey.includes('red') ? 'red' : 'white';
+            const wineVariant = `${wineType}_wine_${abv.replace('.', '_')}`;
+            const wineData = drinkDatabase[wineVariant] || drink;
+
+            // Update the drink info display
+            const drinkInfo = document.querySelector('.drink-detail-info');
+            if (drinkInfo) {
+                const abvElement = drinkInfo.querySelector('.drink-abv');
+                if (abvElement) {
+                    abvElement.textContent = `${wineData.abv} ABV • ${wineData.standardDrinks} standard drinks`;
+                }
+            }
+
+            // Show ABV details
+            const abvDetails = document.getElementById('abv-details');
+            if (abvDetails) {
+                abvDetails.innerHTML = `
+                    <div class="abv-info">
+                        <div class="abv-info-grid">
+                            <div class="abv-info-item">
+                                <div class="abv-info-value">${wineData.abv}</div>
+                                <div class="abv-info-label">Alcohol by Volume</div>
+                            </div>
+                            <div class="abv-info-item">
+                                <div class="abv-info-value">${wineData.standardDrinks}</div>
+                                <div class="abv-info-label">Standard Drinks</div>
+                            </div>
+                            <div class="abv-info-item">
+                                <div class="abv-info-value">150ml</div>
+                                <div class="abv-info-label">Serving Size</div>
+                            </div>
+                            <div class="abv-info-item">
+                                <div class="abv-info-value">${wineData.nutrition.calories}</div>
+                                <div class="abv-info-label">Calories</div>
+                            </div>
+                        </div>
+                        <div class="abv-nutrition">
+                            <h4>Nutrition Information (150ml)</h4>
+                            <div class="abv-nutrition-grid">
+                                <div class="abv-nutrition-item">
+                                    <div class="abv-nutrition-value">${wineData.nutrition.carbs}g</div>
+                                    <div class="abv-nutrition-label">Carbohydrates</div>
+                                </div>
+                                <div class="abv-nutrition-item">
+                                    <div class="abv-nutrition-value">${wineData.nutrition.sugar}g</div>
+                                    <div class="abv-nutrition-label">Sugar</div>
+                                </div>
+                                <div class="abv-nutrition-item">
+                                    <div class="abv-nutrition-value">${wineData.nutrition.protein}g</div>
+                                    <div class="abv-nutrition-label">Protein</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         function showMeasurementDetails(drinkKey, measurement) {
