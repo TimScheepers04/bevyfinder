@@ -185,6 +185,32 @@ const userSchema = new mongoose.Schema({
             default: 'friends'
         }
     },
+    // Push notification settings
+    pushSubscription: {
+        endpoint: String,
+        keys: {
+            p256dh: String,
+            auth: String
+        }
+    },
+    notificationSettings: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        safetyReminders: {
+            type: Boolean,
+            default: true
+        },
+        sessionUpdates: {
+            type: Boolean,
+            default: true
+        },
+        generalNotifications: {
+            type: Boolean,
+            default: true
+        }
+    },
     isVerified: {
         type: Boolean,
         default: false

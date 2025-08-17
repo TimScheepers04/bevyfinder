@@ -185,6 +185,8 @@ self.addEventListener('sync', (event) => {
   
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
+  } else if (event.tag === 'session-sync') {
+    event.waitUntil(syncSessionData());
   }
 });
 
@@ -200,6 +202,164 @@ async function doBackgroundSync() {
   } catch (error) {
     console.error('Service Worker: Background sync failed:', error);
   }
+}
+
+// Session sync function
+async function syncSessionData() {
+  try {
+    console.log('Service Worker: Syncing session data');
+    
+    // Get session data from IndexedDB or localStorage
+    const sessionData = await getSessionData();
+    
+    if (sessionData && sessionData.isActive) {
+      // Update session duration and stats
+      const updatedSession = updateSessionStats(sessionData);
+      
+      // Save updated session data
+      await saveSessionData(updatedSession);
+      
+      // Send notification if BAC is high
+      if (updatedSession.currentBAC > 0.08) {
+        await sendSafetyNotification(updatedSession);
+      }
+    }
+  } catch (error) {
+    console.error('Service Worker: Session sync failed:', error);
+  }
+}
+
+// Get session data from storage
+async function getSessionData() {
+  try {
+    // Try to get from IndexedDB first, fallback to localStorage
+    const db = await openDB();
+    const session = await db.get('sessions', 'current');
+    return session || JSON.parse(localStorage.getItem('bevyfinder_session') || 'null');
+  } catch (error) {
+    console.log('Service Worker: Using localStorage fallback for session data');
+    return JSON.parse(localStorage.getItem('bevyfinder_session') || 'null');
+  }
+}
+
+// Save session data to storage
+async function saveSessionData(sessionData) {
+  try {
+    // Save to IndexedDB first, fallback to localStorage
+    const db = await openDB();
+    await db.put('sessions', sessionData, 'current');
+  } catch (error) {
+    console.log('Service Worker: Using localStorage fallback for session data');
+    localStorage.setItem('bevyfinder_session', JSON.stringify(sessionData));
+  }
+}
+
+// Update session statistics
+function updateSessionStats(sessionData) {
+  const now = Date.now();
+  const elapsedMinutes = (now - sessionData.startTime) / (1000 * 60);
+  
+  // Calculate current BAC based on time elapsed
+  const updatedSession = {
+    ...sessionData,
+    currentTime: now,
+    elapsedMinutes: elapsedMinutes,
+    currentBAC: calculateCurrentBAC(sessionData, elapsedMinutes)
+  };
+  
+  return updatedSession;
+}
+
+// Calculate current BAC based on time elapsed
+function calculateCurrentBAC(sessionData, elapsedMinutes) {
+  let totalAlcohol = 0;
+  
+  // Calculate total alcohol consumed
+  sessionData.drinks.forEach(drink => {
+    const drinkTime = new Date(drink.timestamp).getTime();
+    const drinkElapsedMinutes = (Date.now() - drinkTime) / (1000 * 60);
+    
+    // Alcohol metabolism rate (varies by person, using average)
+    const metabolismRate = 0.015; // % per hour
+    const metabolized = (drinkElapsedMinutes / 60) * metabolismRate;
+    
+    const remainingAlcohol = Math.max(0, drink.alcoholContent - metabolized);
+    totalAlcohol += remainingAlcohol;
+  });
+  
+  // Convert to BAC (simplified calculation)
+  const weight = sessionData.userWeight || 70; // kg
+  const gender = sessionData.userGender || 'male';
+  const distributionRatio = gender === 'male' ? 0.68 : 0.55;
+  
+  const bac = (totalAlcohol * 100) / (weight * distributionRatio * 10);
+  return Math.max(0, bac);
+}
+
+// Send safety notification
+async function sendSafetyNotification(sessionData) {
+  try {
+    const payload = JSON.stringify({
+      title: 'Safety Alert - High BAC',
+      body: `Your current BAC is ${(sessionData.currentBAC * 100).toFixed(3)}%. Please consider stopping drinking.`,
+      icon: '/icon-192x192.png',
+      badge: '/icon-72x72.png',
+      data: {
+        url: '/tracking-page',
+        type: 'safety',
+        bacLevel: sessionData.currentBAC
+      }
+    });
+    
+    // Get all push subscriptions and send notifications
+    const subscriptions = await getPushSubscriptions();
+    for (const subscription of subscriptions) {
+      try {
+        await self.registration.pushManager.sendNotification(subscription, payload);
+      } catch (error) {
+        console.error('Service Worker: Failed to send safety notification:', error);
+      }
+    }
+  } catch (error) {
+    console.error('Service Worker: Safety notification failed:', error);
+  }
+}
+
+// Get push subscriptions
+async function getPushSubscriptions() {
+  try {
+    const db = await openDB();
+    const subscriptions = await db.getAll('pushSubscriptions');
+    return subscriptions;
+  } catch (error) {
+    console.log('Service Worker: No push subscriptions found');
+    return [];
+  }
+}
+
+// Open IndexedDB
+async function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('BevyFinderDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      
+      // Create sessions store
+      if (!db.objectStoreNames.contains('sessions')) {
+        const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
+        sessionStore.createIndex('isActive', 'isActive', { unique: false });
+      }
+      
+      // Create push subscriptions store
+      if (!db.objectStoreNames.contains('pushSubscriptions')) {
+        db.createObjectStore('pushSubscriptions', { keyPath: 'endpoint' });
+      }
+    };
+  });
 }
 
 // Handle push notifications

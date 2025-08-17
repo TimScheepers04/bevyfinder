@@ -1,19 +1,68 @@
 // Test if JavaScript is running
 console.log('Script.js loaded successfully!');
 
-// API Base URL - Dynamic detection for mobile and desktop
+// API Base URL - Dynamic detection with fallback
 let API_BASE_URL;
+const PRODUCTION_API = 'https://bevyfinder.up.railway.app/api';
+const LOCAL_API = 'http://localhost:3000/api';
+
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    API_BASE_URL = 'http://localhost:3000/api'; // Local development
+    API_BASE_URL = LOCAL_API;
     console.log('🏠 Using localhost API for development');
 } else {
-    API_BASE_URL = 'https://bevyfinder.up.railway.app/api'; // Production
+    API_BASE_URL = PRODUCTION_API;
     console.log('🌍 Using production API for mobile/live deployment');
 }
 
-// 🚨 TEMPORARY AUTHENTICATION BYPASS - FOR TESTING ONLY 🚨
-// This bypasses all authentication requirements so you can test features
-const TEMP_AUTH_BYPASS = true;
+// API health check function
+async function checkAPIHealth() {
+    try {
+        const response = await fetch(`${API_BASE_URL.replace('/api', '')}/health`, {
+            method: 'GET',
+            timeout: 5000
+        });
+        return response.ok;
+    } catch (error) {
+        console.warn('⚠️ API health check failed:', error);
+        return false;
+    }
+}
+
+// Enhanced API call function with retry logic
+async function apiCall(endpoint, options = {}, retries = 3) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error(`❌ API call failed (attempt ${i + 1}/${retries}):`, error);
+            
+            if (i === retries - 1) {
+                throw error;
+            }
+            
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        }
+    }
+}
+
+// Authentication configuration
+// Set to false for production deployment
+const TEMP_AUTH_BYPASS = false;
 const TEMP_USER = {
     id: 'temp-user-123',
     name: 'Test User',
@@ -51,15 +100,37 @@ function requireAuth(callback) {
     }
 }
 
-// Mock auth methods for testing
+// Enhanced auth methods with proper error handling
 async function addFavoriteDrink(beverageKey) {
     if (TEMP_AUTH_BYPASS) {
-        const favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
-        if (!favorites.includes(beverageKey)) {
-            favorites.push(beverageKey);
-            localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+        try {
+            const favorites = JSON.parse(localStorage.getItem('bevyfinder_favorites') || '[]');
+            if (!favorites.includes(beverageKey)) {
+                favorites.push(beverageKey);
+                localStorage.setItem('bevyfinder_favorites', JSON.stringify(favorites));
+                showNotification('Drink added to favorites!', 'success');
+            } else {
+                showNotification('Drink is already in your favorites', 'info');
+            }
+            return { success: true };
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+            showNotification('Failed to add to favorites. Please try again.', 'error');
+            return { success: false, error: error.message };
         }
-        return { success: true };
+    } else {
+        try {
+            const response = await apiCall('/favorites/add', {
+                method: 'POST',
+                body: JSON.stringify({ beverageKey })
+            });
+            showNotification('Drink added to favorites!', 'success');
+            return response;
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+            showNotification('Failed to add to favorites. Please try again.', 'error');
+            return { success: false, error: error.message };
+        }
     }
 }
 
@@ -90,10 +161,775 @@ async function updateProfile(updateData) {
     }
 }
 
+// Push Notification System
+class PushNotificationManager {
+    constructor() {
+        this.isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+        this.permission = 'default';
+        this.subscription = null;
+        this.init();
+    }
+
+    async init() {
+        if (!this.isSupported) {
+            console.log('Push notifications not supported');
+            return;
+        }
+
+        try {
+            // Register service worker
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('Service Worker registered:', registration);
+
+            // Check permission
+            this.permission = await this.checkPermission();
+            
+            // Get existing subscription
+            this.subscription = await registration.pushManager.getSubscription();
+            
+            if (this.subscription) {
+                console.log('Existing push subscription found');
+                this.updateSubscriptionOnServer(this.subscription);
+            }
+
+            // Listen for permission changes
+            navigator.permissions.query({ name: 'notifications' }).then(permissionStatus => {
+                permissionStatus.onchange = () => {
+                    this.permission = permissionStatus.state;
+                    this.updatePermissionUI();
+                };
+            });
+
+        } catch (error) {
+            console.error('Push notification initialization failed:', error);
+        }
+    }
+
+    async checkPermission() {
+        if (!this.isSupported) return 'denied';
+        
+        const permission = await Notification.requestPermission();
+        return permission;
+    }
+
+    async requestPermission() {
+        if (!this.isSupported) {
+            showNotification('Push notifications are not supported in this browser', 'error');
+            return false;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            this.permission = permission;
+            
+            if (permission === 'granted') {
+                await this.subscribe();
+                showNotification('Push notifications enabled!', 'success');
+                return true;
+            } else {
+                showNotification('Push notifications permission denied', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error requesting notification permission:', error);
+            showNotification('Failed to enable push notifications', 'error');
+            return false;
+        }
+    }
+
+    async subscribe() {
+        if (!this.isSupported || this.permission !== 'granted') {
+            return false;
+        }
+
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            
+            // Get VAPID public key from server
+            const vapidPublicKey = await this.getVapidPublicKey();
+            
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey)
+            });
+
+            this.subscription = subscription;
+            await this.updateSubscriptionOnServer(subscription);
+            
+            console.log('Push subscription created:', subscription);
+            return true;
+        } catch (error) {
+            console.error('Error subscribing to push notifications:', error);
+            return false;
+        }
+    }
+
+    async unsubscribe() {
+        if (!this.subscription) {
+            return false;
+        }
+
+        try {
+            await this.subscription.unsubscribe();
+            await this.removeSubscriptionFromServer();
+            this.subscription = null;
+            
+            showNotification('Push notifications disabled', 'info');
+            return true;
+        } catch (error) {
+            console.error('Error unsubscribing from push notifications:', error);
+            return false;
+        }
+    }
+
+    async updateSubscriptionOnServer(subscription) {
+        try {
+            const response = await apiCall('/notifications/subscribe', {
+                method: 'POST',
+                body: JSON.stringify({
+                    subscription: subscription.toJSON(),
+                    userId: getCurrentUser()?.id
+                })
+            });
+            
+            if (response.success) {
+                console.log('Subscription updated on server');
+            }
+        } catch (error) {
+            console.error('Failed to update subscription on server:', error);
+        }
+    }
+
+    async removeSubscriptionFromServer() {
+        try {
+            await apiCall('/notifications/unsubscribe', {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: getCurrentUser()?.id
+                })
+            });
+        } catch (error) {
+            console.error('Failed to remove subscription from server:', error);
+        }
+    }
+
+    async getVapidPublicKey() {
+        try {
+            const response = await apiCall('/notifications/vapid-public-key');
+            return response.publicKey;
+        } catch (error) {
+            console.error('Failed to get VAPID public key:', error);
+            // Fallback to a default key (you should replace this with your actual key)
+            return 'BEl62iUYgUivxIkv69yViEuiBIa1HxJ9J9XzQjRj_4vqXzQjRj_4vqXzQjRj_4vqXzQjRj_4vqXzQjRj_4vq';
+        }
+    }
+
+    urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    updatePermissionUI() {
+        const notificationToggle = document.getElementById('notification-toggle');
+        if (notificationToggle) {
+            notificationToggle.checked = this.permission === 'granted';
+            notificationToggle.disabled = this.permission === 'denied';
+        }
+    }
+
+    // Send test notification
+    async sendTestNotification() {
+        if (this.permission !== 'granted') {
+            showNotification('Please enable push notifications first', 'error');
+            return;
+        }
+
+        try {
+            await apiCall('/notifications/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: getCurrentUser()?.id
+                })
+            });
+            
+            showNotification('Test notification sent!', 'success');
+        } catch (error) {
+            console.error('Failed to send test notification:', error);
+            showNotification('Failed to send test notification', 'error');
+        }
+    }
+
+    // Send safety alert
+    async sendSafetyAlert(bacLevel, message) {
+        if (this.permission !== 'granted') {
+            return false;
+        }
+
+        try {
+            await apiCall('/notifications/safety-alert', {
+                method: 'POST',
+                body: JSON.stringify({
+                    bacLevel,
+                    message
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Failed to send safety alert:', error);
+            return false;
+        }
+    }
+
+    // Send session update
+    async sendSessionUpdate(drinkName, sessionStats) {
+        if (this.permission !== 'granted') {
+            return false;
+        }
+
+        try {
+            await apiCall('/notifications/session-update', {
+                method: 'POST',
+                body: JSON.stringify({
+                    drinkName,
+                    sessionStats
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Failed to send session update:', error);
+            return false;
+        }
+    }
+
+    // Update notification settings
+    updateNotificationSettings() {
+        const notificationSettings = document.getElementById('notification-settings');
+        const notificationStatus = document.getElementById('notification-status');
+        
+        if (notificationSettings) {
+            notificationSettings.style.display = 'block';
+        }
+        
+        if (notificationStatus) {
+            if (this.permission === 'granted') {
+                notificationStatus.textContent = 'Push notifications are enabled';
+                notificationStatus.style.color = '#10b981';
+            } else if (this.permission === 'denied') {
+                notificationStatus.textContent = 'Push notifications are blocked. Please enable them in your browser settings.';
+                notificationStatus.style.color = '#ef4444';
+            } else {
+                notificationStatus.textContent = 'Push notifications are not enabled';
+                notificationStatus.style.color = 'rgba(255, 255, 255, 0.7)';
+            }
+        }
+        
+        this.updatePermissionUI();
+    }
+}
+
+// Background Session Manager
+class BackgroundSessionManager {
+    constructor() {
+        this.sessionId = null;
+        this.syncInterval = null;
+        this.isActive = false;
+        this.init();
+    }
+
+    async init() {
+        // Check for existing active session
+        const existingSession = await this.getSessionData();
+        if (existingSession && existingSession.isActive) {
+            this.sessionId = existingSession.id;
+            this.isActive = true;
+            this.startBackgroundSync();
+            console.log('Background session manager: Resumed existing session');
+        }
+    }
+
+    async startSession(userData) {
+        const sessionId = 'session_' + Date.now();
+        const sessionData = {
+            id: sessionId,
+            startTime: Date.now(),
+            currentTime: Date.now(),
+            isActive: true,
+            drinks: [],
+            userWeight: userData.weight,
+            userGender: userData.gender,
+            currentBAC: 0,
+            elapsedMinutes: 0
+        };
+
+        this.sessionId = sessionId;
+        this.isActive = true;
+
+        // Save session data
+        await this.saveSessionData(sessionData);
+        
+        // Start background sync
+        this.startBackgroundSync();
+        
+        // Register background sync
+        if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('session-sync');
+        }
+
+        console.log('Background session manager: Session started');
+        return sessionId;
+    }
+
+    async endSession() {
+        if (!this.isActive) return;
+
+        const sessionData = await this.getSessionData();
+        if (sessionData) {
+            sessionData.isActive = false;
+            sessionData.endTime = Date.now();
+            sessionData.duration = (sessionData.endTime - sessionData.startTime) / (1000 * 60); // minutes
+            
+            await this.saveSessionData(sessionData);
+            
+            // Save to session history
+            await this.saveToHistory(sessionData);
+        }
+
+        this.isActive = false;
+        this.stopBackgroundSync();
+        
+        console.log('Background session manager: Session ended');
+    }
+
+    async addDrink(drinkData) {
+        if (!this.isActive) return;
+
+        const sessionData = await this.getSessionData();
+        if (sessionData) {
+            const drink = {
+                ...drinkData,
+                timestamp: Date.now(),
+                sessionTime: Date.now() - sessionData.startTime
+            };
+
+            sessionData.drinks.push(drink);
+            sessionData.currentTime = Date.now();
+            sessionData.currentBAC = this.calculateBAC(sessionData);
+
+            await this.saveSessionData(sessionData);
+            
+            // Send session update notification
+            if (pushManager.permission === 'granted') {
+                await pushManager.sendSessionUpdate(drinkData.name, {
+                    bac: sessionData.currentBAC,
+                    drinks: sessionData.drinks.length,
+                    elapsedMinutes: sessionData.elapsedMinutes
+                });
+            }
+
+            console.log('Background session manager: Drink added');
+        }
+    }
+
+    async getCurrentSession() {
+        return await this.getSessionData();
+    }
+
+    async updateSessionStats() {
+        const sessionData = await this.getSessionData();
+        if (sessionData && sessionData.isActive) {
+            const now = Date.now();
+            sessionData.currentTime = now;
+            sessionData.elapsedMinutes = (now - sessionData.startTime) / (1000 * 60);
+            sessionData.currentBAC = this.calculateBAC(sessionData);
+
+            await this.saveSessionData(sessionData);
+
+            // Check for safety alerts
+            if (sessionData.currentBAC > 0.08 && pushManager.permission === 'granted') {
+                await pushManager.sendSafetyAlert(
+                    sessionData.currentBAC,
+                    `Your BAC is ${(sessionData.currentBAC * 100).toFixed(3)}%. Please consider stopping drinking.`
+                );
+            }
+
+            return sessionData;
+        }
+        return null;
+    }
+
+    calculateBAC(sessionData) {
+        let totalAlcohol = 0;
+        const now = Date.now();
+
+        sessionData.drinks.forEach(drink => {
+            const drinkElapsedMinutes = (now - drink.timestamp) / (1000 * 60);
+            
+            // Alcohol metabolism rate (varies by person, using average)
+            const metabolismRate = 0.015; // % per hour
+            const metabolized = (drinkElapsedMinutes / 60) * metabolismRate;
+            
+            const remainingAlcohol = Math.max(0, drink.alcoholContent - metabolized);
+            totalAlcohol += remainingAlcohol;
+        });
+
+        // Convert to BAC (simplified calculation)
+        const weight = sessionData.userWeight || 70; // kg
+        const gender = sessionData.userGender || 'male';
+        const distributionRatio = gender === 'male' ? 0.68 : 0.55;
+
+        const bac = (totalAlcohol * 100) / (weight * distributionRatio * 10);
+        return Math.max(0, bac);
+    }
+
+    startBackgroundSync() {
+        // Sync every 5 minutes
+        this.syncInterval = setInterval(async () => {
+            if (this.isActive) {
+                await this.updateSessionStats();
+                
+                // Register background sync
+                if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                    try {
+                        const registration = await navigator.serviceWorker.ready;
+                        await registration.sync.register('session-sync');
+                    } catch (error) {
+                        console.log('Background sync registration failed:', error);
+                    }
+                }
+            }
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    stopBackgroundSync() {
+        if (this.syncInterval) {
+            clearInterval(this.syncInterval);
+            this.syncInterval = null;
+        }
+    }
+
+    async getSessionData() {
+        try {
+            // Try IndexedDB first, fallback to localStorage
+            const db = await this.openDB();
+            const session = await db.get('sessions', 'current');
+            return session || JSON.parse(localStorage.getItem('bevyfinder_session') || 'null');
+        } catch (error) {
+            return JSON.parse(localStorage.getItem('bevyfinder_session') || 'null');
+        }
+    }
+
+    async saveSessionData(sessionData) {
+        try {
+            // Save to IndexedDB first, fallback to localStorage
+            const db = await this.openDB();
+            await db.put('sessions', sessionData, 'current');
+        } catch (error) {
+            localStorage.setItem('bevyfinder_session', JSON.stringify(sessionData));
+        }
+    }
+
+    async saveToHistory(sessionData) {
+        try {
+            const history = JSON.parse(localStorage.getItem('bevyfinder_session_history') || '[]');
+            history.push(sessionData);
+            
+            // Keep only last 50 sessions
+            if (history.length > 50) {
+                history.splice(0, history.length - 50);
+            }
+            
+            localStorage.setItem('bevyfinder_session_history', JSON.stringify(history));
+        } catch (error) {
+            console.error('Failed to save session to history:', error);
+        }
+    }
+
+    async openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('BevyFinderDB', 1);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains('sessions')) {
+                    const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
+                    sessionStore.createIndex('isActive', 'isActive', { unique: false });
+                }
+            };
+        });
+    }
+}
+
+// Initialize background session manager
+const backgroundSessionManager = new BackgroundSessionManager();
+
+// Page visibility and app state handling
+document.addEventListener('visibilitychange', handleVisibilityChange);
+window.addEventListener('beforeunload', handleBeforeUnload);
+window.addEventListener('pagehide', handlePageHide);
+
+// Handle page visibility changes
+function handleVisibilityChange() {
+    if (document.hidden) {
+        console.log('App went to background - session continues running');
+        // Session continues running in background
+    } else {
+        console.log('App came to foreground - updating session stats');
+        // Update session stats when app comes back to foreground
+        if (backgroundSessionManager.isActive) {
+            backgroundSessionManager.updateSessionStats().then(sessionData => {
+                if (sessionData) {
+                    updateTrackingUI(sessionData);
+                }
+            });
+        }
+    }
+}
+
+// Handle before unload (user closing tab/window)
+function handleBeforeUnload(event) {
+    if (backgroundSessionManager.isActive) {
+        // Don't show confirmation dialog, just let the session continue
+        console.log('User closing app - session continues in background');
+    }
+}
+
+// Handle page hide (user navigating away)
+function handlePageHide(event) {
+    if (backgroundSessionManager.isActive) {
+        console.log('User navigating away - session continues in background');
+        // Session continues running in background
+    }
+}
+
+// Update tracking UI with session data
+function updateTrackingUI(sessionData) {
+    // Update BAC display
+    const bacElement = document.querySelector('.sobriety-card .card-content p');
+    if (bacElement) {
+        bacElement.textContent = (sessionData.currentBAC * 100).toFixed(3);
+    }
+
+    // Update session duration
+    const durationElement = document.querySelector('.session-info p');
+    if (durationElement) {
+        const hours = Math.floor(sessionData.elapsedMinutes / 60);
+        const minutes = Math.floor(sessionData.elapsedMinutes % 60);
+        durationElement.textContent = `${hours}h ${minutes}m`;
+    }
+
+    // Update drink count
+    const drinkCountElement = document.querySelector('.alcohol-card .card-content p');
+    if (drinkCountElement) {
+        drinkCountElement.textContent = sessionData.drinks.length;
+    }
+
+    // Update driving status
+    updateDrivingStatus(sessionData.currentBAC);
+}
+
+// Update driving status based on BAC
+function updateDrivingStatus(bac) {
+    const statusElement = document.querySelector('.driving-status');
+    if (!statusElement) return;
+
+    if (bac < 0.05) {
+        statusElement.textContent = 'Safe to Drive';
+        statusElement.className = 'driving-status safe';
+    } else if (bac < 0.08) {
+        statusElement.textContent = 'Caution - Limit Driving';
+        statusElement.className = 'driving-status caution';
+    } else {
+        statusElement.textContent = 'Do Not Drive';
+        statusElement.className = 'driving-status unsafe';
+    }
+}
+
+// Session management functions
+async function startNightTrackerSession() {
+    const user = getCurrentUser();
+    if (!user) {
+        showNotification('Please sign in to start a session', 'error');
+        return;
+    }
+
+    const userData = {
+        weight: user.weight || 70,
+        gender: user.gender || 'male'
+    };
+
+    await backgroundSessionManager.startSession(userData);
+    showSessionPersistenceIndicator();
+    showNotification('Night tracker session started! Session will continue even when you close the app.', 'success');
+    
+    // Update UI to show session is active
+    updateSessionUI(true);
+}
+
+async function endNightTrackerSession() {
+    if (!backgroundSessionManager.isActive) {
+        showNotification('No active session to end', 'info');
+        return;
+    }
+
+    await backgroundSessionManager.endSession();
+    hideSessionPersistenceIndicator();
+    showNotification('Night tracker session ended', 'info');
+    
+    // Update UI to show session is inactive
+    updateSessionUI(false);
+}
+
+async function addDrinkToSession(drinkData) {
+    if (!backgroundSessionManager.isActive) {
+        showNotification('Please start a session first', 'error');
+        return;
+    }
+
+    await backgroundSessionManager.addDrink(drinkData);
+    showNotification(`${drinkData.name} added to session`, 'success');
+    
+    // Update session stats
+    const sessionData = await backgroundSessionManager.getCurrentSession();
+    if (sessionData) {
+        updateTrackingUI(sessionData);
+    }
+}
+
+// Show session persistence indicator
+function showSessionPersistenceIndicator() {
+    const indicator = document.getElementById('session-persistence-indicator');
+    if (indicator) {
+        indicator.classList.add('show');
+        indicator.classList.add('pulse');
+    }
+}
+
+// Hide session persistence indicator
+function hideSessionPersistenceIndicator() {
+    const indicator = document.getElementById('session-persistence-indicator');
+    if (indicator) {
+        indicator.classList.remove('show');
+        indicator.classList.remove('pulse');
+    }
+}
+
+// Update session UI based on active state
+function updateSessionUI(isActive) {
+    const startBtn = document.querySelector('.start-session-btn');
+    const endBtn = document.querySelector('.end-session-btn');
+    
+    if (startBtn) {
+        startBtn.style.display = isActive ? 'none' : 'block';
+    }
+    
+    if (endBtn) {
+        endBtn.style.display = isActive ? 'block' : 'none';
+    }
+    
+    // Show/hide session persistence indicator
+    if (isActive) {
+        showSessionPersistenceIndicator();
+    } else {
+        hideSessionPersistenceIndicator();
+    }
+}
+
+// Check for existing session on page load
+async function checkExistingSession() {
+    const sessionData = await backgroundSessionManager.getCurrentSession();
+    if (sessionData && sessionData.isActive) {
+        console.log('Found existing active session, resuming...');
+        updateSessionUI(true);
+        updateTrackingUI(sessionData);
+        
+        // Show notification about resumed session
+        showNotification('Resumed active night tracker session', 'info');
+    }
+}
+
+// Initialize session check on page load
+document.addEventListener('DOMContentLoaded', () => {
+    checkExistingSession();
+});
+
+// Global notification functions
+async function requestNotificationPermission() {
+    const success = await pushManager.requestPermission();
+    if (success) {
+        pushManager.updateNotificationSettings();
+    }
+}
+
+async function sendTestNotification() {
+    await pushManager.sendTestNotification();
+}
+
+function toggleNotificationSettings() {
+    const notificationSettings = document.getElementById('notification-settings');
+    if (notificationSettings) {
+        const isVisible = notificationSettings.style.display !== 'none';
+        notificationSettings.style.display = isVisible ? 'none' : 'block';
+        
+        if (!isVisible) {
+            pushManager.updateNotificationSettings();
+        }
+    }
+}
+
+// Initialize push notification manager
+const pushManager = new PushNotificationManager();
+
+// Input validation functions
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+    return password && password.length >= 6;
+}
+
+function validateName(name) {
+    return name && name.trim().length >= 2;
+}
+
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input.trim().replace(/[<>]/g, '');
+}
+
 function signOut() {
     if (TEMP_AUTH_BYPASS) {
         // Mock sign out - just show notification
         showNotification('Mock sign out - authentication bypass is still active', 'info');
+    } else {
+        try {
+            localStorage.removeItem('bevyfinder_token');
+            localStorage.removeItem('bevyfinder_user');
+            showNotification('Successfully signed out', 'success');
+            // Redirect to login or refresh page
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            console.error('Error signing out:', error);
+            showNotification('Error signing out. Please try again.', 'error');
+        }
     }
 }
 

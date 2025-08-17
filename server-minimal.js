@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 require('dotenv').config();
 
 console.log('🚀 Starting BevyFinder API server...');
@@ -13,13 +17,91 @@ const reviewRoutes = require('./server/routes/reviews');
 const favoritesRoutes = require('./server/routes/favorites');
 const likesRoutes = require('./server/routes/likes');
 const socialRoutes = require('./server/routes/social');
+const notificationRoutes = require('./server/routes/notifications');
 
 // Initialize express app
 const app = express();
 
-// CORS configuration - allow all origins for now
+// Compression middleware
+app.use(compression());
+
+// Logging middleware
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+} else {
+    app.use(morgan('combined'));
+}
+
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "https://www.googletagmanager.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "https://fonts.googleapis.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            fontSrc: [
+                "'self'",
+                "https://fonts.gstatic.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            imgSrc: [
+                "'self'",
+                "data:",
+                "https:"
+            ],
+            connectSrc: [
+                "'self'",
+                "https://www.google-analytics.com"
+            ]
+        }
+    }
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: {
+        success: false,
+        message: 'Too many requests from this IP, please try again later.'
+    }
+});
+
+app.use('/api/', limiter);
+
+// CORS configuration - secure for production
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : ['http://localhost:3000', 'http://localhost:8080', 'https://bevyfinder.com', 'https://bevyfinder.up.railway.app'];
+
 app.use(cors({
-    origin: true,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        // In development, allow all localhost origins
+        if (process.env.NODE_ENV === 'development') {
+            if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+                return callback(null, true);
+            }
+        }
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
@@ -44,6 +126,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/likes', likesRoutes);
 app.use('/api/social', socialRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // API test endpoint
 app.get('/api/test', (req, res) => {
@@ -65,10 +148,42 @@ app.use('*', (req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
     console.error('❌ Error:', err);
-    res.status(500).json({
+    
+    // Handle specific error types
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({
+            success: false,
+            message: 'Validation error',
+            errors: Object.values(err.errors).map(e => e.message)
+        });
+    }
+    
+    if (err.name === 'MongoError' && err.code === 11000) {
+        return res.status(400).json({
+            success: false,
+            message: 'Duplicate field value'
+        });
+    }
+    
+    if (err.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+            success: false,
+            message: 'Invalid token'
+        });
+    }
+    
+    if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+            success: false,
+            message: 'Token expired'
+        });
+    }
+    
+    // Default error response
+    res.status(err.status || 500).json({
         success: false,
-        message: 'Internal server error',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        message: err.message || 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
 
