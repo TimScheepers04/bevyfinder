@@ -14389,8 +14389,22 @@
             }
             
             // Check for night data (either nightData or sessionStats)
-            const nightData = post.nightData || post.sessionStats;
+            let nightData = post.nightData || post.sessionStats;
+            
+            // If no nightData or sessionStats, check if the data is stored directly in the post
+            if (!nightData) {
+                // Check if the post itself contains the night data
+                const hasNightData = post.sessionDuration || post.totalDrinks || post.totalStandards || post.finalBAC;
+                if (hasNightData) {
+                    nightData = post;
+                    console.log('🌙 Using post as nightData (direct properties)');
+                }
+            }
             console.log('🌙 Using night data:', nightData);
+            console.log('🌙 Full post structure:', JSON.stringify(post, null, 2));
+            console.log('🌙 Available properties:', Object.keys(post));
+            console.log('🌙 nightData properties:', nightData ? Object.keys(nightData) : 'No nightData');
+            console.log('🌙 sessionStats properties:', post.sessionStats ? Object.keys(post.sessionStats) : 'No sessionStats');
             
             if (!nightData) {
                 console.warn('⚠️ No night data in post:', post);
@@ -14527,6 +14541,16 @@
                                         <span class="stat-value">${(nightData.totalLiquid || 0)}ml</span>
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <!-- Debug info (remove after testing) -->
+                            <div style="background: rgba(255,0,0,0.1); padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 0.8rem;">
+                                <strong>Debug Info:</strong><br>
+                                Calories: ${nightData.totalCalories || 'undefined'}<br>
+                                Carbs: ${nightData.totalCarbs || 'undefined'}<br>
+                                Liquid: ${nightData.totalLiquid || 'undefined'}<br>
+                                All properties: ${Object.keys(nightData).join(', ')}
+                            </div>
                             </div>
                             
                             <div class="night-share-drinks">
