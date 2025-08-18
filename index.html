@@ -12279,7 +12279,7 @@
                     type: 'night_share',
                     content: message,
                     privacy: privacy,
-                    nightData: {
+                    sessionStats: {
                         sessionDuration: currentSharingNight.sessionData.sessionDuration,
                         totalDrinks: currentSharingNight.sessionData.drinks.length,
                         totalStandards: currentSharingNight.sessionData.totalStandards,
@@ -14392,8 +14392,8 @@
                 }
             }
             
-            // Check for night data (either nightData or sessionStats)
-            let nightData = post.nightData || post.sessionStats;
+            // Check for night data (either sessionStats or nightData)
+            let nightData = post.sessionStats || post.nightData;
             
             // If no nightData or sessionStats, check if the data is stored directly in the post
             if (!nightData) {
@@ -15040,7 +15040,7 @@
                 type: 'night_share',
                 content: 'Test night share post with all stats',
                 privacy: 'friends',
-                nightData: {
+                sessionStats: {
                     sessionDuration: 7200000, // 2 hours in ms
                     totalDrinks: 5,
                     totalStandards: 6.5,
