@@ -15255,12 +15255,19 @@
                     if (profileModal) {
                         console.log('✅ Showing profile modal');
                         profileModal.style.display = 'flex';
+                        profileModal.style.opacity = '1';
+                        profileModal.style.visibility = 'visible';
                         
                         // Also hide any other content in the modal
                         const signupFields = document.getElementById('signup-fields');
                         const profileForm = document.getElementById('profile-form');
+                        const userInfo = document.getElementById('user-info');
+                        const profileModeTabs = document.querySelector('.profile-mode-tabs');
+                        
                         if (signupFields) signupFields.style.display = 'none';
                         if (profileForm) profileForm.style.display = 'none';
+                        if (userInfo) userInfo.style.display = 'none';
+                        if (profileModeTabs) profileModeTabs.style.display = 'none';
                         
                         console.log('✅ Notification settings should now be visible');
                     } else {
