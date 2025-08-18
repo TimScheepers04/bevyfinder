@@ -15242,19 +15242,38 @@
                 
                 // Show the notification settings in the profile modal
                 const notificationSettings = document.getElementById('notification-settings');
+                console.log('🔍 Looking for notification-settings element:', notificationSettings);
+                
                 if (notificationSettings) {
                     console.log('✅ Found notification settings, showing them');
                     notificationSettings.style.display = 'block';
                     
                     // Show the profile modal if it's not already visible
                     const profileModal = document.getElementById('profile-modal');
+                    console.log('🔍 Looking for profile-modal element:', profileModal);
+                    
                     if (profileModal) {
                         console.log('✅ Showing profile modal');
                         profileModal.style.display = 'flex';
+                        
+                        // Also hide any other content in the modal
+                        const signupFields = document.getElementById('signup-fields');
+                        const profileForm = document.getElementById('profile-form');
+                        if (signupFields) signupFields.style.display = 'none';
+                        if (profileForm) profileForm.style.display = 'none';
+                        
+                        console.log('✅ Notification settings should now be visible');
+                    } else {
+                        console.log('❌ Profile modal not found');
+                        alert('Profile modal not found');
                     }
                 } else {
                     console.log('❌ Notification settings element not found');
-                    alert('Notification settings not found');
+                    console.log('🔍 Available elements with "notification" in ID:');
+                    document.querySelectorAll('[id*="notification"]').forEach(el => {
+                        console.log('  -', el.id);
+                    });
+                    alert('Notification settings element not found');
                 }
             };
         }
