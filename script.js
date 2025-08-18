@@ -891,6 +891,42 @@ function toggleNotificationSettings() {
     }
 }
 
+function showNotificationSettings() {
+    // Close the profile dropdown first
+    const profileDropdown = document.getElementById('profile-dropdown');
+    if (profileDropdown) {
+        profileDropdown.style.display = 'none';
+    }
+    
+    // Show the notification settings in the profile modal
+    const notificationSettings = document.getElementById('notification-settings');
+    if (notificationSettings) {
+        notificationSettings.style.display = 'block';
+        pushManager.updateNotificationSettings();
+        
+        // Show the profile modal if it's not already visible
+        const profileModal = document.getElementById('profile-modal');
+        if (profileModal) {
+            profileModal.style.display = 'flex';
+        }
+    } else {
+        showNotification('Notification settings not found', 'error');
+    }
+}
+
+function hideNotificationSettings() {
+    const notificationSettings = document.getElementById('notification-settings');
+    if (notificationSettings) {
+        notificationSettings.style.display = 'none';
+    }
+    
+    // Close the profile modal if no other content is visible
+    const profileModal = document.getElementById('profile-modal');
+    if (profileModal) {
+        profileModal.style.display = 'none';
+    }
+}
+
 // Initialize push notification manager
 const pushManager = new PushNotificationManager();
 
