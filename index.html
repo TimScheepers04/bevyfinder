@@ -15245,8 +15245,12 @@
                 console.log('🔍 Looking for notification-settings element:', notificationSettings);
                 
                 if (notificationSettings) {
-                    console.log('✅ Found notification settings, showing them');
-                    notificationSettings.style.display = 'block';
+                                            console.log('✅ Found notification settings, showing them');
+                        notificationSettings.style.display = 'block';
+                        notificationSettings.style.backgroundColor = 'red'; // Temporary debug
+                        notificationSettings.style.border = '3px solid yellow'; // Temporary debug
+                        notificationSettings.style.padding = '20px'; // Temporary debug
+                        notificationSettings.style.zIndex = '9999'; // Temporary debug
                     
                     // Show the profile modal if it's not already visible
                     const profileModal = document.getElementById('profile-modal');
