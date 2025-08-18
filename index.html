@@ -37,7 +37,7 @@
                 });
                 alert('✅ Test notification sent!');
             } else if (Notification.permission === 'denied') {
-                alert('❌ Notification permission denied. Please enable notifications in your browser settings.');
+                alert('❌ Notification permission denied.\n\nTo enable:\n1. Click the lock icon in address bar\n2. Change "Notifications" to "Allow"\n3. Refresh the page');
             } else {
                 alert('❌ Please enable notifications first by clicking "Enable Notifications"');
             }
@@ -6141,6 +6141,35 @@
                 </div>
             </div>
             
+            <!-- Live Update Controls -->
+            <div class="live-update-controls" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; margin: 20px 0; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h3><i class="fas fa-broadcast-tower"></i> Live Updates</h3>
+                <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 15px; font-size: 0.9rem;">
+                    Automatically share drink updates with your friends in real-time
+                </p>
+                <div class="live-update-options">
+                    <div class="live-update-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="live-updates-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Enable Live Updates</span>
+                    </div>
+                    <div class="live-update-privacy">
+                        <label>Privacy:</label>
+                        <select id="live-update-privacy" onchange="setLiveUpdatePrivacy(this.value)">
+                            <option value="friends" selected>Friends Only</option>
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="live-update-status" id="live-update-status" style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    <span style="color: #10b981; margin-left: 8px;">Live updates enabled - Friends will see your drink updates</span>
+                </div>
+            </div>
+            
             <!-- Summary Cards -->
             <div class="summary-cards">
                 <div class="summary-card alcohol-card">
@@ -11309,6 +11338,9 @@
                 updateDisplay();
                 updateDrinkList();
                 console.log('Drink added:', drink.name);
+                
+                // Send live update to social feed
+                sendLiveDrinkUpdate(drink);
             }
         }
 
@@ -11376,6 +11408,213 @@
             // BAC can't be negative
             return Math.max(bac, 0).toFixed(4);  // returns BAC as a string like "0.0412"
         }
+
+        // Live Update System for Social Feed
+        async function sendLiveDrinkUpdate(drink) {
+            try {
+                // Check if live updates are enabled
+                if (!liveUpdatesEnabled) {
+                    console.log('Live updates disabled, skipping update');
+                    return;
+                }
+                
+                // Check if user is logged in
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.log('User not logged in, skipping live update');
+                    return;
+                }
+
+                // Get current session stats
+                const sessionStats = {
+                    totalDrinks: drinks.length,
+                    totalStandards: totalStandards,
+                    currentBAC: calculateBAC(),
+                    sessionDuration: sessionActive ? Math.floor((new Date() - sessionStartTime) / 1000 / 60) : 0,
+                    totalCalories: totalCalories,
+                    totalCarbs: totalCarbs,
+                    totalSugar: totalSugar,
+                    totalProtein: totalProtein
+                };
+
+                // Create live update post
+                const liveUpdateData = {
+                    type: 'drink_session',
+                    content: `🍺 Just added ${drink.name} to my night!`,
+                    privacy: liveUpdatePrivacy, // Use user's privacy setting
+                    sessionStats: sessionStats,
+                    drinks: [{
+                        drinkKey: drink.key || drink.name.toLowerCase().replace(/\s+/g, '_'),
+                        drinkName: drink.name,
+                        quantity: 1
+                    }],
+                    isLiveUpdate: true
+                };
+
+                console.log('📤 Sending live drink update:', liveUpdateData);
+
+                const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(liveUpdateData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Live drink update sent successfully:', result);
+                    
+                    // Show a subtle notification
+                    showNotification(`🍺 ${drink.name} added to your night!`, 'success');
+                    
+                    // Refresh social feed if it's currently open
+                    if (document.getElementById('social-feed-page') && 
+                        document.getElementById('social-feed-page').classList.contains('active')) {
+                        console.log('🔄 Refreshing social feed for live update...');
+                        setTimeout(() => {
+                            loadSocialFeed();
+                        }, 1000); // Small delay to ensure post is saved
+                    }
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Error sending live drink update:', error);
+                }
+            } catch (error) {
+                console.error('❌ Error sending live drink update:', error);
+            }
+        }
+
+        // Live Update Settings
+        let liveUpdatesEnabled = true;
+        let liveUpdatePrivacy = 'friends';
+
+        function toggleLiveUpdates() {
+            liveUpdatesEnabled = !liveUpdatesEnabled;
+            const status = liveUpdatesEnabled ? 'enabled' : 'disabled';
+            showNotification(`Live updates ${status}`, 'info');
+            console.log(`Live updates ${status}`);
+            
+            // Update UI
+            const toggle = document.getElementById('live-updates-toggle');
+            const statusDiv = document.getElementById('live-update-status');
+            
+            if (toggle) {
+                toggle.checked = liveUpdatesEnabled;
+            }
+            
+            if (statusDiv) {
+                if (liveUpdatesEnabled) {
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i><span style="color: #10b981; margin-left: 8px;">Live updates enabled - Friends will see your drink updates</span>';
+                    statusDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+                    statusDiv.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                } else {
+                    statusDiv.innerHTML = '<i class="fas fa-times-circle" style="color: #ef4444;"></i><span style="color: #ef4444; margin-left: 8px;">Live updates disabled - Your drink updates are private</span>';
+                    statusDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+                    statusDiv.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+                }
+            }
+        }
+
+        function setLiveUpdatePrivacy(privacy) {
+            liveUpdatePrivacy = privacy;
+            showNotification(`Live updates set to ${privacy}`, 'info');
+            console.log(`Live update privacy set to ${privacy}`);
+        }
+
+        // Initialize live update controls
+        function initializeLiveUpdateControls() {
+            const toggle = document.getElementById('live-updates-toggle');
+            if (toggle) {
+                toggle.addEventListener('change', function() {
+                    toggleLiveUpdates();
+                });
+            }
+        }
+
+        // Add CSS for toggle switch
+        const toggleCSS = `
+            <style>
+                .toggle-switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 50px;
+                    height: 24px;
+                    margin-right: 10px;
+                }
+                
+                .toggle-switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+                
+                .toggle-slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    transition: 0.3s;
+                    border-radius: 24px;
+                }
+                
+                .toggle-slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 18px;
+                    width: 18px;
+                    left: 3px;
+                    bottom: 3px;
+                    background-color: white;
+                    transition: 0.3s;
+                    border-radius: 50%;
+                }
+                
+                .toggle-switch input:checked + .toggle-slider {
+                    background-color: #10b981;
+                }
+                
+                .toggle-switch input:checked + .toggle-slider:before {
+                    transform: translateX(26px);
+                }
+                
+                .live-update-options {
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+                
+                .live-update-toggle {
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .live-update-privacy {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                
+                .live-update-privacy select {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+            </style>
+        `;
+        
+        // Inject CSS when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.head.insertAdjacentHTML('beforeend', toggleCSS);
+            initializeLiveUpdateControls();
+        });
 
         function updateDrinkList() {
             const drinkList = document.getElementById('drink-list');
