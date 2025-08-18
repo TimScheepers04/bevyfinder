@@ -11440,7 +11440,7 @@
                 // Create live update post
                 const liveUpdateData = {
                     type: 'drink_session',
-                    content: `🍺 Just added ${drink.name} to my night!`,
+                    content: `🍺 Live Update: Just added ${drink.name} to my night! (${drinks.length} drinks total)`,
                     privacy: liveUpdatePrivacy, // Use user's privacy setting
                     sessionStats: sessionStats,
                     drinks: [{
@@ -11448,7 +11448,8 @@
                         drinkName: drink.name,
                         quantity: 1
                     }],
-                    isLiveUpdate: true
+                    isLiveUpdate: true,
+                    createdAt: new Date().toISOString() // Ensure proper timestamp
                 };
 
                 console.log('📤 Sending live drink update:', liveUpdateData);
@@ -11475,7 +11476,7 @@
                         console.log('🔄 Refreshing social feed for live update...');
                         setTimeout(() => {
                             loadSocialFeed();
-                        }, 1000); // Small delay to ensure post is saved
+                        }, 500); // Reduced delay for faster updates
                     }
                 } else {
                     const error = await response.json();
@@ -11606,6 +11607,39 @@
                     color: white;
                     padding: 5px 10px;
                     border-radius: 5px;
+                }
+                
+                /* Live Update Post Styling */
+                .live-update-post {
+                    border-left: 4px solid #10b981;
+                    background: rgba(16, 185, 129, 0.05);
+                }
+                
+                .live-update-post .post-header {
+                    background: rgba(16, 185, 129, 0.1);
+                }
+                
+                .live-indicator {
+                    background: #ef4444;
+                    color: white;
+                    padding: 2px 6px;
+                    border-radius: 10px;
+                    font-size: 0.7rem;
+                    font-weight: bold;
+                    margin-left: 8px;
+                    animation: pulse 2s infinite;
+                }
+                
+                @keyframes pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                    100% { opacity: 1; }
+                }
+                
+                .drink-session-badge {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
                 }
             </style>
         `;
@@ -14083,12 +14117,28 @@
                             
                             // Combine all posts: night shares, regular posts, and drink sessions
                             feedPosts = [...nightSharePosts, ...regularPosts, ...convertedDrinkPosts];
-                            console.log('📝 Combined posts to render:', feedPosts);
+                            
+                            // Sort by most recent first
+                            feedPosts.sort((a, b) => {
+                                const dateA = new Date(a.createdAt || a.date || 0);
+                                const dateB = new Date(b.createdAt || b.date || 0);
+                                return dateB - dateA;
+                            });
+                            
+                            console.log('📝 Combined posts to render (sorted by recent):', feedPosts);
                             renderFeed();
                         } else if (validPosts.length > 0) {
                             // Combine night shares and regular posts
                             feedPosts = [...nightSharePosts, ...regularPosts];
-                            console.log('📝 Valid posts to render:', feedPosts);
+                            
+                            // Sort by most recent first
+                            feedPosts.sort((a, b) => {
+                                const dateA = new Date(a.createdAt || a.date || 0);
+                                const dateB = new Date(b.createdAt || b.date || 0);
+                                return dateB - dateA;
+                            });
+                            
+                            console.log('📝 Valid posts to render (sorted by recent):', feedPosts);
                             renderFeed();
                         } else {
                             console.log('❌ No valid posts or drink data found, showing empty state');
@@ -14697,9 +14747,10 @@
             const userInitial = userName.charAt(0).toUpperCase();
             const postDate = post.createdAt ? formatDate(post.createdAt) : 'Unknown date';
             const sessionStats = post.sessionStats || {};
+            const isLiveUpdate = post.isLiveUpdate || post.content.includes('Live Update');
             
             return `
-                <div class="post drink-session-post">
+                <div class="post drink-session-post ${isLiveUpdate ? 'live-update-post' : ''}">
                     <div class="post-header">
                         <div class="post-avatar drink-session-avatar">
                             <i class="fas fa-wine-glass-alt"></i>
@@ -14708,7 +14759,8 @@
                             <h4>${userName}</h4>
                             <span>${postDate}</span>
                             <div class="drink-session-badge">
-                                <i class="fas fa-chart-line"></i> Drink Session
+                                <i class="fas fa-chart-line"></i> ${isLiveUpdate ? 'Live Update' : 'Drink Session'}
+                                ${isLiveUpdate ? '<span class="live-indicator">🔴 LIVE</span>' : ''}
                             </div>
                         </div>
                     </div>
