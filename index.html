@@ -9,6 +9,95 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
     <title>BevyFinder - Your Ultimate Drink Database</title>
+    
+    <!-- Notification functions - available immediately -->
+    <script>
+        // Define notification functions immediately
+        window.requestNotificationPermission = function() {
+            console.log('🔔 Requesting notification permission');
+            if ('Notification' in window) {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        alert('✅ Notification permission granted!');
+                    } else {
+                        alert('❌ Notification permission denied');
+                    }
+                });
+            } else {
+                alert('❌ Notifications not supported in this browser');
+            }
+        };
+        
+        window.sendTestNotification = function() {
+            console.log('🔔 Sending test notification');
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('BevyFinder Test', {
+                    body: 'This is a test notification from BevyFinder!',
+                    icon: '/favicon.ico'
+                });
+                alert('✅ Test notification sent!');
+            } else if (Notification.permission === 'denied') {
+                alert('❌ Notification permission denied. Please enable notifications in your browser settings.');
+            } else {
+                alert('❌ Please enable notifications first by clicking "Enable Notifications"');
+            }
+        };
+        
+        window.showNotificationSettings = function() {
+            console.log('🔔 showNotificationSettings called');
+            
+            // Close the profile dropdown first
+            const profileDropdown = document.getElementById('profile-dropdown');
+            if (profileDropdown) {
+                console.log('✅ Closing profile dropdown');
+                profileDropdown.style.display = 'none';
+            }
+            
+            // Show the notification settings in the profile modal
+            const notificationSettings = document.getElementById('notification-settings');
+            console.log('🔍 Looking for notification-settings element:', notificationSettings);
+            
+            if (notificationSettings) {
+                console.log('✅ Found notification settings, showing them');
+                notificationSettings.style.display = 'block';
+                
+                // Show the profile modal if it's not already visible
+                const profileModal = document.getElementById('profile-modal');
+                console.log('🔍 Looking for profile-modal element:', profileModal);
+                
+                if (profileModal) {
+                    console.log('✅ Showing profile modal');
+                    profileModal.style.display = 'flex';
+                    profileModal.style.opacity = '1';
+                    profileModal.style.visibility = 'visible';
+                    
+                    // Also hide any other content in the modal
+                    const signupFields = document.getElementById('signup-fields');
+                    const profileForm = document.getElementById('profile-form');
+                    const userInfo = document.getElementById('user-info');
+                    const profileModeTabs = document.querySelector('.profile-mode-tabs');
+                    
+                    if (signupFields) signupFields.style.display = 'none';
+                    if (profileForm) profileForm.style.display = 'none';
+                    if (userInfo) userInfo.style.display = 'none';
+                    if (profileModeTabs) profileModeTabs.style.display = 'none';
+                    
+                    console.log('✅ Notification settings should now be visible');
+                } else {
+                    console.log('❌ Profile modal not found');
+                    alert('Profile modal not found');
+                }
+            } else {
+                console.log('❌ Notification settings element not found');
+                console.log('🔍 Available elements with "notification" in ID:');
+                document.querySelectorAll('[id*="notification"]').forEach(el => {
+                    console.log('  -', el.id);
+                });
+                alert('Notification settings element not found');
+            }
+        };
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -15225,100 +15314,6 @@
     <!-- Load main JavaScript file -->
     <script src="script.js"></script>
     
-    <!-- Fallback notification settings function -->
-    <script>
-        // Ensure showNotificationSettings is available
-        if (typeof showNotificationSettings === 'undefined') {
-            console.log('🔧 Creating fallback showNotificationSettings function');
-            window.showNotificationSettings = function() {
-                console.log('🔔 showNotificationSettings called (fallback)');
-                
-                // Close the profile dropdown first
-                const profileDropdown = document.getElementById('profile-dropdown');
-                if (profileDropdown) {
-                    console.log('✅ Closing profile dropdown');
-                    profileDropdown.style.display = 'none';
-                }
-                
-                // Show the notification settings in the profile modal
-                const notificationSettings = document.getElementById('notification-settings');
-                console.log('🔍 Looking for notification-settings element:', notificationSettings);
-                
-                if (notificationSettings) {
-                                            console.log('✅ Found notification settings, showing them');
-                        notificationSettings.style.display = 'block';
-                    
-                    // Show the profile modal if it's not already visible
-                    const profileModal = document.getElementById('profile-modal');
-                    console.log('🔍 Looking for profile-modal element:', profileModal);
-                    
-                    if (profileModal) {
-                        console.log('✅ Showing profile modal');
-                        profileModal.style.display = 'flex';
-                        profileModal.style.opacity = '1';
-                        profileModal.style.visibility = 'visible';
-                        
-                        // Also hide any other content in the modal
-                        const signupFields = document.getElementById('signup-fields');
-                        const profileForm = document.getElementById('profile-form');
-                        const userInfo = document.getElementById('user-info');
-                        const profileModeTabs = document.querySelector('.profile-mode-tabs');
-                        
-                        if (signupFields) signupFields.style.display = 'none';
-                        if (profileForm) profileForm.style.display = 'none';
-                        if (userInfo) userInfo.style.display = 'none';
-                        if (profileModeTabs) profileModeTabs.style.display = 'none';
-                        
-                        console.log('✅ Notification settings should now be visible');
-                    } else {
-                        console.log('❌ Profile modal not found');
-                        alert('Profile modal not found');
-                    }
-                } else {
-                    console.log('❌ Notification settings element not found');
-                    console.log('🔍 Available elements with "notification" in ID:');
-                    document.querySelectorAll('[id*="notification"]').forEach(el => {
-                        console.log('  -', el.id);
-                    });
-                    alert('Notification settings element not found');
-                }
-            };
-        }
-        
-        // Add missing notification functions
-        if (typeof requestNotificationPermission === 'undefined') {
-            window.requestNotificationPermission = function() {
-                console.log('🔔 Requesting notification permission');
-                if ('Notification' in window) {
-                    Notification.requestPermission().then(function(permission) {
-                        if (permission === 'granted') {
-                            alert('✅ Notification permission granted!');
-                        } else {
-                            alert('❌ Notification permission denied');
-                        }
-                    });
-                } else {
-                    alert('❌ Notifications not supported in this browser');
-                }
-            };
-        }
-        
-        if (typeof sendTestNotification === 'undefined') {
-            window.sendTestNotification = function() {
-                console.log('🔔 Sending test notification');
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('BevyFinder Test', {
-                        body: 'This is a test notification from BevyFinder!',
-                        icon: '/favicon.ico'
-                    });
-                    alert('✅ Test notification sent!');
-                } else if (Notification.permission === 'denied') {
-                    alert('❌ Notification permission denied. Please enable notifications in your browser settings.');
-                } else {
-                    alert('❌ Please enable notifications first by clicking "Enable Notifications"');
-                }
-            };
-        }
-    </script>
+    
 </body>
 </html> 
