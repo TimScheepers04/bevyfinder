@@ -6451,6 +6451,9 @@
                 <button class="btn secondary-btn" onclick="refreshFeed()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
+                <button class="btn secondary-btn" onclick="testCreateNightSharePost()" style="background: #ff6b6b;">
+                    <i class="fas fa-flask"></i> Test Night Share
+                </button>
             </div>
             
             <div class="feed-container" id="feed-container">
@@ -14093,7 +14096,8 @@
                                 hasUserId: !!post.userId,
                                 hasNightData: !!post.nightData,
                                 id: post._id || post.id,
-                                content: post.content ? post.content.substring(0, 50) + '...' : 'No content'
+                                content: post.content ? post.content.substring(0, 50) + '...' : 'No content',
+                                fullPost: post // Log the full post for debugging
                             });
                         });
                         
@@ -15020,6 +15024,71 @@
             // Remove the selection modal
             const modal = document.querySelector('.share-nights-modal');
             if (modal) modal.remove();
+        }
+
+        // Test function to create a night share post manually
+        async function testCreateNightSharePost() {
+            console.log('🧪 === TESTING NIGHT SHARE POST CREATION ===');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showNotification('Please sign in first', 'error');
+                return;
+            }
+            
+            const testPostData = {
+                type: 'night_share',
+                content: 'Test night share post with all stats',
+                privacy: 'friends',
+                nightData: {
+                    sessionDuration: 7200000, // 2 hours in ms
+                    totalDrinks: 5,
+                    totalStandards: 6.5,
+                    finalBAC: 0.085,
+                    totalCalories: 450,
+                    totalCarbs: 12.5,
+                    totalLiquid: 750,
+                    drinks: [
+                        { name: 'Corona Extra', time: new Date().toISOString(), standardDrinks: 1.2 },
+                        { name: 'Heineken', time: new Date().toISOString(), standardDrinks: 1.5 }
+                    ],
+                    sessionStart: new Date(Date.now() - 7200000).toISOString(),
+                    sessionEnd: new Date().toISOString()
+                }
+            };
+            
+            try {
+                console.log('📤 Sending test post data:', testPostData);
+                
+                const response = await fetch(`${API_BASE_URL}/social/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testPostData)
+                });
+                
+                console.log('📡 Test response status:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Test night share post created successfully!', result);
+                    showNotification('Test night share post created!', 'success');
+                    
+                    // Refresh feed to see the new post
+                    setTimeout(() => {
+                        loadSocialFeed();
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Test post creation failed:', error);
+                    showNotification('Test post creation failed: ' + (error.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('❌ Test post creation error:', error);
+                showNotification('Test post creation error: ' + error.message, 'error');
+            }
         }
 
         // Function to clear old posts
