@@ -15224,5 +15224,40 @@
     
     <!-- Load main JavaScript file -->
     <script src="script.js"></script>
+    
+    <!-- Fallback notification settings function -->
+    <script>
+        // Ensure showNotificationSettings is available
+        if (typeof showNotificationSettings === 'undefined') {
+            console.log('🔧 Creating fallback showNotificationSettings function');
+            window.showNotificationSettings = function() {
+                console.log('🔔 showNotificationSettings called (fallback)');
+                
+                // Close the profile dropdown first
+                const profileDropdown = document.getElementById('profile-dropdown');
+                if (profileDropdown) {
+                    console.log('✅ Closing profile dropdown');
+                    profileDropdown.style.display = 'none';
+                }
+                
+                // Show the notification settings in the profile modal
+                const notificationSettings = document.getElementById('notification-settings');
+                if (notificationSettings) {
+                    console.log('✅ Found notification settings, showing them');
+                    notificationSettings.style.display = 'block';
+                    
+                    // Show the profile modal if it's not already visible
+                    const profileModal = document.getElementById('profile-modal');
+                    if (profileModal) {
+                        console.log('✅ Showing profile modal');
+                        profileModal.style.display = 'flex';
+                    }
+                } else {
+                    console.log('❌ Notification settings element not found');
+                    alert('Notification settings not found');
+                }
+            };
+        }
+    </script>
 </body>
 </html> 
