@@ -15247,10 +15247,6 @@
                 if (notificationSettings) {
                                             console.log('✅ Found notification settings, showing them');
                         notificationSettings.style.display = 'block';
-                        notificationSettings.style.backgroundColor = 'red'; // Temporary debug
-                        notificationSettings.style.border = '3px solid yellow'; // Temporary debug
-                        notificationSettings.style.padding = '20px'; // Temporary debug
-                        notificationSettings.style.zIndex = '9999'; // Temporary debug
                     
                     // Show the profile modal if it's not already visible
                     const profileModal = document.getElementById('profile-modal');
@@ -15285,6 +15281,41 @@
                         console.log('  -', el.id);
                     });
                     alert('Notification settings element not found');
+                }
+            };
+        }
+        
+        // Add missing notification functions
+        if (typeof requestNotificationPermission === 'undefined') {
+            window.requestNotificationPermission = function() {
+                console.log('🔔 Requesting notification permission');
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === 'granted') {
+                            alert('✅ Notification permission granted!');
+                        } else {
+                            alert('❌ Notification permission denied');
+                        }
+                    });
+                } else {
+                    alert('❌ Notifications not supported in this browser');
+                }
+            };
+        }
+        
+        if (typeof sendTestNotification === 'undefined') {
+            window.sendTestNotification = function() {
+                console.log('🔔 Sending test notification');
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('BevyFinder Test', {
+                        body: 'This is a test notification from BevyFinder!',
+                        icon: '/favicon.ico'
+                    });
+                    alert('✅ Test notification sent!');
+                } else if (Notification.permission === 'denied') {
+                    alert('❌ Notification permission denied. Please enable notifications in your browser settings.');
+                } else {
+                    alert('❌ Please enable notifications first by clicking "Enable Notifications"');
                 }
             };
         }
