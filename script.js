@@ -892,24 +892,46 @@ function toggleNotificationSettings() {
 }
 
 function showNotificationSettings() {
+    console.log('🔔 showNotificationSettings called');
+    alert('Notification settings button clicked!'); // Temporary test
+    
     // Close the profile dropdown first
     const profileDropdown = document.getElementById('profile-dropdown');
     if (profileDropdown) {
+        console.log('✅ Closing profile dropdown');
         profileDropdown.style.display = 'none';
+    } else {
+        console.log('❌ Profile dropdown not found');
     }
     
     // Show the notification settings in the profile modal
     const notificationSettings = document.getElementById('notification-settings');
     if (notificationSettings) {
+        console.log('✅ Found notification settings, showing them');
         notificationSettings.style.display = 'block';
-        pushManager.updateNotificationSettings();
+        
+        // Try to update notification settings if pushManager exists
+        if (typeof pushManager !== 'undefined' && pushManager.updateNotificationSettings) {
+            try {
+                pushManager.updateNotificationSettings();
+                console.log('✅ Updated notification settings');
+            } catch (error) {
+                console.error('❌ Error updating notification settings:', error);
+            }
+        } else {
+            console.log('⚠️ pushManager not available');
+        }
         
         // Show the profile modal if it's not already visible
         const profileModal = document.getElementById('profile-modal');
         if (profileModal) {
+            console.log('✅ Showing profile modal');
             profileModal.style.display = 'flex';
+        } else {
+            console.log('❌ Profile modal not found');
         }
     } else {
+        console.log('❌ Notification settings element not found');
         showNotification('Notification settings not found', 'error');
     }
 }
