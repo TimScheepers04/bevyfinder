@@ -222,7 +222,7 @@ router.get('/search-users', protect, async (req, res) => {
 // Create post
 router.post('/posts', protect, async (req, res) => {
     try {
-        const { content, drinks, location, privacy, sessionStats } = req.body;
+        const { content, drinks, location, privacy, sessionStats, type } = req.body;
         
         if (!content) {
             return res.status(400).json({
@@ -234,6 +234,7 @@ router.post('/posts', protect, async (req, res) => {
         const post = new Post({
             user: req.user.id,
             content,
+            type: type || 'regular',
             drinks: drinks || [],
             location,
             privacy: privacy || 'friends',
