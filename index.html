@@ -14097,8 +14097,10 @@
                                 hasNightData: !!post.nightData,
                                 id: post._id || post.id,
                                 content: post.content ? post.content.substring(0, 50) + '...' : 'No content',
-                                fullPost: post // Log the full post for debugging
+                                sessionStatsKeys: post.sessionStats ? Object.keys(post.sessionStats) : 'No sessionStats',
+                                nightDataKeys: post.nightData ? Object.keys(post.nightData) : 'No nightData'
                             });
+                            console.log(`📝 Post ${index} FULL DATA:`, post);
                         });
                         
                         // Check if the posts are actually valid post objects
@@ -14107,9 +14109,15 @@
                         );
                         
                         // Separate night share posts from regular posts
-                        const nightSharePosts = validPosts.filter(post => 
-                            post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'))
-                        );
+                        console.log('🔍 === FILTERING POSTS ===');
+                        console.log('🔍 Valid posts before filtering:', validPosts.length);
+                        
+                        const nightSharePosts = validPosts.filter(post => {
+                            const isNightShare = post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'));
+                            console.log(`🔍 Post ${post._id}: type=${post.type}, hasSessionStats=${!!post.sessionStats}, isNightShare=${isNightShare}`);
+                            return isNightShare;
+                        });
+                        
                         const regularPosts = validPosts.filter(post => 
                             !nightSharePosts.includes(post)
                         );
@@ -14235,6 +14243,11 @@
                             hasSessionStats: !!post.sessionStats,
                             content: post.content ? post.content.substring(0, 30) + '...' : 'No content'
                         });
+                        
+                        console.log('🎨 === RENDERING DECISION ===');
+                        console.log('🎨 Post type:', post.type);
+                        console.log('🎨 Has sessionStats:', !!post.sessionStats);
+                        console.log('🎨 Content includes "Shared my night out":', post.content ? post.content.includes('Shared my night out') : false);
                         
                         if (post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'))) {
                             console.log('🌙 Rendering as night share post');
