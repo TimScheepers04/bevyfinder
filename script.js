@@ -1,6 +1,12 @@
 // Test if JavaScript is running
 console.log('Script.js loaded successfully!');
 
+// Test function to verify script loading
+window.testScriptLoaded = function() {
+    console.log('✅ Script.js is loaded and accessible!');
+    return true;
+};
+
 // API Base URL - Dynamic detection with fallback
 let API_BASE_URL;
 const PRODUCTION_API = 'https://bevyfinder.up.railway.app/api';
@@ -893,7 +899,6 @@ function toggleNotificationSettings() {
 
 function showNotificationSettings() {
     console.log('🔔 showNotificationSettings called');
-    alert('Notification settings button clicked!'); // Temporary test
     
     // Close the profile dropdown first
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -935,6 +940,9 @@ function showNotificationSettings() {
         showNotification('Notification settings not found', 'error');
     }
 }
+
+// Make function globally accessible
+window.showNotificationSettings = showNotificationSettings;
 
 function hideNotificationSettings() {
     const notificationSettings = document.getElementById('notification-settings');
