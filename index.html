@@ -1724,8 +1724,8 @@
 
         .night-share-stats {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -1798,12 +1798,25 @@
 
         @media (max-width: 768px) {
             .night-share-stats {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
 
             .night-share-stat {
-                padding: 10px;
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .night-share-stat i {
+                font-size: 1rem;
+            }
+            
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            
+            .stat-value {
+                font-size: 0.8rem;
             }
 
             .night-share-header {
@@ -14491,6 +14504,27 @@
                                     <div>
                                         <span class="stat-label">Final BAC</span>
                                         <span class="stat-value">${(nightData.finalBAC || 0).toFixed(3)}%</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-fire"></i>
+                                    <div>
+                                        <span class="stat-label">Calories</span>
+                                        <span class="stat-value">${(nightData.totalCalories || 0).toFixed(0)}</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-bread-slice"></i>
+                                    <div>
+                                        <span class="stat-label">Carbs</span>
+                                        <span class="stat-value">${(nightData.totalCarbs || 0).toFixed(1)}g</span>
+                                    </div>
+                                </div>
+                                <div class="night-share-stat">
+                                    <i class="fas fa-tint"></i>
+                                    <div>
+                                        <span class="stat-label">Liquid</span>
+                                        <span class="stat-value">${(nightData.totalLiquid || 0)}ml</span>
                                     </div>
                                 </div>
                             </div>
