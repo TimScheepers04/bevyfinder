@@ -13,7 +13,7 @@ const vapidKeys = {
 };
 
 webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:test@example.com',
+    process.env.VAPID_EMAIL || 'mailto:admin@bevyfinder.com',
     vapidKeys.publicKey,
     vapidKeys.privateKey
 );
