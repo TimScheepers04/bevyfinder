@@ -33,10 +33,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/health', (req, res) => {
     res.json({
         success: true,
-        message: 'BevyFinder API is running',
+        message: 'BevyFinder API is running - UPDATED WITH NEW ROUTES',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        version: '2.0.0-with-notifications'
     });
 });
 
