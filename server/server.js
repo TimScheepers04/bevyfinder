@@ -19,6 +19,7 @@ const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
 const socialRoutes = require('./routes/social');
 const trackingRoutes = require('./routes/tracking');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize express app
 const app = express();
@@ -152,6 +153,7 @@ app.use('/api/favorites', favoritesRoutes);
 app.use('/api/likes', likesRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/tracking', trackingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
