@@ -6,17 +6,31 @@ const { body, validationResult } = require('express-validator');
 const webpush = require('web-push');
 require('dotenv').config();
 
-// Configure web-push
-const vapidKeys = {
-    publicKey: process.env.VAPID_PUBLIC_KEY || 'test-public-key',
-    privateKey: process.env.VAPID_PRIVATE_KEY || 'test-private-key'
-};
+// Configure web-push only if VAPID keys are provided
+let vapidKeys = null;
+let webpushConfigured = false;
 
-webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:admin@bevyfinder.com',
-    vapidKeys.publicKey,
-    vapidKeys.privateKey
-);
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    vapidKeys = {
+        publicKey: process.env.VAPID_PUBLIC_KEY,
+        privateKey: process.env.VAPID_PRIVATE_KEY
+    };
+    
+    try {
+        webpush.setVapidDetails(
+            process.env.VAPID_EMAIL || 'mailto:admin@bevyfinder.com',
+            vapidKeys.publicKey,
+            vapidKeys.privateKey
+        );
+        webpushConfigured = true;
+        console.log('✅ Web-push configured with VAPID keys');
+    } catch (error) {
+        console.log('⚠️ VAPID keys invalid, using fallback mode:', error.message);
+        webpushConfigured = false;
+    }
+} else {
+    console.log('⚠️ No VAPID keys provided, push notifications disabled');
+}
 
 const User = require('./models/User');
 
@@ -73,7 +87,8 @@ app.get('/api/test', (req, res) => {
 app.get('/api/notifications/vapid-public-key', (req, res) => {
     res.json({
         success: true,
-        publicKey: vapidKeys.publicKey
+        publicKey: vapidKeys ? vapidKeys.publicKey : 'no-vapid-key-configured',
+        configured: webpushConfigured
     });
 });
 
@@ -86,6 +101,13 @@ app.post('/api/notifications/subscribe', authenticateToken, [
             return res.status(400).json({
                 success: false,
                 message: 'Invalid subscription data'
+            });
+        }
+
+        if (!webpushConfigured) {
+            return res.status(503).json({
+                success: false,
+                message: 'Push notifications not configured - VAPID keys missing'
             });
         }
 
