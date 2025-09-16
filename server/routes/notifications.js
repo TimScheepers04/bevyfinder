@@ -310,4 +310,168 @@ router.post('/session-update', [
     }
 });
 
+// @route   POST /api/notifications/friend-drink-update
+// @desc    Send notification to friends when user adds a drink
+// @access  Private
+router.post('/friend-drink-update', [
+    protect,
+    body('drinkName').notEmpty().withMessage('Drink name is required'),
+    body('drinkSize').optional().isString().withMessage('Drink size must be a string'),
+    body('sessionStats').isObject().withMessage('Session stats are required')
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error',
+                errors: errors.array()
+            });
+        }
+
+        const { drinkName, drinkSize, sessionStats } = req.body;
+        const userId = req.user.id;
+
+        // Get current user info
+        const currentUser = await User.findById(userId);
+        if (!currentUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Get user's friends who have friend notifications enabled
+        const friends = await User.find({
+            _id: { $in: currentUser.friends || [] },
+            'notificationSettings.friendDrinkUpdates': true,
+            pushSubscription: { $exists: true, $ne: null }
+        });
+
+        if (friends.length === 0) {
+            return res.json({
+                success: true,
+                message: 'No friends with notifications enabled',
+                notificationsSent: 0
+            });
+        }
+
+        // Prepare notification content
+        const sizeInfo = drinkSize ? ` (${drinkSize})` : '';
+        const title = `${currentUser.username} added a drink!`;
+        const body = `Just added ${drinkName}${sizeInfo} to their night (${sessionStats.totalDrinks} drinks total)`;
+
+        // Send notifications to all friends
+        const notificationPromises = friends.map(async (friend) => {
+            try {
+                const payload = JSON.stringify({
+                    title,
+                    body,
+                    icon: '/icon-192x192.png',
+                    badge: '/icon-72x72.png',
+                    data: {
+                        url: '/social-feed-page',
+                        type: 'friend_drink_update',
+                        userId: userId,
+                        drinkName,
+                        drinkSize,
+                        sessionStats
+                    }
+                });
+
+                await webpush.sendNotification(friend.pushSubscription, payload);
+                return { success: true, friendId: friend._id };
+            } catch (error) {
+                console.error(`Failed to send notification to friend ${friend._id}:`, error);
+                return { success: false, friendId: friend._id, error: error.message };
+            }
+        });
+
+        const results = await Promise.all(notificationPromises);
+        const successCount = results.filter(r => r.success).length;
+
+        res.json({
+            success: true,
+            message: `Friend notifications sent`,
+            notificationsSent: successCount,
+            totalFriends: friends.length,
+            results: results
+        });
+
+    } catch (error) {
+        console.error('Friend drink update notification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send friend notifications'
+        });
+    }
+});
+
+// @route   POST /api/notifications/settings
+// @desc    Update user notification settings
+// @access  Private
+router.post('/settings', [
+    protect,
+    body('friendDrinkUpdates').optional().isBoolean().withMessage('Friend drink updates must be a boolean'),
+    body('safetyReminders').optional().isBoolean().withMessage('Safety reminders must be a boolean'),
+    body('sessionUpdates').optional().isBoolean().withMessage('Session updates must be a boolean'),
+    body('generalNotifications').optional().isBoolean().withMessage('General notifications must be a boolean')
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error',
+                errors: errors.array()
+            });
+        }
+
+        const userId = req.user.id;
+        const updateData = {};
+
+        // Only update provided settings
+        if (req.body.friendDrinkUpdates !== undefined) {
+            updateData['notificationSettings.friendDrinkUpdates'] = req.body.friendDrinkUpdates;
+        }
+        if (req.body.safetyReminders !== undefined) {
+            updateData['notificationSettings.safetyReminders'] = req.body.safetyReminders;
+        }
+        if (req.body.sessionUpdates !== undefined) {
+            updateData['notificationSettings.sessionUpdates'] = req.body.sessionUpdates;
+        }
+        if (req.body.generalNotifications !== undefined) {
+            updateData['notificationSettings.generalNotifications'] = req.body.generalNotifications;
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No valid notification settings provided'
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Notification settings updated successfully',
+            settings: user.notificationSettings
+        });
+
+    } catch (error) {
+        console.error('Notification settings update error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update notification settings'
+        });
+    }
+});
+
 module.exports = router;

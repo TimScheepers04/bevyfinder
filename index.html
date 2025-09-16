@@ -1659,6 +1659,17 @@
         .night-share-post {
             border: 2px solid rgba(102, 126, 234, 0.3);
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+            animation: nightShareGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes nightShareGlow {
+            0% {
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+            }
+            100% {
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+            }
         }
 
         .night-share-avatar {
@@ -1710,11 +1721,13 @@
 
         .night-share-header h3 {
             color: #ffd700;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            font-weight: 700;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .night-share-date {
@@ -1724,8 +1737,8 @@
 
         .night-share-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin-bottom: 20px;
         }
 
@@ -1733,10 +1746,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .night-share-stat:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
         }
 
         .night-share-stat i {
@@ -1759,8 +1780,9 @@
 
         .stat-value {
             color: white;
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .night-share-drinks {
@@ -3399,6 +3421,122 @@
         .drink-suggestion-details {
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.85rem;
+        }
+
+        .drink-suggestion-sizes {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .size-option {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .size-option:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Size Selection Modal */
+        .size-selection-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        }
+
+        .size-selection-content {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .size-selection-content h3 {
+            color: #ffd700;
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 1.4rem;
+        }
+
+        .size-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .size-selection-btn {
+            background: linear-gradient(135deg, #333, #444);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .size-selection-btn:hover {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .size-selection-btn .size-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .size-selection-btn .size-volume {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .size-selection-btn .size-standards {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .no-suggestions {
@@ -5851,6 +5989,17 @@
                     </label>
                 </div>
                 
+                <div class="notification-option">
+                    <div>
+                        <div class="notification-option-label">Friend Drink Updates</div>
+                        <div class="notification-option-description">Get notified when your friends add drinks to their night tracker</div>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" id="friend-drink-notifications" checked onchange="updateFriendNotificationSetting(this.checked)">
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
                 <div class="notification-actions">
                     <button type="button" class="notification-btn" onclick="requestNotificationPermission()">
                         <i class="fas fa-bell"></i> Enable Notifications
@@ -6230,22 +6379,22 @@
                 <div class="quick-add-section">
                     <h4><i class="fas fa-bolt"></i> Quick Add Popular Drinks</h4>
                     <div class="quick-add-buttons">
-                        <button class="quick-add-btn" onclick="addDrink('heineken')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('heineken')">
                             <i class="fas fa-beer"></i> Heineken
                         </button>
-                        <button class="quick-add-btn" onclick="addDrink('corona')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('corona')">
                             <i class="fas fa-beer"></i> Corona
                         </button>
-                        <button class="quick-add-btn" onclick="addDrink('red_wine_13_5')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('red_wine_13_5')">
                             <i class="fas fa-wine-glass"></i> Red Wine
                         </button>
-                        <button class="quick-add-btn" onclick="addDrink('white_wine_12_5')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('white_wine_12_5')">
                             <i class="fas fa-wine-glass"></i> White Wine
                         </button>
-                        <button class="quick-add-btn" onclick="addDrink('vodka')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('vodka')">
                             <i class="fas fa-cocktail"></i> Vodka
                         </button>
-                        <button class="quick-add-btn" onclick="addDrink('gin')">
+                        <button class="quick-add-btn" onclick="showDrinkSizeSelection('gin')">
                             <i class="fas fa-cocktail"></i> Gin
                         </button>
                     </div>
@@ -6453,6 +6602,9 @@
                 </button>
                 <button class="btn secondary-btn" onclick="testCreateNightSharePost()" style="background: #ff6b6b;">
                     <i class="fas fa-flask"></i> Test Night Share
+                </button>
+                <button class="btn secondary-btn" onclick="debugFeedData()" style="background: #4ecdc4;">
+                    <i class="fas fa-bug"></i> Debug Feed
                 </button>
             </div>
             
@@ -8808,25 +8960,6 @@
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Experimental', 'Australian', 'Limited Edition', 'Innovative']
             },
-            'little_creatures_pale_ale': {
-                name: 'Little Creatures Pale Ale (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Pale Ale',
-                abv: '5.2%',
-                standardDrinks: '1.1',
-                ingredients: ['Malted barley', 'Cascade hops', 'Citra hops', 'Water', 'Yeast'],
-                description: 'A well-balanced pale ale with fruity and citrus notes. Features prominent grapefruit and orange notes from Cascade and Citra hops, balanced by caramel malt sweetness. Medium-bodied with bright carbonation and a crisp, refreshing mouthfeel. The hop bitterness is assertive but well-balanced, creating a complex and satisfying drinking experience. One 330ml bottle contains 1.1 standard drinks.',
-                nutrition: {
-                    calories: 135,
-                    carbs: 12.8,
-                    protein: 1.2,
-                    fat: 0,
-                    sugar: 0.6,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Pale Ale', 'Australian', 'Fruity', 'Citrus']
-            },
             'little_creatures_rogers': {
                 name: 'Little Creatures Rogers (330ml)',
                 type: 'Beer',
@@ -8883,25 +9016,6 @@
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'IPA', 'Australian', 'Hop-forward', 'Tropical']
-            },
-            'little_creatures_dog_days': {
-                name: 'Little Creatures Dog Days (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Summer Ale',
-                abv: '4.2%',
-                standardDrinks: '0.9',
-                ingredients: ['Malted barley', 'Wheat malt', 'Citrus hops', 'Water', 'Yeast'],
-                description: 'A summer ale with light, refreshing citrus notes. Features bright notes of lemon, lime, and orange from citrus hops, with a smooth wheat malt backbone. Light-bodied with bright carbonation and a smooth, thirst-quenching mouthfeel. The finish is clean and refreshing, perfect for hot summer days and casual drinking. One 330ml bottle contains 0.9 standard drinks.',
-                nutrition: {
-                    calories: 115,
-                    carbs: 10.7,
-                    protein: 1.1,
-                    fat: 0,
-                    sugar: 0.4,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Summer Ale', 'Australian', 'Refreshing', 'Citrus']
             },
             'little_creatures_pilsner': {
                 name: 'Little Creatures Pilsner (330ml)',
@@ -9320,25 +9434,6 @@
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Amber Ale', 'Australian', 'Malt-forward', 'Caramel']
-            },
-            'beer_farm_saison': {
-                name: 'Beer Farm Saison (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Saison',
-                abv: '6.0%',
-                standardDrinks: '1.2',
-                ingredients: ['Malted barley', 'Wheat malt', 'Saison yeast', 'Spices', 'Water'],
-                description: 'A farmhouse ale with peppery spice and fruity esters. Features notes of peppery spice, fruity esters, and a touch of funk from saison yeast. Medium-bodied with bright carbonation and a smooth, complex mouthfeel. The finish is dry and slightly spicy, with lingering notes of pepper and fruit. One 330ml bottle contains 1.2 standard drinks.',
-                nutrition: {
-                    calories: 150,
-                    carbs: 14.3,
-                    protein: 1.4,
-                    fat: 0,
-                    sugar: 0.7,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Saison', 'Australian', 'Farmhouse', 'Spicy']
             },
             'beer_farm_lager': {
                 name: 'Beer Farm Lager (330ml)',
@@ -9816,25 +9911,6 @@
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Pale Ale', 'Australian', 'Tropical', 'Galaxy Hops']
             },
-            'stone_wood_garden_ale': {
-                name: 'Stone & Wood Garden Ale (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Session Ale',
-                abv: '3.8%',
-                standardDrinks: '0.8',
-                ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-                description: 'A sessionable ale with bright citrus and tropical fruit flavors. Features notes of Citra and Mosaic hops, with a balanced malt backbone. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, perfect for extended drinking sessions. One 330ml bottle contains 0.8 standard drinks.',
-                nutrition: {
-                    calories: 105,
-                    carbs: 9.9,
-                    protein: 1.0,
-                    fat: 0,
-                    sugar: 0.4,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Session Ale', 'Australian', 'Citrus', 'Tropical']
-            },
             'stone_wood_cloud_catcher': {
                 name: 'Stone & Wood Cloud Catcher (330ml)',
                 type: 'Beer',
@@ -10248,25 +10324,6 @@
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Pale Ale', 'Australian', 'Refreshing', 'Citrus']
             },
-            'james_squire_ipa': {
-                name: 'James Squire IPA (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian IPA',
-                abv: '5.6%',
-                standardDrinks: '1.5',
-                ingredients: ['Malted barley', 'Citra hops', 'Mosaic hops', 'Water', 'Yeast'],
-                description: 'A hop-forward IPA with citrus and tropical fruit flavors. Features intense notes of grapefruit, pine, and tropical fruit from Citra and Mosaic hops. Medium-bodied with bright carbonation and a smooth, hoppy mouthfeel. The finish is clean and bitter, with lingering citrus and pine hop notes. One 330ml bottle contains 1.5 standard drinks.',
-                nutrition: {
-                    calories: 165,
-                    carbs: 15.2,
-                    protein: 1.5,
-                    fat: 0,
-                    sugar: 0.7,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'IPA', 'Australian', 'Hop-forward', 'Citrus']
-            },
             'james_squire_porter': {
                 name: 'James Squire Porter (330ml)',
                 type: 'Beer',
@@ -10464,25 +10521,6 @@
                 },
                 image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
                 tags: ['Beer', 'Pale Ale', 'Australian', 'Refreshing', 'Tropical']
-            },
-            'stone_wood_garden_ale': {
-                name: 'Stone & Wood Garden Ale (330ml)',
-                type: 'Beer',
-                alcohol: 'Australian Session Ale',
-                abv: '3.8%',
-                standardDrinks: '1.0',
-                ingredients: ['Malted barley', 'Galaxy hops', 'Water', 'Yeast'],
-                description: 'A sessionable ale with citrus and tropical fruit flavors. Features notes of passionfruit, citrus, and pale malt from Galaxy hops. Light-bodied with bright carbonation and a smooth, refreshing mouthfeel. The finish is clean and slightly bitter, perfect for extended drinking sessions. One 330ml bottle contains 1.0 standard drinks.',
-                nutrition: {
-                    calories: 115,
-                    carbs: 10.5,
-                    protein: 1.0,
-                    fat: 0,
-                    sugar: 0.4,
-                    servingSize: '330ml'
-                },
-                image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-                tags: ['Beer', 'Session Ale', 'Australian', 'Sessionable', 'Citrus']
             },
             'stone_wood_lager': {
                 name: 'Stone & Wood Lager (330ml)',
@@ -11323,7 +11361,7 @@
             console.log('Session reset');
         }
 
-        function addDrink(drinkType) {
+        function addDrink(drinkType, size = 'can-bottle') {
             if (!consentAccepted) {
                 showNotification('Please accept the terms and conditions first.', 'error');
                 showConsentModal();
@@ -11337,26 +11375,142 @@
 
             const drink = drinkDatabase[drinkType];
             if (drink) {
+                const servingSizes = getDrinkServingSizes(drink);
+                const selectedSize = servingSizes[size] || servingSizes['can-bottle'];
+                const multiplier = selectedSize.multiplier;
+                
+                // Calculate adjusted values based on size
+                const adjustedStandardDrinks = (parseFloat(drink.standardDrinks) * multiplier).toFixed(2);
+                const adjustedCalories = Math.round(drink.nutrition.calories * multiplier);
+                const adjustedCarbs = Math.round(drink.nutrition.carbs * multiplier);
+                const adjustedSugar = Math.round(drink.nutrition.sugar * multiplier);
+                const adjustedProtein = Math.round(drink.nutrition.protein * multiplier);
+                
                 const drinkEntry = {
                     ...drink,
                     time: new Date(),
-                    id: Date.now()
+                    id: Date.now(),
+                    selectedSize: size,
+                    sizeName: selectedSize.name,
+                    sizeVolume: selectedSize.volume,
+                    adjustedNutrition: {
+                        calories: adjustedCalories,
+                        carbs: adjustedCarbs,
+                        sugar: adjustedSugar,
+                        protein: adjustedProtein
+                    },
+                    adjustedStandardDrinks: adjustedStandardDrinks
                 };
                 
                 drinks.push(drinkEntry);
-                totalAlcohol += parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
-                totalCalories += drink.nutrition.calories;
-                totalStandards += parseFloat(drink.standardDrinks);
-                totalCarbs += drink.nutrition.carbs;
-                totalSugar += drink.nutrition.sugar;
-                totalProtein += drink.nutrition.protein;
+                totalAlcohol += parseFloat(adjustedStandardDrinks) * 10; // Convert to grams of alcohol
+                totalCalories += adjustedCalories;
+                totalStandards += parseFloat(adjustedStandardDrinks);
+                totalCarbs += adjustedCarbs;
+                totalSugar += adjustedSugar;
+                totalProtein += adjustedProtein;
                 
                 updateDisplay();
                 updateDrinkList();
-                console.log('Drink added:', drink.name);
+                console.log('Drink added:', drink.name, 'Size:', selectedSize.name);
                 
                 // Send live update to social feed
-                sendLiveDrinkUpdate(drink);
+                sendLiveDrinkUpdate(drinkEntry);
+            }
+        }
+
+        function addDrinkWithSize(drinkType, size) {
+            addDrink(drinkType, size);
+            // Clear the search input and suggestions
+            document.getElementById('drink-search').value = '';
+            document.getElementById('drink-suggestions').innerHTML = '';
+            document.getElementById('add-drink-btn').disabled = true;
+            showNotification(`Added ${drinkDatabase[drinkType].name} (${getDrinkServingSizes(drinkDatabase[drinkType])[size].name})`, 'success');
+        }
+
+        function getDrinkServingSizes(drink) {
+            // Default serving sizes if not defined in drink
+            const defaultSizes = {
+                'schooner': { name: 'Schooner', volume: 425, multiplier: 1.29 },
+                'pint': { name: 'Pint', volume: 570, multiplier: 1.73 },
+                'can-bottle': { name: 'Can/Bottle', volume: 330, multiplier: 1.0 },
+                'jug': { name: 'Jug', volume: 1140, multiplier: 3.45 }
+            };
+            
+            return drink.servingSizes || defaultSizes;
+        }
+
+        function showDrinkSizeSelection(drinkKey) {
+            const drink = drinkDatabase[drinkKey];
+            const servingSizes = getDrinkServingSizes(drink);
+            
+            // Create size selection modal or dropdown
+            const sizeOptions = Object.entries(servingSizes).map(([key, size]) => 
+                `<button class="size-selection-btn" onclick="addDrinkWithSize('${drinkKey}', '${key}')">
+                    <span class="size-name">${size.name}</span>
+                    <span class="size-volume">${size.volume}ml</span>
+                    <span class="size-standards">${(parseFloat(drink.standardDrinks) * size.multiplier).toFixed(2)} standards</span>
+                </button>`
+            ).join('');
+            
+            const modalHtml = `
+                <div class="size-selection-modal" id="size-selection-modal">
+                    <div class="size-selection-content">
+                        <h3>Select Size for ${drink.name}</h3>
+                        <div class="size-options">
+                            ${sizeOptions}
+                        </div>
+                        <button class="cancel-btn" onclick="closeSizeSelection()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Clear search
+            document.getElementById('drink-search').value = '';
+            document.getElementById('drink-suggestions').innerHTML = '';
+            document.getElementById('add-drink-btn').disabled = true;
+        }
+
+        function closeSizeSelection() {
+            const modal = document.getElementById('size-selection-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Update friend notification setting
+        async function updateFriendNotificationSetting(enabled) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showNotification('Please log in to update notification settings', 'error');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/notifications/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        friendDrinkUpdates: enabled
+                    })
+                });
+
+                if (response.ok) {
+                    const message = enabled ? 'Friend drink notifications enabled' : 'Friend drink notifications disabled';
+                    showNotification(message, 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Failed to update notification settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating friend notification setting:', error);
+                showNotification('Failed to update notification settings', 'error');
             }
         }
 
@@ -11364,17 +11518,22 @@
             const drinkIndex = drinks.findIndex(d => d.id === drinkId);
             if (drinkIndex !== -1) {
                 const drink = drinks[drinkIndex];
-                totalAlcohol -= parseFloat(drink.standardDrinks) * 10; // Convert to grams of alcohol
-                totalCalories -= drink.nutrition.calories;
-                totalStandards -= parseFloat(drink.standardDrinks);
-                totalCarbs -= drink.nutrition.carbs;
-                totalSugar -= drink.nutrition.sugar;
-                totalProtein -= drink.nutrition.protein;
+                
+                // Use adjusted values if available, otherwise use original values
+                const standardDrinks = drink.adjustedStandardDrinks || drink.standardDrinks;
+                const nutrition = drink.adjustedNutrition || drink.nutrition;
+                
+                totalAlcohol -= parseFloat(standardDrinks) * 10; // Convert to grams of alcohol
+                totalCalories -= nutrition.calories;
+                totalStandards -= parseFloat(standardDrinks);
+                totalCarbs -= nutrition.carbs;
+                totalSugar -= nutrition.sugar;
+                totalProtein -= nutrition.protein;
                 
                 drinks.splice(drinkIndex, 1);
                 updateDisplay();
                 updateDrinkList();
-                console.log('Drink removed');
+                console.log('Drink removed:', drink.name, drink.sizeName ? `(${drink.sizeName})` : '');
             }
         }
 
@@ -11454,14 +11613,17 @@
                 };
 
                 // Create live update post
+                const sizeInfo = drink.sizeName ? ` (${drink.sizeName})` : '';
                 const liveUpdateData = {
                     type: 'drink_session',
-                    content: `🍺 Live Update: Just added ${drink.name} to my night! (${drinks.length} drinks total)`,
+                    content: `🍺 Live Update: Just added ${drink.name}${sizeInfo} to my night! (${drinks.length} drinks total)`,
                     privacy: liveUpdatePrivacy, // Use user's privacy setting
                     sessionStats: sessionStats,
                     drinks: [{
                         drinkKey: drink.key || drink.name.toLowerCase().replace(/\s+/g, '_'),
                         drinkName: drink.name,
+                        size: drink.sizeName || 'Can/Bottle',
+                        sizeVolume: drink.sizeVolume || 330,
                         quantity: 1
                     }],
                     isLiveUpdate: true,
@@ -11483,8 +11645,12 @@
                     const result = await response.json();
                     console.log('✅ Live drink update sent successfully:', result);
                     
+                    // Send friend notifications
+                    await sendFriendNotifications(drink, sessionStats);
+                    
                     // Show a subtle notification
-                    showNotification(`🍺 ${drink.name} added to your night!`, 'success');
+                    const notificationSizeInfo = drink.sizeName ? ` (${drink.sizeName})` : '';
+                    showNotification(`🍺 ${drink.name}${notificationSizeInfo} added to your night!`, 'success');
                     
                     // Refresh social feed if it's currently open
                     if (document.getElementById('social-feed-page') && 
@@ -11500,6 +11666,44 @@
                 }
             } catch (error) {
                 console.error('❌ Error sending live drink update:', error);
+            }
+        }
+
+        // Send notifications to friends when a drink is added
+        async function sendFriendNotifications(drink, sessionStats) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.log('User not logged in, skipping friend notifications');
+                    return;
+                }
+
+                const friendNotificationData = {
+                    drinkName: drink.name,
+                    drinkSize: drink.sizeName || null,
+                    sessionStats: sessionStats
+                };
+
+                console.log('📱 Sending friend notifications:', friendNotificationData);
+
+                const response = await fetch(`${API_BASE_URL}/notifications/friend-drink-update`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(friendNotificationData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Friend notifications sent successfully:', result);
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Error sending friend notifications:', error);
+                }
+            } catch (error) {
+                console.error('❌ Error sending friend notifications:', error);
             }
         }
 
@@ -11678,20 +11882,27 @@
                     </div>
                 `;
             } else {
-                drinkList.innerHTML = drinks.map(drink => `
-                    <div class="drink-item">
-                        <div class="drink-info">
-                            <div class="drink-name">${drink.name}</div>
-                            <div class="drink-details">
-                                ${drink.abv} ABV • ${drink.nutrition.calories} kcal • ${drink.standardDrinks} standards
+                drinkList.innerHTML = drinks.map(drink => {
+                    // Use adjusted values if available, otherwise use original values
+                    const standardDrinks = drink.adjustedStandardDrinks || drink.standardDrinks;
+                    const nutrition = drink.adjustedNutrition || drink.nutrition;
+                    const sizeInfo = drink.sizeName ? ` • ${drink.sizeName} (${drink.sizeVolume}ml)` : '';
+                    
+                    return `
+                        <div class="drink-item">
+                            <div class="drink-info">
+                                <div class="drink-name">${drink.name}${sizeInfo}</div>
+                                <div class="drink-details">
+                                    ${drink.abv} ABV • ${nutrition.calories} kcal • ${standardDrinks} standards
+                                </div>
+                                <div class="drink-time">${drink.time.toLocaleTimeString()}</div>
                             </div>
-                            <div class="drink-time">${drink.time.toLocaleTimeString()}</div>
+                            <button class="drink-remove" onclick="removeDrink(${drink.id})">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <button class="drink-remove" onclick="removeDrink(${drink.id})">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
@@ -11710,17 +11921,26 @@
             );
             
             if (matchingDrinks.length > 0) {
-                suggestions.innerHTML = matchingDrinks.slice(0, 8).map(key => `
-                    <div class="drink-suggestion" onclick="selectDrink('${key}')">
-                        <div class="drink-suggestion-icon">
-                            <i class="fas fa-glass-whiskey"></i>
+                suggestions.innerHTML = matchingDrinks.slice(0, 8).map(key => {
+                    const drink = drinkDatabase[key];
+                    const servingSizes = getDrinkServingSizes(drink);
+                    return `
+                        <div class="drink-suggestion" onclick="showDrinkSizeSelection('${key}')">
+                            <div class="drink-suggestion-icon">
+                                <i class="fas fa-glass-whiskey"></i>
+                            </div>
+                            <div class="drink-suggestion-content">
+                                <div class="drink-suggestion-name">${drink.name}</div>
+                                <div class="drink-suggestion-details">${drink.abv} • ${drink.standardDrinks} standards</div>
+                                <div class="drink-suggestion-sizes">
+                                    ${Object.keys(servingSizes).map(sizeKey => 
+                                        `<span class="size-option" onclick="event.stopPropagation(); addDrinkWithSize('${key}', '${sizeKey}')">${servingSizes[sizeKey].name}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
                         </div>
-                        <div class="drink-suggestion-content">
-                            <div class="drink-suggestion-name">${drinkDatabase[key].name}</div>
-                            <div class="drink-suggestion-details">${drinkDatabase[key].abv} • ${drinkDatabase[key].standardDrinks} standards</div>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 addDrinkBtn.disabled = false;
             } else {
                 suggestions.innerHTML = '<div class="no-suggestions">No drinks found. Try a different search term.</div>';
@@ -11880,18 +12100,23 @@
                         <div class="summary-drinks">
                             <h3><i class="fas fa-list"></i> Drinks Consumed</h3>
                             <div class="drinks-list">
-                                ${drinks.map(drink => `
-                                    <div class="summary-drink-item">
-                                        <div class="drink-info">
-                                            <span class="drink-name">${drink.name}</span>
-                                            <span class="drink-time">${drink.time.toLocaleTimeString()}</span>
+                                ${drinks.map(drink => {
+                                    const sizeInfo = drink.sizeName ? ` (${drink.sizeName})` : '';
+                                    const nutrition = drink.adjustedNutrition || drink.nutrition;
+                                    const standardDrinks = drink.adjustedStandardDrinks || drink.standardDrinks;
+                                    return `
+                                        <div class="summary-drink-item">
+                                            <div class="drink-info">
+                                                <span class="drink-name">${drink.name}${sizeInfo}</span>
+                                                <span class="drink-time">${drink.time.toLocaleTimeString()}</span>
+                                            </div>
+                                            <div class="drink-stats">
+                                                <span class="drink-alcohol">${standardDrinks} standards</span>
+                                                <span class="drink-calories">${nutrition.calories} kcal</span>
+                                            </div>
                                         </div>
-                                        <div class="drink-stats">
-                                            <span class="drink-alcohol">${drink.alcohol}g</span>
-                                            <span class="drink-calories">${drink.calories} kcal</span>
-                                        </div>
-                                    </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                         
@@ -12102,12 +12327,15 @@
                         <div class="saved-night-drinks">
                             <h4>Drinks Consumed</h4>
                             <div class="saved-drinks-list">
-                                ${sessionData.drinks.map(drink => `
-                                    <div class="saved-drink-item">
-                                        <span class="saved-drink-name">${drink.name}</span>
-                                        <span class="saved-drink-time">${new Date(drink.time).toLocaleTimeString()}</span>
-                                    </div>
-                                `).join('')}
+                                ${sessionData.drinks.map(drink => {
+                                    const sizeInfo = drink.sizeName ? ` (${drink.sizeName})` : '';
+                                    return `
+                                        <div class="saved-drink-item">
+                                            <span class="saved-drink-name">${drink.name}${sizeInfo}</span>
+                                            <span class="saved-drink-time">${new Date(drink.time).toLocaleTimeString()}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                         
@@ -13916,7 +14144,7 @@
             `;
         }
 
-        function addDrinkToNightTracker(drinkKey) {
+        function addDrinkToNightTracker(drinkKey, size = 'can-bottle') {
             // Check if Night Tracker session is active
             if (!sessionActive) {
                 alert('Please start a Night Tracker session first!');
@@ -13924,8 +14152,11 @@
                 return;
             }
 
-            addDrink(drinkKey);
-            alert('Drink added to Night Tracker!');
+            addDrink(drinkKey, size);
+            const drink = drinkDatabase[drinkKey];
+            const servingSizes = getDrinkServingSizes(drink);
+            const sizeName = servingSizes[size] ? servingSizes[size].name : 'Can/Bottle';
+            showNotification(`Added ${drink.name} (${sizeName}) to Night Tracker!`, 'success');
             showPage('tracking-page');
         }
 
@@ -14113,7 +14344,10 @@
                         console.log('🔍 Valid posts before filtering:', validPosts.length);
                         
                         const nightSharePosts = validPosts.filter(post => {
-                            const isNightShare = post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'));
+                            // Consider any post with sessionStats as a night share post
+                            const isNightShare = post.type === 'night_share' || 
+                                                (post.sessionStats && post.sessionStats.totalDrinks > 0) ||
+                                                (post.sessionStats && post.content && post.content.includes('Shared my night out'));
                             console.log(`🔍 Post ${post._id}: type=${post.type}, hasSessionStats=${!!post.sessionStats}, isNightShare=${isNightShare}`);
                             return isNightShare;
                         });
@@ -14249,7 +14483,15 @@
                         console.log('🎨 Has sessionStats:', !!post.sessionStats);
                         console.log('🎨 Content includes "Shared my night out":', post.content ? post.content.includes('Shared my night out') : false);
                         
-                        if (post.type === 'night_share' || (post.sessionStats && post.content && post.content.includes('Shared my night out'))) {
+                        // Check if this should be rendered as a night share post
+                        const shouldRenderAsNightShare = post.type === 'night_share' || 
+                                                       (post.sessionStats && post.sessionStats.totalDrinks > 0) ||
+                                                       (post.sessionStats && post.content && post.content.includes('Shared my night out'));
+                        
+                        console.log('🎨 Should render as night share:', shouldRenderAsNightShare);
+                        console.log('🎨 Post sessionStats:', post.sessionStats);
+                        
+                        if (shouldRenderAsNightShare) {
                             console.log('🌙 Rendering as night share post');
                             return renderNightSharePost(post);
                         } else if (post.type === 'drink_session') {
@@ -14375,10 +14617,7 @@
 
         function renderNightSharePost(post) {
             // Debug: Log the actual post structure
-            console.log('🌙 === RENDERING NIGHT SHARE POST ===');
-            console.log('📊 Post data:', post);
-            console.log('🌙 Night data (nightData):', post.nightData);
-            console.log('🌙 Session stats (sessionStats):', post.sessionStats);
+
             
             // More flexible validation - check for different possible user structures
             let userName = 'Unknown User';
@@ -14414,14 +14653,9 @@
                 const hasNightData = post.sessionDuration || post.totalDrinks || post.totalStandards || post.finalBAC;
                 if (hasNightData) {
                     nightData = post;
-                    console.log('🌙 Using post as nightData (direct properties)');
                 }
             }
-            console.log('🌙 Using night data:', nightData);
-            console.log('🌙 Full post structure:', JSON.stringify(post, null, 2));
-            console.log('🌙 Available properties:', Object.keys(post));
-            console.log('🌙 nightData properties:', nightData ? Object.keys(nightData) : 'No nightData');
-            console.log('🌙 sessionStats properties:', post.sessionStats ? Object.keys(post.sessionStats) : 'No sessionStats');
+
             
             if (!nightData) {
                 console.warn('⚠️ No night data in post:', post);
@@ -14430,7 +14664,6 @@
                     <div class="post error-post">
                         <div class="post-content">
                             <p><i class="fas fa-exclamation-triangle"></i> Missing night session data</p>
-                            <small style="color: rgba(255,255,255,0.6);">Debug: ${JSON.stringify(post).substring(0, 200)}...</small>
                         </div>
                     </div>
                 `;
@@ -14442,17 +14675,7 @@
             const comments = post.comments || [];
             const isLiked = likes.includes(currentUser?.id || currentUser?._id);
 
-            // Validate night data - be more flexible
-            console.log('🌙 Night data validation:', {
-                hasSessionDuration: !!nightData.sessionDuration,
-                hasSessionStart: !!nightData.sessionStart,
-                hasTotalDrinks: !!nightData.totalDrinks,
-                hasFinalBAC: !!nightData.finalBAC,
-                hasTotalStandards: !!nightData.totalStandards,
-                sessionDuration: nightData.sessionDuration,
-                totalDrinks: nightData.totalDrinks,
-                finalBAC: nightData.finalBAC
-            });
+
             
             if (!nightData.sessionDuration && !nightData.totalDrinks) {
                 console.warn('⚠️ Invalid night data - missing both sessionDuration and totalDrinks:', nightData);
@@ -14465,17 +14688,29 @@
                 `;
             }
 
-            console.log('🔍 Duration calculation debug:', {
+            // Debug duration calculation
+        console.log('🔍 Duration calculation debug:', {
             sessionDuration: nightData.sessionDuration,
             type: typeof nightData.sessionDuration,
             isZero: nightData.sessionDuration === 0,
-            isFalsy: !nightData.sessionDuration
+            isFalsy: !nightData.sessionDuration,
+            allKeys: Object.keys(nightData)
         });
         
-        const duration = nightData.sessionDuration ? 
-            (nightData.sessionDuration < 60000 ? 
-                `${Math.round(nightData.sessionDuration / 1000)} seconds` : 
-                formatSessionDuration(Math.round(nightData.sessionDuration / (1000 * 60)))
+        // Try different ways to get session duration
+        let sessionDuration = nightData.sessionDuration;
+        if (!sessionDuration && nightData.sessionStart && nightData.sessionEnd) {
+            // Calculate duration from start and end times
+            const start = new Date(nightData.sessionStart);
+            const end = new Date(nightData.sessionEnd);
+            sessionDuration = end.getTime() - start.getTime();
+            console.log('🔍 Calculated duration from start/end times:', sessionDuration);
+        }
+        
+        const duration = sessionDuration ? 
+            (sessionDuration < 60000 ? 
+                `${Math.round(sessionDuration / 1000)}s` : 
+                formatSessionDuration(Math.round(sessionDuration / (1000 * 60)))
             ) : 'Unknown duration';
             const sessionDate = nightData.sessionStart ? new Date(nightData.sessionStart).toLocaleDateString('en-AU', {
                 weekday: 'long',
@@ -14560,14 +14795,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Debug info (remove after testing) -->
-                            <div style="background: rgba(255,0,0,0.1); padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 0.8rem;">
-                                <strong>Debug Info:</strong><br>
-                                Calories: ${nightData.totalCalories || 'undefined'}<br>
-                                Carbs: ${nightData.totalCarbs || 'undefined'}<br>
-                                Liquid: ${nightData.totalLiquid || 'undefined'}<br>
-                                All properties: ${Object.keys(nightData).join(', ')}
-                            </div>
                             </div>
                             
                             <div class="night-share-drinks">
@@ -15101,6 +15328,58 @@
             } catch (error) {
                 console.error('❌ Test post creation error:', error);
                 showNotification('Test post creation error: ' + error.message, 'error');
+            }
+        }
+
+        // Debug function to check what's in the feed
+        async function debugFeedData() {
+            console.log('🔍 === DEBUGGING FEED DATA ===');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log('❌ No token found');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/social/feed`, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('📡 Feed response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Raw feed data:', data);
+                    
+                    if (data.posts && Array.isArray(data.posts)) {
+                        console.log('📝 Found posts:', data.posts.length);
+                        
+                        data.posts.forEach((post, index) => {
+                            console.log(`📝 Post ${index}:`, {
+                                id: post._id,
+                                type: post.type,
+                                content: post.content ? post.content.substring(0, 50) + '...' : 'No content',
+                                hasSessionStats: !!post.sessionStats,
+                                sessionStatsKeys: post.sessionStats ? Object.keys(post.sessionStats) : 'No sessionStats',
+                                hasNightData: !!post.nightData,
+                                nightDataKeys: post.nightData ? Object.keys(post.nightData) : 'No nightData',
+                                createdAt: post.createdAt,
+                                user: post.user ? post.user.name : 'No user'
+                            });
+                        });
+                    } else {
+                        console.log('❌ No posts array in response');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Feed API error:', response.status, errorText);
+                }
+            } catch (error) {
+                console.error('Error debugging feed:', error);
             }
         }
 

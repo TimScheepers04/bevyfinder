@@ -209,6 +209,10 @@ const userSchema = new mongoose.Schema({
         generalNotifications: {
             type: Boolean,
             default: true
+        },
+        friendDrinkUpdates: {
+            type: Boolean,
+            default: true
         }
     },
     isVerified: {

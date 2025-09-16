@@ -396,9 +396,11 @@ self.addEventListener('push', (event) => {
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
-  console.log('Service Worker: Notification clicked');
+  console.log('Service Worker: Notification clicked', event.notification.data);
   
   event.notification.close();
+
+  const data = event.notification.data || {};
 
   if (event.action === 'explore') {
     event.waitUntil(
@@ -407,9 +409,21 @@ self.addEventListener('notificationclick', (event) => {
   } else if (event.action === 'close') {
     // Just close the notification
   } else {
-    // Default action - open the app
+    // Handle different notification types
+    let targetUrl = '/';
+    
+    if (data.type === 'friend_drink_update') {
+      targetUrl = '/social-feed-page';
+    } else if (data.type === 'safety') {
+      targetUrl = '/tracking-page';
+    } else if (data.type === 'session') {
+      targetUrl = '/tracking-page';
+    } else if (data.url) {
+      targetUrl = data.url;
+    }
+    
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow(targetUrl)
     );
   }
 });
