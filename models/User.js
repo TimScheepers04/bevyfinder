@@ -1,235 +1,107 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: [true, 'Email is required'],
+        required: true,
         unique: true,
         lowercase: true,
-        trim: true,
-        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-    },
-    name: {
-        type: String,
-        required: [true, 'Name is required'],
-        trim: true,
-        minlength: [2, 'Name must be at least 2 characters long'],
-        maxlength: [50, 'Name cannot exceed 50 characters']
+        trim: true
     },
     password: {
         type: String,
-        required: [true, 'Password is required'],
-        minlength: [6, 'Password must be at least 6 characters long'],
-        select: false // Don't include password in queries by default
+        required: true,
+        minlength: 6
     },
     personalDetails: {
-        age: {
-            type: Number,
-            min: [18, 'Must be at least 18 years old'],
-            max: [120, 'Age cannot exceed 120 years']
+        firstName: {
+            type: String,
+            trim: true
+        },
+        lastName: {
+            type: String,
+            trim: true
+        },
+        dateOfBirth: {
+            type: Date
         },
         weight: {
             type: Number,
-            min: [30, 'Weight must be at least 30 kg'],
-            max: [300, 'Weight cannot exceed 300 kg']
-        },
-        height: {
-            type: Number,
-            min: [100, 'Height must be at least 100 cm'],
-            max: [250, 'Height cannot exceed 250 cm']
+            min: 30,
+            max: 300
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
-            required: false
+            enum: ['male', 'female', 'other']
         }
     },
-    profile: {
-        avatar: {
-            type: String,
-            default: null
+    pushSubscription: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
+    notificationSettings: {
+        enabled: {
+            type: Boolean,
+            default: false
         },
-        bio: {
-            type: String,
-            maxlength: [500, 'Bio cannot exceed 500 characters'],
-            default: ''
+        safetyReminders: {
+            type: Boolean,
+            default: true
         },
-        location: {
-            type: String,
-            maxlength: [100, 'Location cannot exceed 100 characters'],
-            default: ''
+        sessionUpdates: {
+            type: Boolean,
+            default: true
         },
-        preferences: {
-            favoriteDrinks: [{
-                type: String,
-                ref: 'Drink'
-            }],
-            likedDrinks: [{
-                type: String,
-                ref: 'Drink'
-            }],
-            dietaryRestrictions: [{
-                type: String,
-                enum: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'none']
-            }],
-            notifications: {
-                type: Boolean,
-                default: true
-            }
+        generalNotifications: {
+            type: Boolean,
+            default: true
+        },
+        friendDrinkUpdates: {
+            type: Boolean,
+            default: true
         }
     },
-    stats: {
-        searches: {
-            type: Number,
-            default: 0
+    friends: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    friendRequests: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
         },
-        favorites: {
-            type: Number,
-            default: 0
+        status: {
+            type: String,
+            enum: ['pending', 'accepted', 'declined'],
+            default: 'pending'
         },
-        lastActive: {
+        createdAt: {
             type: Date,
             default: Date.now
         }
-    },
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    verificationToken: String,
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    loginAttempts: {
-        type: Number,
-        default: 0
-    },
-    lockUntil: Date
+    }]
 }, {
-    timestamps: true // Adds createdAt and updatedAt fields
+    timestamps: true
 });
 
-// Index for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ 'stats.lastActive': -1 });
-
-// Virtual for checking if account is locked
-userSchema.virtual('isLocked').get(function() {
-    return !!(this.lockUntil && this.lockUntil > Date.now());
-});
-
-// Pre-save middleware to hash password
+// Hash password before saving
 userSchema.pre('save', async function(next) {
-    // Only hash the password if it has been modified (or is new)
     if (!this.isModified('password')) return next();
-
+    
     try {
-        // Hash password with cost of 12
-        this.password = await bcrypt.hash(this.password, 12);
+        const bcrypt = require('bcryptjs');
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (error) {
         next(error);
     }
 });
 
-// Instance method to check password
+// Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
+    const bcrypt = require('bcryptjs');
+    return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Instance method to increment login attempts
-userSchema.methods.incLoginAttempts = function() {
-    // If we have a previous lock that has expired, restart at 1
-    if (this.lockUntil && this.lockUntil < Date.now()) {
-        return this.updateOne({
-            $unset: { lockUntil: 1 },
-            $set: { loginAttempts: 1 }
-        });
-    }
-    
-    const updates = { $inc: { loginAttempts: 1 } };
-    
-    // Lock account after 5 failed attempts
-    if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
-        updates.$set = { lockUntil: Date.now() + 2 * 60 * 60 * 1000 }; // 2 hours
-    }
-    
-    return this.updateOne(updates);
-};
-
-// Instance method to reset login attempts
-userSchema.methods.resetLoginAttempts = function() {
-    return this.updateOne({
-        $unset: { loginAttempts: 1, lockUntil: 1 }
-    });
-};
-
-// Static method to find user by email
-userSchema.statics.findByEmail = function(email) {
-    return this.findOne({ email: email.toLowerCase() });
-};
-
-// Method to add favorite drink
-userSchema.methods.addFavoriteDrink = function(drinkId) {
-    if (!this.profile.preferences.favoriteDrinks.includes(drinkId)) {
-        this.profile.preferences.favoriteDrinks.push(drinkId);
-        this.stats.favorites = this.profile.preferences.favoriteDrinks.length;
-        return this.save();
-    }
-    return Promise.resolve(this);
-};
-
-// Method to remove favorite drink
-userSchema.methods.removeFavoriteDrink = function(drinkId) {
-    const index = this.profile.preferences.favoriteDrinks.indexOf(drinkId);
-    if (index > -1) {
-        this.profile.preferences.favoriteDrinks.splice(index, 1);
-        this.stats.favorites = this.profile.preferences.favoriteDrinks.length;
-        return this.save();
-    }
-    return Promise.resolve(this);
-};
-
-// Method to track search
-userSchema.methods.trackSearch = function() {
-    this.stats.searches += 1;
-    this.stats.lastActive = new Date();
-    return this.save();
-};
-
-// Method to update profile
-userSchema.methods.updateProfile = async function(updates) {
-    // Handle email change - check if new email is already taken
-    if (updates.email && updates.email !== this.email) {
-        const existingUser = await this.constructor.findByEmail(updates.email);
-        if (existingUser) {
-            throw new Error('Email is already in use');
-        }
-    }
-    
-    // Update fields
-    if (updates.name) this.name = updates.name;
-    if (updates.email) this.email = updates.email.toLowerCase();
-    if (updates.password) this.password = updates.password; // Will be hashed by pre-save middleware
-    if (updates.personalDetails) this.personalDetails = updates.personalDetails;
-    if (updates.profile) this.profile = { ...this.profile, ...updates.profile };
-    
-    // Update last active
-    this.stats.lastActive = new Date();
-    
-    return this.save();
-};
-
-// Method to get public profile (without sensitive data)
-userSchema.methods.getPublicProfile = function() {
-    return {
-        id: this._id,
-        name: this.name,
-        email: this.email,
-        profile: this.profile,
-        stats: this.stats,
-        createdAt: this.createdAt
-    };
-};
-
-module.exports = mongoose.model('User', userSchema); 
+module.exports = mongoose.model('User', userSchema);
