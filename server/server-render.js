@@ -13,6 +13,8 @@ const reviewRoutes = require('./routes/reviews');
 const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
 const socialRoutes = require('./routes/social');
+const trackingRoutes = require('./routes/tracking');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize express app
 const app = express();
@@ -48,6 +50,10 @@ app.use('/api/favorites', favoritesRoutes);
 console.log('✅ Favorites routes loaded');
 app.use('/api/likes', likesRoutes);
 console.log('✅ Likes routes loaded');
+app.use('/api/tracking', trackingRoutes);
+console.log('✅ Tracking routes loaded');
+app.use('/api/notifications', notificationRoutes);
+console.log('✅ Notification routes loaded');
 try {
     app.use('/api/social', socialRoutes);
     console.log('✅ Social routes loaded');
