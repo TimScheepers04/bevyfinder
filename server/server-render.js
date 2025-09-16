@@ -13,8 +13,8 @@ const reviewRoutes = require('./routes/reviews');
 const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
 const socialRoutes = require('./routes/social');
-const trackingRoutes = require('./routes/tracking-simple');
-const notificationRoutes = require('./routes/notifications-simple');
+const trackingRoutes = require('./routes/tracking');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize express app
 const app = express();
@@ -33,11 +33,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/health', (req, res) => {
     res.json({
         success: true,
-        message: 'BevyFinder API is running - UPDATED WITH NEW ROUTES',
+        message: 'BevyFinder API is running',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        version: '2.0.0-with-notifications'
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     });
 });
 
