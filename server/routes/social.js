@@ -224,6 +224,11 @@ router.post('/posts', protect, async (req, res) => {
     try {
         const { content, drinks, location, privacy, sessionStats, type } = req.body;
         
+        console.log('📝 === CREATING POST ===');
+        console.log('📝 Received type:', type);
+        console.log('📝 Received content:', content);
+        console.log('📝 Received sessionStats:', sessionStats);
+        
         if (!content) {
             return res.status(400).json({
                 success: false,
@@ -231,7 +236,7 @@ router.post('/posts', protect, async (req, res) => {
             });
         }
 
-        const post = new Post({
+        const postData = {
             user: req.user.id,
             content,
             type: type || 'regular',
@@ -239,9 +244,16 @@ router.post('/posts', protect, async (req, res) => {
             location,
             privacy: privacy || 'friends',
             sessionStats: sessionStats || {}
-        });
+        };
+        
+        console.log('📝 Post data to save:', postData);
+
+        const post = new Post(postData);
 
         await post.save();
+        
+        console.log('📝 Saved post type:', post.type);
+        console.log('📝 Saved post:', post);
         
         // Update user stats
         const user = await User.findById(req.user.id);
@@ -270,7 +282,22 @@ router.get('/feed', protect, async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
         
+        console.log('📊 === GETTING SOCIAL FEED ===');
+        console.log('📊 User ID:', req.user.id);
+        console.log('📊 Page:', page, 'Limit:', limit);
+        
         const posts = await Post.getFeed(req.user.id, parseInt(page), parseInt(limit));
+        
+        console.log('📊 Found posts:', posts.length);
+        posts.forEach((post, index) => {
+            console.log(`📊 Post ${index}:`, {
+                id: post._id,
+                type: post.type,
+                content: post.content ? post.content.substring(0, 30) + '...' : 'No content',
+                hasSessionStats: !!post.sessionStats,
+                sessionStatsKeys: post.sessionStats ? Object.keys(post.sessionStats) : 'No sessionStats'
+            });
+        });
         
         res.json({
             success: true,
