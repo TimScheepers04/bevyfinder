@@ -3,6 +3,6 @@ services:
     name: bevyfinder-api
     env: node
     plan: free
-    buildCommand: cd server && npm install --production
+    buildCommand: cd server && npm install
     startCommand: cd server && npm start
     healthCheckPath: /health
