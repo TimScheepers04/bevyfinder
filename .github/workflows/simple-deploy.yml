@@ -1,0 +1,43 @@
+name: Simple Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy BevyFinder to GitHub Pages
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Verify files
+      run: |
+        echo "✅ Checking key files..."
+        ls -la index.html
+        ls -la styles.css
+        ls -la script.js
+        ls -la sw.js
+        echo "✅ All frontend files present"
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        
+    - name: Deployment success
+      run: |
+        echo "🎉 BevyFinder deployed successfully!"
+        echo "📱 Your app is now live with:"
+        echo "  ✅ Drink size selection (Can/Bottle, Schooner, Pint, Jug)"
+        echo "  ✅ Friend push notifications"
+        echo "  ✅ Mobile PWA support"
+        echo "  ✅ Real-time social features"
