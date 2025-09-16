@@ -13,8 +13,8 @@ const reviewRoutes = require('./routes/reviews');
 const favoritesRoutes = require('./routes/favorites');
 const likesRoutes = require('./routes/likes');
 const socialRoutes = require('./routes/social');
-const trackingRoutes = require('./routes/tracking');
-const notificationRoutes = require('./routes/notifications');
+const trackingRoutes = require('./routes/tracking-simple');
+const notificationRoutes = require('./routes/notifications-simple');
 
 // Initialize express app
 const app = express();
