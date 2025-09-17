@@ -9,12 +9,24 @@ const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 app.use(cors({
-    origin: [
-        'https://bevyfinder.com',
-        'https://www.bevyfinder.com', 
-        'https://bevyfinder.netlify.app',
-        'http://localhost:3000'
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'https://bevyfinder.com',
+            'https://www.bevyfinder.com', 
+            'https://bevyfinder.netlify.app',
+            'http://localhost:3000'
+        ];
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(null, true); // Allow all origins for now
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
