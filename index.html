@@ -12577,7 +12577,7 @@
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             API_BASE_URL = 'http://localhost:3000/api'; // Local development
         } else {
-            API_BASE_URL = 'https://bevyfinder.github.io/beverage-input-app/api'; // Production - GitHub Pages
+            API_BASE_URL = 'https://bevyfinder.onrender.com/api'; // Production - Render
         }
         console.log('🌐 Using API URL:', API_BASE_URL);
         
@@ -12920,9 +12920,9 @@
 
                 if (result.success) {
                     // Store token and user data
-                    localStorage.setItem('token', result.data.token);
-                    currentUser = result.data.user;
-                    localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                    localStorage.setItem('token', result.token);
+                    currentUser = result.user;
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
                     
                     // Update UI
                     updateProfileButton();
@@ -12961,9 +12961,9 @@
 
                 if (result.success) {
                     // Store token and user data
-                    localStorage.setItem('token', result.data.token);
-                    currentUser = result.data.user;
-                    localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                    localStorage.setItem('token', result.token);
+                    currentUser = result.user;
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
                     
                     // Handle "Remember Me"
                     if (rememberMe) {
@@ -12971,8 +12971,8 @@
                         localStorage.setItem('bevyfinder_user_email', email);
                     } else {
                         // For session storage (clears when browser closes)
-                        sessionStorage.setItem('token', result.data.token);
-                        sessionStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                        sessionStorage.setItem('token', result.token);
+                        sessionStorage.setItem('currentUser', JSON.stringify(result.user));
                         localStorage.removeItem('bevyfinder_remember_me');
                         localStorage.removeItem('bevyfinder_user_email');
                     }
