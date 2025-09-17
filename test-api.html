@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Testing API...');
+                
+                // Test health endpoint
+                const healthResponse = await fetch('https://bevyfinder.onrender.com/api/health');
+                console.log('Health response:', healthResponse.status);
+                
+                if (healthResponse.ok) {
+                    const healthData = await healthResponse.json();
+                    console.log('Health data:', healthData);
+                    
+                    // Test login endpoint
+                    const loginResponse = await fetch('https://bevyfinder.onrender.com/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: 'test',
+                            password: 'test'
+                        })
+                    });
+                    
+                    console.log('Login response:', loginResponse.status);
+                    
+                    if (loginResponse.ok) {
+                        const loginData = await loginResponse.json();
+                        console.log('Login data:', loginData);
+                        
+                        resultDiv.innerHTML = `
+                            <h2>✅ API is working!</h2>
+                            <p>Health: ${healthData.message}</p>
+                            <p>Login: ${loginData.message}</p>
+                            <p>Token: ${loginData.token}</p>
+                        `;
+                    } else {
+                        const errorText = await loginResponse.text();
+                        resultDiv.innerHTML = `
+                            <h2>❌ Login failed</h2>
+                            <p>Status: ${loginResponse.status}</p>
+                            <p>Error: ${errorText}</p>
+                        `;
+                    }
+                } else {
+                    const errorText = await healthResponse.text();
+                    resultDiv.innerHTML = `
+                        <h2>❌ Health check failed</h2>
+                        <p>Status: ${healthResponse.status}</p>
+                        <p>Error: ${errorText}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <h2>❌ Network Error</h2>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
