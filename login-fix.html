@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BevyFinder - Login Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .login-form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-form">
+        <h2>🔧 BevyFinder Login Fix</h2>
+        <p>This page uses the correct Render API backend.</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        
+        <div id="message" class="message"></div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 5px;">
+            <h4>✅ API Status:</h4>
+            <p id="apiStatus">Checking...</p>
+        </div>
+    </div>
+
+    <script>
+        // Use the correct Render API URL
+        const API_BASE_URL = 'https://bevyfinder.onrender.com/api';
+        
+        // Check API status on load
+        async function checkAPIStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('apiStatus').innerHTML = 
+                        `✅ Backend is working<br>Status: ${data.message}`;
+                } else {
+                    document.getElementById('apiStatus').innerHTML = 
+                        `❌ Backend error: ${response.status}`;
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = 
+                    `❌ Cannot connect to backend: ${error.message}`;
+            }
+        }
+        
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            // Show loading
+            messageDiv.className = 'message info';
+            messageDiv.style.display = 'block';
+            messageDiv.textContent = 'Signing in...';
+            
+            try {
+                console.log('🔐 Attempting login with:', { email, password: '***' });
+                
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                console.log('📡 Login response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Login successful:', data);
+                    
+                    // Store token
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = `
+                        ✅ Login successful!<br>
+                        Welcome ${data.user.username}!<br>
+                        <a href="https://bevyfinder.com" style="color: #155724;">Go to main app</a>
+                    `;
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Login failed:', error);
+                    
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = `Login failed: ${error.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                
+                messageDiv.className = 'message error';
+                messageDiv.textContent = `Network error: ${error.message}`;
+            }
+        });
+        
+        // Check API status when page loads
+        checkAPIStatus();
+    </script>
+</body>
+</html>
