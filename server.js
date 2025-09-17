@@ -9,8 +9,15 @@ const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 app.use(cors({
-    origin: true,
-    credentials: true
+    origin: [
+        'https://bevyfinder.com',
+        'https://www.bevyfinder.com', 
+        'https://bevyfinder.netlify.app',
+        'http://localhost:3000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parsing middleware
