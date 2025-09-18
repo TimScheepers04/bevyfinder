@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
@@ -6,6 +7,26 @@ console.log('🚀 Starting BevyFinder server...');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB
+const connectDB = async () => {
+    try {
+        const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bevyfinder';
+        console.log('🔌 Connecting to MongoDB...');
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('✅ MongoDB connected successfully');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error);
+        // Don't exit the process, continue with limited functionality
+        console.log('⚠️  Server will run without database connection');
+    }
+};
+
+// Initialize database connection
+connectDB();
 
 // CORS configuration
 app.use(cors({
@@ -36,53 +57,32 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Import routes
+const authRoutes = require('./server/routes/auth');
+const reviewRoutes = require('./server/routes/reviews');
+const favoriteRoutes = require('./server/routes/favorites');
+const likeRoutes = require('./server/routes/likes');
+const notificationRoutes = require('./server/routes/notifications');
+const trackingRoutes = require('./server/routes/tracking');
+const socialRoutes = require('./server/routes/social');
+
+// Use routes
+app.use('/api/auth', authRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/likes', likeRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/tracking', trackingRoutes);
+app.use('/api/social', socialRoutes);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
         message: 'BevyFinder API is running',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'production'
-    });
-});
-
-// Simple auth endpoints for testing
-app.post('/api/auth/login', (req, res) => {
-    console.log('🔐 Login attempt:', req.body);
-    res.json({
-        success: true,
-        message: 'Login successful',
-        user: {
-            id: 'test-user',
-            username: req.body.username || 'testuser',
-            email: req.body.email || 'test@example.com'
-        },
-        token: 'test-token-' + Date.now()
-    });
-});
-
-app.post('/api/auth/register', (req, res) => {
-    console.log('📝 Registration attempt:', req.body);
-    res.json({
-        success: true,
-        message: 'Registration successful',
-        user: {
-            id: 'test-user-' + Date.now(),
-            username: req.body.username || 'testuser',
-            email: req.body.email || 'test@example.com'
-        },
-        token: 'test-token-' + Date.now()
-    });
-});
-
-app.get('/api/auth/me', (req, res) => {
-    res.json({
-        success: true,
-        user: {
-            id: 'test-user',
-            username: 'testuser',
-            email: 'test@example.com'
-        }
+        environment: process.env.NODE_ENV || 'production',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     });
 });
 
