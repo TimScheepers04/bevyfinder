@@ -88,7 +88,7 @@ const generateToken = (id) => {
     });
 };
 
-// Health check route
+// API Routes - MUST be defined before catch-all route
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
@@ -107,7 +107,6 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Test route
 app.get('/api/test', (req, res) => {
     res.json({
         success: true,
@@ -118,7 +117,6 @@ app.get('/api/test', (req, res) => {
     });
 });
 
-// MongoDB connection test route
 app.get('/api/test-db', async (req, res) => {
     try {
         if (!dbConnected || !User) {
@@ -152,7 +150,6 @@ app.get('/api/test-db', async (req, res) => {
     }
 });
 
-// Register endpoint
 app.post('/api/auth/register', async (req, res) => {
     try {
         console.log('📝 Registration attempt:', req.body);
@@ -224,7 +221,6 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// Login endpoint
 app.post('/api/auth/login', async (req, res) => {
     try {
         console.log('🔐 Login attempt:', req.body.email);
