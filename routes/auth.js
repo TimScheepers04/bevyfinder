@@ -71,7 +71,11 @@ router.post('/register', [
             success: true,
             message: 'User registered successfully',
             data: {
-                user: user.getPublicProfile(),
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    personalDetails: user.personalDetails
+                },
                 token
             }
         });
