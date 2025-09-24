@@ -75,6 +75,15 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Simple test endpoint
+app.post('/api/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Test endpoint working',
+        body: req.body
+    });
+});
+
 // Serve static files
 app.use(express.static(path.join(__dirname)));
 
