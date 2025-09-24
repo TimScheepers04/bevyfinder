@@ -83,12 +83,21 @@ const connectDB = async () => {
                 totalDrinks: { type: Number, default: 0 },
                 totalCalories: { type: Number, default: 0 },
                 totalStandardDrinks: { type: Number, default: 0 },
+                totalStandards: { type: Number, default: 0 },
                 sessionDuration: { type: Number, default: 0 },
+                totalBAC: { type: Number, default: 0 },
+                finalBAC: { type: Number, default: 0 },
+                totalCarbs: { type: Number, default: 0 },
+                totalLiquid: { type: Number, default: 0 },
+                sessionStart: { type: Date },
+                sessionEnd: { type: Date },
                 drinks: [{
                     name: String,
                     count: Number,
                     calories: Number,
-                    standardDrinks: Number
+                    standardDrinks: Number,
+                    time: Date,
+                    _id: String
                 }]
             },
             likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -174,7 +183,7 @@ app.get('/api/test-db', async (req, res) => {
     try {
         if (!dbConnected || !User) {
             return res.status(503).json({
-                success: false,
+        success: false,
                 message: 'Database not connected',
                 dbConnected: dbConnected,
                 hasUserModel: !!User,
@@ -237,7 +246,7 @@ app.post('/api/auth/register', async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({
+        return res.status(400).json({
                 success: false,
                 message: 'User with this email already exists'
             });
@@ -310,7 +319,7 @@ app.post('/api/auth/login', async (req, res) => {
         // Check password
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(401).json({
+        return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
             });
@@ -354,11 +363,11 @@ const authenticateToken = (req, res, next) => {
             message: 'Access token required'
         });
     }
-
+    
     jwt.verify(token, 'bevyfinder-super-secret-jwt-key-2024', (err, user) => {
         if (err) {
             return res.status(403).json({
-                success: false,
+        success: false,
                 message: 'Invalid or expired token'
             });
         }
@@ -419,11 +428,27 @@ app.post('/api/social/posts', authenticateToken, async (req, res) => {
             });
         }
 
+        // Ensure sessionStats has proper structure with all fields
+        const fullSessionStats = {
+            totalDrinks: sessionStats?.totalDrinks || 0,
+            totalCalories: sessionStats?.totalCalories || 0,
+            totalStandardDrinks: sessionStats?.totalStandardDrinks || 0,
+            totalStandards: sessionStats?.totalStandards || 0,
+            sessionDuration: sessionStats?.sessionDuration || 0,
+            totalBAC: sessionStats?.totalBAC || 0,
+            finalBAC: sessionStats?.finalBAC || 0,
+            totalCarbs: sessionStats?.totalCarbs || 0,
+            totalLiquid: sessionStats?.totalLiquid || 0,
+            sessionStart: sessionStats?.sessionStart ? new Date(sessionStats.sessionStart) : undefined,
+            sessionEnd: sessionStats?.sessionEnd ? new Date(sessionStats.sessionEnd) : undefined,
+            drinks: sessionStats?.drinks || []
+        };
+
         const post = new Post({
             userId: req.user.id,
             content: content.trim(),
             type: type || 'regular',
-            sessionStats: sessionStats || {}
+            sessionStats: fullSessionStats
         });
 
         await post.save();
@@ -434,7 +459,7 @@ app.post('/api/social/posts', authenticateToken, async (req, res) => {
             message: 'Post created successfully',
             post: post
         });
-    } catch (error) {
+        } catch (error) {
         console.error('❌ Create post error:', error);
         res.status(500).json({
             success: false,
