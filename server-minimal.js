@@ -28,9 +28,11 @@ let dbConnected = false;
 
 const connectDB = async () => {
     try {
-        const mongoURI = 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
+        // Try environment variable first, fallback to hardcoded
+        const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
         console.log('🔌 Connecting to MongoDB...');
         console.log('📝 Using connection string:', mongoURI.substring(0, 50) + '...');
+        console.log('🌐 MONGODB_URI set:', !!process.env.MONGODB_URI);
         
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
@@ -96,7 +98,7 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'production',
         database: dbConnected ? 'connected' : 'disconnected',
-        mongoURI_set: false, // We're using hardcoded connection
+        mongoURI_set: !!process.env.MONGODB_URI,
         connectionState: mongoose.connection.readyState,
         mongooseState: {
             0: 'disconnected',
