@@ -294,11 +294,18 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// Serve static files (but not for API routes)
+app.use('/static', express.static(path.join(__dirname)));
 
-// Catch all handler - serve index.html for client-side routing
+// Catch all handler - serve index.html for client-side routing (but not for API routes)
 app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({
+            success: false,
+            message: 'API endpoint not found'
+        });
+    }
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
