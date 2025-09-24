@@ -82,7 +82,9 @@ app.get('/api/health', (req, res) => {
         message: 'BevyFinder API is running',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'production',
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        mongoURI_set: !!process.env.MONGODB_URI,
+        connectionState: mongoose.connection.readyState
     });
 });
 
