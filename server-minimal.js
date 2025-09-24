@@ -13,11 +13,10 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 const connectDB = async () => {
     try {
-        const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
+        // Hardcoded connection string - no environment variables
+        const mongoURI = 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
         console.log('🔌 Connecting to MongoDB...');
-        console.log('🌐 MONGODB_URI set:', !!process.env.MONGODB_URI);
-        console.log('🔑 JWT_SECRET set:', !!process.env.JWT_SECRET);
-        console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+        console.log('📝 Using hardcoded connection string');
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -71,7 +70,7 @@ const User = mongoose.model('User', userSchema);
 
 // Generate JWT Token
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback-secret', {
+    return jwt.sign({ id }, 'bevyfinder-super-secret-jwt-key-2024', {
         expiresIn: '7d'
     });
 };
