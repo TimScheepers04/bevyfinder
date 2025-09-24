@@ -24,6 +24,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // MongoDB connection with better error handling
 let User;
+let Post;
+let Friend;
+let FriendRequest;
 let dbConnected = false;
 
 const connectDB = async () => {
@@ -70,6 +73,54 @@ const connectDB = async () => {
 
         User = mongoose.model('User', userSchema);
         console.log('✅ User model created successfully');
+        
+        // Create Post model for social feed
+        const postSchema = new mongoose.Schema({
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            content: { type: String, required: true },
+            type: { type: String, enum: ['regular', 'night_share'], default: 'regular' },
+            sessionStats: {
+                totalDrinks: { type: Number, default: 0 },
+                totalCalories: { type: Number, default: 0 },
+                totalStandardDrinks: { type: Number, default: 0 },
+                sessionDuration: { type: Number, default: 0 },
+                drinks: [{
+                    name: String,
+                    count: Number,
+                    calories: Number,
+                    standardDrinks: Number
+                }]
+            },
+            likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+            comments: [{
+                userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+                content: String,
+                createdAt: { type: Date, default: Date.now }
+            }]
+        }, { timestamps: true });
+
+        Post = mongoose.model('Post', postSchema);
+        console.log('✅ Post model created successfully');
+        
+        // Create Friend model
+        const friendSchema = new mongoose.Schema({
+            user1: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            user2: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            status: { type: String, enum: ['pending', 'accepted'], default: 'pending' }
+        }, { timestamps: true });
+
+        Friend = mongoose.model('Friend', friendSchema);
+        console.log('✅ Friend model created successfully');
+        
+        // Create FriendRequest model
+        const friendRequestSchema = new mongoose.Schema({
+            from: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            to: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' }
+        }, { timestamps: true });
+
+        FriendRequest = mongoose.model('FriendRequest', friendRequestSchema);
+        console.log('✅ FriendRequest model created successfully');
         
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
@@ -287,6 +338,493 @@ app.post('/api/auth/login', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error during login',
+            error: error.message
+        });
+    }
+});
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'Access token required'
+        });
+    }
+
+    jwt.verify(token, 'bevyfinder-super-secret-jwt-key-2024', (err, user) => {
+        if (err) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid or expired token'
+            });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+// Social Feed Endpoints
+
+// Get social feed
+app.get('/api/social/feed', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !Post || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        // Get posts with user information
+        const posts = await Post.find()
+            .populate('userId', 'name email')
+            .populate('likes', 'name')
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        res.json({
+            success: true,
+            posts: posts
+        });
+    } catch (error) {
+        console.error('❌ Social feed error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error loading social feed',
+            error: error.message
+        });
+    }
+});
+
+// Create post
+app.post('/api/social/posts', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !Post || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const { content, type, sessionStats } = req.body;
+
+        if (!content || content.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Content is required'
+            });
+        }
+
+        const post = new Post({
+            userId: req.user.id,
+            content: content.trim(),
+            type: type || 'regular',
+            sessionStats: sessionStats || {}
+        });
+
+        await post.save();
+        await post.populate('userId', 'name email');
+
+        res.status(201).json({
+            success: true,
+            message: 'Post created successfully',
+            post: post
+        });
+    } catch (error) {
+        console.error('❌ Create post error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating post',
+            error: error.message
+        });
+    }
+});
+
+// Like/Unlike post
+app.post('/api/social/posts/:postId/like', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !Post) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            });
+        }
+
+        const userId = req.user.id;
+        const isLiked = post.likes.includes(userId);
+
+        if (isLiked) {
+            post.likes = post.likes.filter(id => !id.equals(userId));
+        } else {
+            post.likes.push(userId);
+        }
+
+        await post.save();
+
+        res.json({
+            success: true,
+            liked: !isLiked,
+            likesCount: post.likes.length
+        });
+    } catch (error) {
+        console.error('❌ Like post error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating like',
+            error: error.message
+        });
+    }
+});
+
+// Get friends
+app.get('/api/social/friends', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !Friend || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const userId = req.user.id;
+        const friendships = await Friend.find({
+            $or: [{ user1: userId }, { user2: userId }],
+            status: 'accepted'
+        }).populate('user1 user2', 'name email');
+
+        const friends = friendships.map(friendship => {
+            const friend = friendship.user1._id.equals(userId) ? friendship.user2 : friendship.user1;
+            return {
+                id: friend._id,
+                name: friend.name,
+                email: friend.email
+            };
+        });
+
+        res.json({
+            success: true,
+            friends: friends
+        });
+    } catch (error) {
+        console.error('❌ Get friends error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error loading friends',
+            error: error.message
+        });
+    }
+});
+
+// Get friend requests
+app.get('/api/social/friend-requests', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !FriendRequest || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const userId = req.user.id;
+        const requests = await FriendRequest.find({
+            to: userId,
+            status: 'pending'
+        }).populate('from', 'name email');
+
+        res.json({
+            success: true,
+            friendRequests: requests
+        });
+    } catch (error) {
+        console.error('❌ Get friend requests error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error loading friend requests',
+            error: error.message
+        });
+    }
+});
+
+// Search users
+app.get('/api/social/search-users', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const query = req.query.query;
+        if (!query || query.length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Query must be at least 2 characters'
+            });
+        }
+
+        const users = await User.find({
+            $and: [
+                { _id: { $ne: req.user.id } },
+                {
+                    $or: [
+                        { name: { $regex: query, $options: 'i' } },
+                        { email: { $regex: query, $options: 'i' } }
+                    ]
+                }
+            ]
+        }).select('name email').limit(10);
+
+        res.json({
+            success: true,
+            users: users
+        });
+    } catch (error) {
+        console.error('❌ Search users error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error searching users',
+            error: error.message
+        });
+    }
+});
+
+// Send friend request
+app.post('/api/social/friend-request/send', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !FriendRequest || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const { targetUserId } = req.body;
+        const fromUserId = req.user.id;
+
+        if (!targetUserId || targetUserId === fromUserId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid target user'
+            });
+        }
+
+        // Check if request already exists
+        const existingRequest = await FriendRequest.findOne({
+            $or: [
+                { from: fromUserId, to: targetUserId },
+                { from: targetUserId, to: fromUserId }
+            ]
+        });
+
+        if (existingRequest) {
+            return res.status(400).json({
+                success: false,
+                message: 'Friend request already exists'
+            });
+        }
+
+        const friendRequest = new FriendRequest({
+            from: fromUserId,
+            to: targetUserId,
+            status: 'pending'
+        });
+
+        await friendRequest.save();
+
+        res.json({
+            success: true,
+            message: 'Friend request sent successfully'
+        });
+    } catch (error) {
+        console.error('❌ Send friend request error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error sending friend request',
+            error: error.message
+        });
+    }
+});
+
+// Accept friend request
+app.post('/api/social/friend-request/accept', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !FriendRequest || !Friend) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const { fromUserId } = req.body;
+        const toUserId = req.user.id;
+
+        const friendRequest = await FriendRequest.findOne({
+            from: fromUserId,
+            to: toUserId,
+            status: 'pending'
+        });
+
+        if (!friendRequest) {
+            return res.status(404).json({
+                success: false,
+                message: 'Friend request not found'
+            });
+        }
+
+        // Update friend request status
+        friendRequest.status = 'accepted';
+        await friendRequest.save();
+
+        // Create friendship
+        const friendship = new Friend({
+            user1: fromUserId,
+            user2: toUserId,
+            status: 'accepted'
+        });
+        await friendship.save();
+
+        res.json({
+            success: true,
+            message: 'Friend request accepted successfully'
+        });
+    } catch (error) {
+        console.error('❌ Accept friend request error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error accepting friend request',
+            error: error.message
+        });
+    }
+});
+
+// Decline friend request
+app.post('/api/social/friend-request/decline', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !FriendRequest) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const { fromUserId } = req.body;
+        const toUserId = req.user.id;
+
+        const friendRequest = await FriendRequest.findOne({
+            from: fromUserId,
+            to: toUserId,
+            status: 'pending'
+        });
+
+        if (!friendRequest) {
+            return res.status(404).json({
+                success: false,
+                message: 'Friend request not found'
+            });
+        }
+
+        friendRequest.status = 'declined';
+        await friendRequest.save();
+
+        res.json({
+            success: true,
+            message: 'Friend request declined'
+        });
+    } catch (error) {
+        console.error('❌ Decline friend request error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error declining friend request',
+            error: error.message
+        });
+    }
+});
+
+// Remove friend
+app.delete('/api/social/friends/:userId', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !Friend) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const friendUserId = req.params.userId;
+        const userId = req.user.id;
+
+        await Friend.deleteOne({
+            $or: [
+                { user1: userId, user2: friendUserId },
+                { user1: friendUserId, user2: userId }
+            ]
+        });
+
+        res.json({
+            success: true,
+            message: 'Friend removed successfully'
+        });
+    } catch (error) {
+        console.error('❌ Remove friend error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error removing friend',
+            error: error.message
+        });
+    }
+});
+
+// Get leaderboards
+app.get('/api/social/leaderboards', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !User || !Post) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const type = req.query.type || 'totalDrinks';
+        
+        // For now, return mock data since we don't have complex stats
+        const users = await User.find().select('name email').limit(10);
+        
+        const leaderboard = users.map((user, index) => ({
+            name: user.name,
+            email: user.email,
+            stats: {
+                totalDrinks: Math.floor(Math.random() * 100),
+                totalSessions: Math.floor(Math.random() * 50),
+                longestSession: Math.floor(Math.random() * 300),
+                searches: Math.floor(Math.random() * 200)
+            }
+        }));
+
+        res.json({
+            success: true,
+            leaderboard: {
+                type: type,
+                users: leaderboard
+            }
+        });
+    } catch (error) {
+        console.error('❌ Get leaderboards error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error loading leaderboards',
             error: error.message
         });
     }
