@@ -45,7 +45,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Import routes
-const authRoutes = require('./server/routes/auth');
+const authRoutes = require('./routes/auth-simple');
 const reviewRoutes = require('./server/routes/reviews');
 const favoriteRoutes = require('./server/routes/favorites');
 const likeRoutes = require('./server/routes/likes');
