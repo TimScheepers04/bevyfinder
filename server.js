@@ -13,6 +13,10 @@ const connectDB = async () => {
     try {
         const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bevyfinder';
         console.log('🔌 Connecting to MongoDB...');
+        console.log('🌐 MONGODB_URI set:', !!process.env.MONGODB_URI);
+        console.log('🔑 JWT_SECRET set:', !!process.env.JWT_SECRET);
+        console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+        console.log('📝 Using URI:', mongoURI.substring(0, 50) + '...');
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
