@@ -1,253 +1,225 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
-require('dotenv').config();
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-console.log('🚀 Starting BevyFinder API server...');
-console.log('📊 Environment:', process.env.NODE_ENV || 'development');
-console.log('🔗 Port:', process.env.PORT || 8080);
+console.log('🚀 Starting BevyFinder minimal server...');
 
-// Import routes
-const authRoutes = require('./server/routes/auth');
-const reviewRoutes = require('./server/routes/reviews');
-const favoritesRoutes = require('./server/routes/favorites');
-const likesRoutes = require('./server/routes/likes');
-const socialRoutes = require('./server/routes/social');
-const notificationRoutes = require('./server/routes/notifications');
-
-// Initialize express app
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Compression middleware
-app.use(compression());
-
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-} else {
-    app.use(morgan('combined'));
-}
-
-// Security middleware
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "https://www.googletagmanager.com",
-                "https://cdnjs.cloudflare.com"
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "https://fonts.googleapis.com",
-                "https://cdnjs.cloudflare.com"
-            ],
-            fontSrc: [
-                "'self'",
-                "https://fonts.gstatic.com",
-                "https://cdnjs.cloudflare.com"
-            ],
-            imgSrc: [
-                "'self'",
-                "data:",
-                "https:"
-            ],
-            connectSrc: [
-                "'self'",
-                "https://www.google-analytics.com"
-            ]
-        }
+// Connect to MongoDB
+const connectDB = async () => {
+    try {
+        const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
+        console.log('🔌 Connecting to MongoDB...');
+        console.log('🌐 MONGODB_URI set:', !!process.env.MONGODB_URI);
+        console.log('🔑 JWT_SECRET set:', !!process.env.JWT_SECRET);
+        console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('✅ MongoDB connected successfully');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error);
     }
-}));
+};
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: {
-        success: false,
-        message: 'Too many requests from this IP, please try again later.'
-    }
-});
+// Initialize database connection
+connectDB();
 
-app.use('/api/', limiter);
-
-// CORS configuration - secure for production
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['http://localhost:3000', 'http://localhost:8080', 'https://bevyfinder.com', 'https://bevyfinder.up.railway.app'];
-
+// CORS configuration
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        // In development, allow all localhost origins
-        if (process.env.NODE_ENV === 'development') {
-            if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-                return callback(null, true);
-            }
-        }
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
+// Simple User Schema
+const userSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true }
+}, { timestamps: true });
+
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Compare password method
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
+
+const User = mongoose.model('User', userSchema);
+
+// Generate JWT Token
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback-secret', {
+        expiresIn: '7d'
+    });
+};
+
+// Routes
+app.get('/api/health', (req, res) => {
     res.json({
         success: true,
         message: 'BevyFinder API is running',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        environment: process.env.NODE_ENV || 'production',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        mongoURI_set: !!process.env.MONGODB_URI,
+        connectionState: mongoose.connection.readyState
     });
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/favorites', favoritesRoutes);
-app.use('/api/likes', likesRoutes);
-app.use('/api/social', socialRoutes);
-app.use('/api/notifications', notificationRoutes);
-
-// API test endpoint
-app.get('/api/test', (req, res) => {
-    res.json({
-        success: true,
-        message: 'API is working!',
-        timestamp: new Date().toISOString()
-    });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'API endpoint not found'
-    });
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-    console.error('❌ Error:', err);
-    
-    // Handle specific error types
-    if (err.name === 'ValidationError') {
-        return res.status(400).json({
-            success: false,
-            message: 'Validation error',
-            errors: Object.values(err.errors).map(e => e.message)
-        });
-    }
-    
-    if (err.name === 'MongoError' && err.code === 11000) {
-        return res.status(400).json({
-            success: false,
-            message: 'Duplicate field value'
-        });
-    }
-    
-    if (err.name === 'JsonWebTokenError') {
-        return res.status(401).json({
-            success: false,
-            message: 'Invalid token'
-        });
-    }
-    
-    if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({
-            success: false,
-            message: 'Token expired'
-        });
-    }
-    
-    // Default error response
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Internal server error',
-        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-});
-
-// Connect to MongoDB with retry logic
-const connectDB = async (retries = 5) => {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const mongoUri = process.env.MONGODB_URI;
-            if (!mongoUri) {
-                console.warn('⚠️ MONGODB_URI not found in environment variables');
-                return false;
-            }
-            
-            console.log(`🔗 Attempting to connect to MongoDB (attempt ${i + 1}/${retries})...`);
-            await mongoose.connect(mongoUri);
-            console.log('✅ MongoDB Connected successfully');
-            return true;
-        } catch (error) {
-            console.error(`❌ MongoDB connection attempt ${i + 1} failed:`, error.message);
-            if (i === retries - 1) {
-                console.error('❌ All MongoDB connection attempts failed');
-                return false;
-            }
-            // Wait 2 seconds before retrying
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-    }
-};
-
-// Start server
-const PORT = process.env.PORT || 8080;
-
-const startServer = async () => {
+// Register endpoint
+app.post('/api/auth/register', async (req, res) => {
     try {
-        console.log('🔧 Starting server...');
+        console.log('📝 Registration attempt:', req.body);
         
-        // Try to connect to database (but don't fail if it doesn't work)
-        const dbConnected = await connectDB();
-        if (!dbConnected) {
-            console.warn('⚠️  Warning: Could not connect to MongoDB. Some features may not work.');
+        const { email, password, name } = req.body;
+
+        if (!email || !password || !name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email, password, and name are required'
+            });
         }
-        
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 BevyFinder API server running on port ${PORT}`);
-            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-            console.log(`🔗 API test: http://localhost:${PORT}/api/test`);
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Create new user
+        const user = new User({ email, password, name });
+        await user.save();
+
+        // Generate token
+        const token = generateToken(user._id);
+
+        console.log('✅ User registered successfully:', user.email);
+
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
+            data: {
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    name: user.name
+                },
+                token
+            }
         });
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
-        process.exit(1);
+        console.error('❌ Registration error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during registration',
+            error: error.message
+        });
     }
-};
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('🛑 SIGTERM received, shutting down gracefully');
-    process.exit(0);
 });
 
-process.on('SIGINT', () => {
-    console.log('🛑 SIGINT received, shutting down gracefully');
-    process.exit(0);
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        console.log('🔐 Login attempt:', req.body.email);
+        
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
+        }
+
+        // Check password
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
+        }
+
+        // Generate token
+        const token = generateToken(user._id);
+
+        console.log('✅ User logged in successfully:', user.email);
+
+        res.json({
+            success: true,
+            message: 'Login successful',
+            data: {
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    name: user.name
+                },
+                token
+            }
+        });
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during login',
+            error: error.message
+        });
+    }
 });
 
-// Start the server
-startServer(); 
+// Serve static files
+app.use(express.static(path.join(__dirname)));
+
+// Catch all handler - serve index.html for client-side routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'production'}`);
+});
+
+module.exports = app;
