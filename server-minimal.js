@@ -10,26 +10,6 @@ console.log('🚀 Starting BevyFinder minimal server...');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
-const connectDB = async () => {
-    try {
-        // Hardcoded connection string - no environment variables
-        const mongoURI = 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
-        console.log('🔌 Connecting to MongoDB...');
-        console.log('📝 Using hardcoded connection string');
-        await mongoose.connect(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('✅ MongoDB connected successfully');
-    } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
-    }
-};
-
-// Initialize database connection
-connectDB();
-
 // CORS configuration
 app.use(cors({
     origin: true,
@@ -41,6 +21,25 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Connect to MongoDB (non-blocking)
+const connectDB = async () => {
+    try {
+        const mongoURI = 'mongodb+srv://TimScheepers:Mapimpi11@bevyfinder.fxww13z.mongodb.net/bevyfinder?retryWrites=true&w=majority&appName=BevyFinder';
+        console.log('🔌 Connecting to MongoDB...');
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('✅ MongoDB connected successfully');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error);
+        // Don't exit the process - continue without MongoDB
+    }
+};
+
+// Initialize database connection (async)
+connectDB();
 
 // Simple User Schema
 const userSchema = new mongoose.Schema({
@@ -66,7 +65,13 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+let User;
+try {
+    User = mongoose.model('User', userSchema);
+} catch (error) {
+    // Model already exists
+    User = mongoose.model('User');
+}
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -75,7 +80,7 @@ const generateToken = (id) => {
     });
 };
 
-// Routes
+// Health check route
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
@@ -83,8 +88,17 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'production',
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        mongoURI_set: !!process.env.MONGODB_URI,
+        mongoURI_set: false, // We're using hardcoded connection
         connectionState: mongoose.connection.readyState
+    });
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Test endpoint working',
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -92,6 +106,14 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         console.log('📝 Registration attempt:', req.body);
+        
+        // Check if MongoDB is connected
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
         
         const { email, password, name } = req.body;
 
@@ -153,6 +175,14 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     try {
         console.log('🔐 Login attempt:', req.body.email);
+        
+        // Check if MongoDB is connected
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
         
         const { email, password } = req.body;
 
@@ -216,6 +246,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Start server
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV || 'production'}`);
