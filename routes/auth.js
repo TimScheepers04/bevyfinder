@@ -44,7 +44,7 @@ router.post('/register', [
         const { name, email, password, personalDetails } = req.body;
 
         // Check if user already exists
-        const existingUser = await User.findByEmail(email);
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
                 success: false,
@@ -54,10 +54,12 @@ router.post('/register', [
 
         // Create new user
         const user = new User({
-            name,
             email,
             password,
-            personalDetails
+            personalDetails: {
+                firstName: name,
+                ...personalDetails
+            }
         });
 
         await user.save();
