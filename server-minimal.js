@@ -5,7 +5,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-console.log('🚀 Starting BevyFinder minimal server...');
+console.log('🚀 Starting BevyFinder minimal server - v2.0...');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
