@@ -5687,6 +5687,35 @@
                 font-size: 0.85rem;
             }
         }
+
+        /* Real-time update animations */
+        @keyframes slideInFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-post-indicator {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
     </style>
 </head>
 <body>
@@ -14172,8 +14201,77 @@
             const drink = drinkDatabase[drinkKey];
             const servingSizes = getDrinkServingSizes(drink);
             const sizeName = servingSizes[size] ? servingSizes[size].name : 'Can/Bottle';
+            
+            // Send real-time update to server
+            sendDrinkUpdateToServer(drink.name, drink, size);
+            
             showNotification(`Added ${drink.name} (${sizeName}) to Night Tracker!`, 'success');
             showPage('tracking-page');
+        }
+
+        // Send drink update to server for real-time feed updates
+        async function sendDrinkUpdateToServer(drinkName, drink, size = 'can-bottle') {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const servingSizes = getDrinkServingSizes(drink);
+                const sizeData = servingSizes[size] || servingSizes['can-bottle'];
+                
+                // Calculate drink data
+                const drinkData = {
+                    name: drinkName,
+                    calories: sizeData ? sizeData.calories : drink.calories || 150,
+                    standardDrinks: sizeData ? sizeData.standardDrinks : (drink.abv || 5) * (drink.servingSize || 330) / 1000,
+                    carbs: sizeData ? sizeData.carbs : drink.carbs || 15,
+                    servingSize: sizeData ? sizeData.volume : drink.servingSize || 330,
+                    abv: drink.abv || 5
+                };
+
+                // Get current session stats
+                const sessionStats = {
+                    totalDrinks: drinks.length + 1,
+                    totalCalories: totalCalories + drinkData.calories,
+                    totalStandardDrinks: totalStandards + drinkData.standardDrinks,
+                    totalStandards: totalStandards + drinkData.standardDrinks,
+                    sessionDuration: sessionStartTime ? Math.round((new Date() - sessionStartTime) / (1000 * 60)) : 0,
+                    totalBAC: calculateBAC(),
+                    finalBAC: calculateBAC(),
+                    totalCarbs: totalCarbs + drinkData.carbs,
+                    totalLiquid: totalLiquid + drinkData.servingSize,
+                    sessionStart: sessionStartTime,
+                    sessionEnd: new Date(),
+                    drinks: drinks.map(d => ({
+                        name: d.name,
+                        count: 1,
+                        calories: d.nutrition.calories,
+                        standardDrinks: d.standardDrinks,
+                        time: d.time,
+                        _id: d._id || Date.now().toString()
+                    }))
+                };
+
+                const response = await fetch(`${API_BASE_URL}/tracking/add-drink`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        drinkName: drinkName,
+                        drinkData: drinkData,
+                        sessionStats: sessionStats
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ Drink update sent to server successfully');
+                } else {
+                    console.log('⚠️ Failed to send drink update to server');
+                }
+            } catch (error) {
+                console.error('❌ Error sending drink update to server:', error);
+            }
         }
 
         async function addToFavorites(drinkKey) {
@@ -14281,6 +14379,111 @@
             } catch (error) {
                 console.error('Error initializing social features:', error);
             }
+        }
+
+        // Real-time updates with Server-Sent Events
+        let eventSource = null;
+        let isConnectedToSSE = false;
+
+        // Connect to Server-Sent Events for real-time updates
+        function connectToSSE() {
+            const token = localStorage.getItem('token');
+            if (!token || isConnectedToSSE) return;
+
+            try {
+                eventSource = new EventSource(`${API_BASE_URL}/social/events`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                eventSource.onopen = function(event) {
+                    console.log('✅ Connected to real-time updates');
+                    isConnectedToSSE = true;
+                    showNotification('Connected to real-time updates! 🔴', 'success');
+                };
+
+                eventSource.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('📡 Received real-time update:', data);
+                        
+                        if (data.type === 'new_post') {
+                            // Add the new post to the feed
+                            addNewPostToFeed(data.post);
+                            showNotification(data.message, 'info');
+                        }
+                    } catch (error) {
+                        console.error('❌ Error parsing SSE message:', error);
+                    }
+                };
+
+                eventSource.onerror = function(event) {
+                    console.error('❌ SSE connection error:', event);
+                    isConnectedToSSE = false;
+                    
+                    // Attempt to reconnect after 5 seconds
+                    setTimeout(() => {
+                        if (!isConnectedToSSE) {
+                            console.log('🔄 Attempting to reconnect to SSE...');
+                            connectToSSE();
+                        }
+                    }, 5000);
+                };
+
+            } catch (error) {
+                console.error('❌ Error connecting to SSE:', error);
+            }
+        }
+
+        // Disconnect from SSE
+        function disconnectFromSSE() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                isConnectedToSSE = false;
+                console.log('🔌 Disconnected from SSE');
+            }
+        }
+
+        // Add new post to feed without full reload
+        function addNewPostToFeed(newPost) {
+            if (!newPost) return;
+            
+            const feedContainer = document.getElementById('feed-container');
+            if (!feedContainer) return;
+
+            // Check if we're currently on the social feed page
+            const socialFeedPage = document.getElementById('social-feed-page');
+            if (!socialFeedPage || socialFeedPage.style.display === 'none') {
+                return; // Don't update if not on social feed page
+            }
+
+            // Add the new post to the beginning of the feed
+            const newPostHTML = renderPost(newPost);
+            const existingPosts = feedContainer.querySelector('.post');
+            
+            if (existingPosts) {
+                feedContainer.insertBefore(createElementFromHTML(newPostHTML), existingPosts);
+            } else {
+                feedContainer.innerHTML = newPostHTML + feedContainer.innerHTML;
+            }
+
+            // Show a subtle animation for the new post
+            const firstPost = feedContainer.querySelector('.post');
+            if (firstPost) {
+                firstPost.style.animation = 'slideInFromTop 0.5s ease-out';
+                setTimeout(() => {
+                    firstPost.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Helper function to create element from HTML string
+        function createElementFromHTML(htmlString) {
+            const div = document.createElement('div');
+            div.innerHTML = htmlString.trim();
+            return div.firstChild;
         }
 
         // Social Feed Functions
@@ -14402,6 +14605,8 @@
                             
                             console.log('📝 Combined posts to render (sorted by recent):', feedPosts);
                             renderFeed();
+                            // Connect to real-time updates after loading feed
+                            connectToSSE();
                         } else if (validPosts.length > 0) {
                             // Combine night shares and regular posts
                             feedPosts = [...nightSharePosts, ...regularPosts];
@@ -14415,6 +14620,8 @@
                             
                             console.log('📝 Valid posts to render (sorted by recent):', feedPosts);
                             renderFeed();
+                            // Connect to real-time updates after loading feed
+                            connectToSSE();
                         } else {
                             console.log('❌ No valid posts or drink data found, showing empty state');
                             showEmptyFeedWithCreateButton();

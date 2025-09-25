@@ -342,6 +342,121 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// Real-time updates with Server-Sent Events
+const connectedClients = new Set();
+
+app.get('/api/social/events', authenticateToken, (req, res) => {
+    // Set up Server-Sent Events
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control'
+    });
+
+    // Add client to connected clients
+    const clientId = req.user.id;
+    connectedClients.add({ id: clientId, res: res });
+
+    // Send initial connection message
+    res.write(`data: ${JSON.stringify({ type: 'connected', message: 'Connected to real-time updates' })}\n\n`);
+
+    // Handle client disconnect
+    req.on('close', () => {
+        connectedClients.delete({ id: clientId, res: res });
+        console.log(`Client ${clientId} disconnected from SSE`);
+    });
+
+    console.log(`Client ${clientId} connected to SSE`);
+});
+
+// Broadcast function to send updates to all connected clients
+function broadcastUpdate(update) {
+    const message = `data: ${JSON.stringify(update)}\n\n`;
+    connectedClients.forEach(client => {
+        try {
+            client.res.write(message);
+        } catch (error) {
+            console.error('Error sending SSE message:', error);
+            connectedClients.delete(client);
+        }
+    });
+}
+
+// API endpoint to add a drink to night tracker
+app.post('/api/tracking/add-drink', authenticateToken, async (req, res) => {
+    try {
+        if (!dbConnected || !User) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available'
+            });
+        }
+
+        const { drinkName, drinkData, sessionStats } = req.body;
+
+        if (!drinkName || !drinkData) {
+            return res.status(400).json({
+                success: false,
+                message: 'Drink name and data are required'
+            });
+        }
+
+        // Create a live update post for the feed
+        const liveUpdatePost = {
+            userId: req.user.id,
+            content: `🍺 Live Update: Just added ${drinkName} to my night! (${sessionStats?.totalDrinks || 1} drinks total)`,
+            type: 'regular',
+            sessionStats: sessionStats || {
+                totalDrinks: 1,
+                totalCalories: drinkData.calories || 0,
+                totalStandardDrinks: drinkData.standardDrinks || 0,
+                totalStandards: drinkData.standardDrinks || 0,
+                sessionDuration: 0,
+                totalBAC: 0,
+                finalBAC: 0,
+                totalCarbs: drinkData.carbs || 0,
+                totalLiquid: drinkData.servingSize || 0,
+                drinks: [{
+                    name: drinkName,
+                    count: 1,
+                    calories: drinkData.calories || 0,
+                    standardDrinks: drinkData.standardDrinks || 0,
+                    time: new Date(),
+                    _id: Date.now().toString()
+                }]
+            }
+        };
+
+        // Save the post to database
+        const post = new Post(liveUpdatePost);
+        await post.save();
+        await post.populate('userId', 'name email');
+
+        // Broadcast the update to all connected clients
+        broadcastUpdate({
+            type: 'new_post',
+            post: post,
+            message: `${req.user.name || 'Someone'} just added ${drinkName} to their night!`
+        });
+
+        res.json({
+            success: true,
+            message: 'Drink added successfully',
+            post: post
+        });
+
+    } catch (error) {
+        console.error('❌ Add drink error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error adding drink',
+            error: error.message
+        });
+    }
+});
+
 // Social Feed Endpoints
 
 // Get social feed
