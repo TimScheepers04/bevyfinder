@@ -14567,6 +14567,17 @@
                     userName = post.user.email.split('@')[0]; // Use email prefix as name
                     userInitial = userName.charAt(0).toUpperCase();
                 }
+            } else if (post && post.userId) {
+                if (post.userId.name) {
+                    userName = post.userId.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.userId.username) {
+                    userName = post.userId.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.userId.email) {
+                    userName = post.userId.email.split('@')[0]; // Use email prefix as name
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
             } else if (post && post.author) {
                 // Alternative structure with 'author' instead of 'user'
                 if (post.author.name) {
@@ -14648,6 +14659,17 @@
                     userInitial = userName.charAt(0).toUpperCase();
                 } else if (post.user.email) {
                     userName = post.user.email.split('@')[0];
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            } else if (post && post.userId) {
+                if (post.userId.name) {
+                    userName = post.userId.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.userId.username) {
+                    userName = post.userId.username;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.userId.email) {
+                    userName = post.userId.email.split('@')[0];
                     userInitial = userName.charAt(0).toUpperCase();
                 }
             } else if (post && post.author) {
