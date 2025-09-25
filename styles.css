@@ -106,7 +106,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--gray-800);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -118,7 +118,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     background-attachment: fixed;
     padding: var(--spacing-4);
     position: relative;
@@ -157,7 +157,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
@@ -253,12 +253,12 @@ body {
 .checkbox-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #667eea;
+    accent-color: #404040;
     cursor: pointer;
 }
 
 .checkbox-label:hover {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .form-group select {
@@ -311,7 +311,7 @@ body {
 }
 
 .auth-btn.primary {
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     color: var(--white);
     box-shadow: var(--shadow-lg);
 }
@@ -335,8 +335,8 @@ body {
 
 .auth-toggle-btn {
     background: none;
-    border: 2px solid #667eea;
-    color: #667eea;
+    border: 2px solid #404040;
+    color: #ffd700;
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
@@ -345,7 +345,7 @@ body {
 }
 
 .auth-toggle-btn:hover {
-    background: #667eea;
+    background: #404040;
     color: white;
 }
 
@@ -364,7 +364,7 @@ body {
 .skip-btn {
     background: none;
     border: none;
-    color: #667eea;
+    color: #ffd700;
     text-decoration: underline;
     cursor: pointer;
     font-weight: 600;
@@ -405,7 +405,7 @@ body {
 
 .feature-item i {
     font-size: 2rem;
-    color: #667eea;
+    color: #ffd700;
     margin-bottom: 15px;
 }
 
@@ -476,7 +476,7 @@ body {
     min-height: 100vh;
     text-align: center;
     color: var(--white);
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     background-attachment: fixed;
     position: relative;
     overflow: hidden;
@@ -711,7 +711,7 @@ body {
     text-align: center;
     margin-bottom: var(--spacing-10);
     color: var(--white);
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     padding: var(--spacing-8);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
@@ -939,7 +939,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 0;
@@ -1019,7 +1019,7 @@ body {
 
 .input-wrapper input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #404040;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     color: #333;
 }
@@ -1039,7 +1039,7 @@ body {
 .search-btn {
     position: absolute;
     right: 8px;
-    background: #667eea;
+    background: #404040;
     color: white;
     border: none;
     border-radius: 8px;
@@ -1221,19 +1221,19 @@ body {
 }
 
 .upload-area:hover {
-    border-color: #667eea;
+    border-color: #404040;
     background: #f8f9ff;
 }
 
 .upload-area.dragover {
-    border-color: #667eea;
+    border-color: #404040;
     background: #f0f4ff;
     transform: scale(1.02);
 }
 
 .upload-content i {
     font-size: 3rem;
-    color: #667eea;
+    color: #ffd700;
     margin-bottom: 20px;
 }
 
@@ -1249,7 +1249,7 @@ body {
 }
 
 .upload-btn {
-    background: #667eea;
+    background: #404040;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -1332,7 +1332,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #404040 0%, #ffd700 100%);
     border-radius: 2px;
 }
 
@@ -1409,9 +1409,9 @@ body {
 }
 
 .beverage-photo-area:hover {
-    border-color: #667eea;
+    border-color: #404040;
     background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
-    color: #667eea;
+    color: #ffd700;
     transform: scale(1.02);
 }
 
@@ -1454,7 +1454,7 @@ body {
 }
 
 .tag {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     padding: 6px 16px;
     border-radius: 25px;
@@ -1489,7 +1489,7 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #404040 0%, #ffd700 100%);
 }
 
 .nutrition-section h4 {
@@ -1534,7 +1534,7 @@ body {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #404040 0%, #ffd700 100%);
 }
 
 .nutrition-item:hover {
@@ -1604,7 +1604,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 0;
@@ -1680,7 +1680,7 @@ body {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #404040 0%, #ffd700 100%);
 }
 
 .serving-stat {
@@ -1758,7 +1758,7 @@ body {
 
 .menu-btn i {
     font-size: 1.2rem;
-    color: #667eea;
+    color: #ffd700;
 }
 
 /* Sidebar */
@@ -1768,7 +1768,7 @@ body {
     left: -300px;
     width: 300px;
     height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     z-index: 2000;
     transition: left 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
@@ -1930,7 +1930,7 @@ body {
 }
 
 .favorite-card-type {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -1965,7 +1965,7 @@ body {
 }
 
 .view-favorite-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
 }
 
@@ -2016,7 +2016,7 @@ body {
 }
 
 .start-exploring-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     border: none;
     padding: 15px 30px;
@@ -2332,7 +2332,7 @@ body {
 }
 
 .view-history-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
 }
 
@@ -2395,7 +2395,7 @@ body {
     align-items: center;
     gap: 4px;
     font-size: 0.8rem;
-    color: #667eea;
+    color: #ffd700;
     font-weight: 500;
 }
 
@@ -2621,7 +2621,7 @@ body {
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border-top: 3px solid #ffd700;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -2652,7 +2652,7 @@ body {
 .profile-page {
     display: none;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     padding: 20px;
 }
 
@@ -2731,7 +2731,7 @@ body {
 
 .stat-card i {
     font-size: 2rem;
-    color: #667eea;
+    color: #ffd700;
 }
 
 .stat-info {
@@ -2793,7 +2793,7 @@ body {
 }
 
 .drink-btn {
-    background: #667eea;
+    background: #404040;
     color: white;
     border: none;
     border-radius: 8px;
@@ -2835,12 +2835,12 @@ body {
 
 /* Enhanced Profile Styles */
 .profile-value {
-    color: #667eea;
+    color: #ffd700;
     font-weight: 600;
 }
 
 .profile-btn.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
 }
 
@@ -2890,7 +2890,7 @@ body {
 /* Dashboard Styles */
 .dashboard-page {
     min-height: 100vh;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     display: none;
 }
 
@@ -2928,7 +2928,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
@@ -2945,7 +2945,7 @@ body {
     width: 80px;
     height: 80px;
     border-radius: var(--radius-full);
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3022,7 +3022,7 @@ body {
 }
 
 .dashboard-section h3 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .activity-item,
@@ -3048,7 +3048,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3214,8 +3214,8 @@ body {
 
 .helpful-btn:hover {
     background: #f8f9ff;
-    border-color: #667eea;
-    color: #667eea;
+    border-color: #404040;
+    color: #ffd700;
 }
 
 .review-form {
@@ -3272,7 +3272,7 @@ body {
 
 .review-form textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #404040;
 }
 
 .submit-review-btn {
@@ -3297,7 +3297,7 @@ body {
 }
 
 .write-review-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -3364,7 +3364,7 @@ body {
 }
 
 .session-info h3 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .session-info p {
@@ -3461,7 +3461,7 @@ body {
 }
 
 .alcohol-card .card-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
 }
 
 .calories-card .card-icon {
@@ -3513,7 +3513,7 @@ body {
 }
 
 .add-drink-section h3 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .add-drink-input {
@@ -3535,13 +3535,13 @@ body {
 
 .add-drink-input input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #404040;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .add-drink-btn {
     padding: 12px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -3587,7 +3587,7 @@ body {
 }
 
 .drink-list-section h3 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .drink-list {
@@ -3678,7 +3678,7 @@ body {
 }
 
 .nutrition-details h3 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .nutrition-grid {
@@ -3899,7 +3899,7 @@ body {
     justify-content: space-between;
     padding: 25px 30px;
     border-bottom: 1px solid #e1e5e9;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
     border-radius: 20px 20px 0 0;
 }
@@ -3957,7 +3957,7 @@ body {
 }
 
 .form-section h4 i {
-    color: #667eea;
+    color: #ffd700;
 }
 
 .form-group {
@@ -3988,7 +3988,7 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #404040;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -4037,7 +4037,7 @@ body {
 }
 
 .save-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #404040 0%, #ffd700 100%);
     color: white;
 }
 
@@ -4546,7 +4546,7 @@ body {
 }
 
 .add-friend-btn {
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -4589,7 +4589,7 @@ body {
 .friend-avatar {
     width: 60px;
     height: 60px;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -4769,7 +4769,7 @@ body {
 }
 
 .btn-primary {
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     color: white;
 }
 
@@ -4865,7 +4865,7 @@ body {
 .creator-avatar {
     width: 80px;
     height: 80px;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #404040 0%, #2a2a2a 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
