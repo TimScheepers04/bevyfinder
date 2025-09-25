@@ -5716,6 +5716,265 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+
+        /* Live Update Post Styling */
+        .live-update-post {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .live-update-post::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            animation: liveGradient 2s ease-in-out infinite;
+        }
+
+        @keyframes liveGradient {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .live-update-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px 12px;
+            gap: 12px;
+        }
+
+        .live-update-avatar {
+            position: relative;
+        }
+
+        .live-avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .live-avatar-initial {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .live-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #ff4757;
+            border: 3px solid #1a1a1a;
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .live-update-user-info {
+            flex: 1;
+        }
+
+        .live-user-name {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+        }
+
+        .live-update-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .session-duration {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .live-update-badge {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: liveBadgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes liveBadgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .live-update-badge i {
+            font-size: 10px;
+        }
+
+        .live-update-content {
+            padding: 0 20px 20px;
+        }
+
+        .live-update-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .live-update-message i {
+            color: #4ecdc4;
+            font-size: 16px;
+        }
+
+        .live-update-message span {
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        .live-update-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .live-update-drinks {
+            margin-top: 16px;
+        }
+
+        .live-update-drinks h5 {
+            color: #ffffff;
+            font-size: 14px;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-update-drinks h5 i {
+            color: #4ecdc4;
+            font-size: 12px;
+        }
+
+        .drinks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .live-update-drink-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .drink-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .drink-name {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .drink-standards {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .drink-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        /* Mobile responsive for live updates */
+        @media (max-width: 768px) {
+            .live-update-header {
+                padding: 12px 16px 8px;
+            }
+
+            .live-update-content {
+                padding: 0 16px 16px;
+            }
+
+            .live-update-stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-item {
+                padding: 10px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .live-update-message {
+                padding: 10px 12px;
+            }
+
+            .live-update-drink-item {
+                padding: 6px 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -14228,9 +14487,20 @@
                     abv: drink.abv || 5
                 };
 
-                // Get current session stats
+                // Get current session stats with the new drink added
+                const updatedDrinks = [...drinks, {
+                    name: drinkName,
+                    nutrition: {
+                        calories: drinkData.calories,
+                        carbs: drinkData.carbs
+                    },
+                    standardDrinks: drinkData.standardDrinks,
+                    time: new Date(),
+                    _id: Date.now().toString()
+                }];
+
                 const sessionStats = {
-                    totalDrinks: drinks.length + 1,
+                    totalDrinks: updatedDrinks.length,
                     totalCalories: totalCalories + drinkData.calories,
                     totalStandardDrinks: totalStandards + drinkData.standardDrinks,
                     totalStandards: totalStandards + drinkData.standardDrinks,
@@ -14241,7 +14511,7 @@
                     totalLiquid: totalLiquid + drinkData.servingSize,
                     sessionStart: sessionStartTime,
                     sessionEnd: new Date(),
-                    drinks: drinks.map(d => ({
+                    drinks: updatedDrinks.map(d => ({
                         name: d.name,
                         count: 1,
                         calories: d.nutrition.calories,
@@ -14479,6 +14749,126 @@
             }
         }
 
+        // Render live update posts with clean, professional design
+        function renderLiveUpdatePost(post) {
+            console.log('🔴 Rendering live update post:', post);
+            
+            // Get user information
+            let userName = 'Unknown User';
+            let userInitial = 'U';
+            
+            if (post && post.userId) {
+                if (post.userId.name) {
+                    userName = post.userId.name;
+                    userInitial = userName.charAt(0).toUpperCase();
+                } else if (post.userId.email) {
+                    userName = post.userId.email.split('@')[0];
+                    userInitial = userName.charAt(0).toUpperCase();
+                }
+            }
+
+            // Get live update data
+            const liveData = post.liveUpdateData || {};
+            const sessionStats = post.sessionStats || {};
+            const drinksConsumed = liveData.drinksConsumed || sessionStats.drinks || [];
+            const totalDrinks = liveData.totalDrinks || sessionStats.totalDrinks || 0;
+            const totalStandards = liveData.totalStandards || sessionStats.totalStandards || 0;
+            const sessionDuration = liveData.sessionDuration || sessionStats.sessionDuration || 0;
+            const sessionStart = liveData.sessionStart || sessionStats.sessionStart;
+
+            // Format session duration
+            const formatDuration = (minutes) => {
+                if (minutes < 60) return `${minutes}m`;
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+            };
+
+            // Format time since session started
+            const getSessionTime = () => {
+                if (!sessionStart) return '';
+                const start = new Date(sessionStart);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - start) / (1000 * 60));
+                return formatDuration(diffMinutes);
+            };
+
+            const postDate = post.createdAt ? formatDate(post.createdAt) : 'Just now';
+            const sessionTime = getSessionTime();
+
+            // Create drinks list HTML
+            const drinksListHTML = drinksConsumed.map(drink => {
+                const drinkTime = drink.time ? new Date(drink.time).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }) : '';
+                return `
+                    <div class="live-update-drink-item">
+                        <div class="drink-info">
+                            <span class="drink-name">${drink.name}</span>
+                            <span class="drink-standards">${drink.standardDrinks || 0} standards</span>
+                        </div>
+                        <div class="drink-time">${drinkTime}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="post live-update-post">
+                    <div class="live-update-header">
+                        <div class="live-update-avatar">
+                            <div class="live-avatar-circle">
+                                <span class="live-avatar-initial">${userInitial}</span>
+                            </div>
+                            <div class="live-indicator"></div>
+                        </div>
+                        <div class="live-update-user-info">
+                            <h4 class="live-user-name">${userName}</h4>
+                            <div class="live-update-meta">
+                                <span class="live-update-time">${postDate}</span>
+                                ${sessionTime ? `<span class="session-duration">• ${sessionTime} session</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="live-update-badge">
+                            <i class="fas fa-broadcast-tower"></i>
+                            <span>Live</span>
+                        </div>
+                    </div>
+                    
+                    <div class="live-update-content">
+                        <div class="live-update-message">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Added <strong>${liveData.drinkAdded || 'a drink'}</strong> to their night!</span>
+                        </div>
+                        
+                        <div class="live-update-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${totalDrinks}</div>
+                                <div class="stat-label">Drinks</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${totalStandards.toFixed(1)}</div>
+                                <div class="stat-label">Standards</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${sessionStats.totalCalories || 0}</div>
+                                <div class="stat-label">Calories</div>
+                            </div>
+                        </div>
+                        
+                        ${drinksConsumed.length > 0 ? `
+                        <div class="live-update-drinks">
+                            <h5><i class="fas fa-list"></i> Drinks Consumed</h5>
+                            <div class="drinks-list">
+                                ${drinksListHTML}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
         // Helper function to create element from HTML string
         function createElementFromHTML(htmlString) {
             const div = document.createElement('div');
@@ -14706,15 +15096,15 @@
                         console.log('🎨 Has sessionStats:', !!post.sessionStats);
                         console.log('🎨 Content includes "Shared my night out":', post.content ? post.content.includes('Shared my night out') : false);
                         
+                        // Check if this is a live update post
+                        if (post.type === 'live_update' || post.isLiveUpdate) {
+                            console.log('🔴 Rendering as live update post');
+                            return renderLiveUpdatePost(post);
+                        }
                         // Check if this should be rendered as a night share post
-                        const shouldRenderAsNightShare = post.type === 'night_share' || 
-                                                       (post.sessionStats && post.sessionStats.totalDrinks > 0) ||
-                                                       (post.sessionStats && post.content && post.content.includes('Shared my night out'));
-                        
-                        console.log('🎨 Should render as night share:', shouldRenderAsNightShare);
-                        console.log('🎨 Post sessionStats:', post.sessionStats);
-                        
-                        if (shouldRenderAsNightShare) {
+                        else if (post.type === 'night_share' || 
+                                 (post.sessionStats && post.sessionStats.totalDrinks > 0) ||
+                                 (post.sessionStats && post.content && post.content.includes('Shared my night out'))) {
                             console.log('🌙 Rendering as night share post');
                             return renderNightSharePost(post);
                         } else if (post.type === 'drink_session') {

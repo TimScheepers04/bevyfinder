@@ -403,11 +403,29 @@ app.post('/api/tracking/add-drink', authenticateToken, async (req, res) => {
             });
         }
 
-        // Create a live update post for the feed
+        // Get user info for the post
+        const user = await User.findById(req.user.id);
+        const userName = user?.name || 'Someone';
+
+        // Create a more detailed and professional live update post
+        const totalDrinks = sessionStats?.totalDrinks || 1;
+        const totalStandards = sessionStats?.totalStandards || drinkData.standardDrinks || 0;
+        
+        // Create drink list for display
+        const drinksList = sessionStats?.drinks || [{
+            name: drinkName,
+            count: 1,
+            calories: drinkData.calories || 0,
+            standardDrinks: drinkData.standardDrinks || 0,
+            time: new Date(),
+            _id: Date.now().toString()
+        }];
+
         const liveUpdatePost = {
             userId: req.user.id,
-            content: `🍺 Live Update: Just added ${drinkName} to my night! (${sessionStats?.totalDrinks || 1} drinks total)`,
-            type: 'regular',
+            content: `🍺 ${userName} just added ${drinkName} to their night!`,
+            type: 'live_update', // New type for live updates
+            isLiveUpdate: true,
             sessionStats: sessionStats || {
                 totalDrinks: 1,
                 totalCalories: drinkData.calories || 0,
@@ -418,14 +436,18 @@ app.post('/api/tracking/add-drink', authenticateToken, async (req, res) => {
                 finalBAC: 0,
                 totalCarbs: drinkData.carbs || 0,
                 totalLiquid: drinkData.servingSize || 0,
-                drinks: [{
-                    name: drinkName,
-                    count: 1,
-                    calories: drinkData.calories || 0,
-                    standardDrinks: drinkData.standardDrinks || 0,
-                    time: new Date(),
-                    _id: Date.now().toString()
-                }]
+                drinks: drinksList
+            },
+            // Additional data for live updates
+            liveUpdateData: {
+                userName: userName,
+                drinkAdded: drinkName,
+                totalDrinks: totalDrinks,
+                totalStandards: totalStandards,
+                drinksConsumed: drinksList,
+                sessionDuration: sessionStats?.sessionDuration || 0,
+                sessionStart: sessionStats?.sessionStart,
+                timestamp: new Date()
             }
         };
 
@@ -438,7 +460,7 @@ app.post('/api/tracking/add-drink', authenticateToken, async (req, res) => {
         broadcastUpdate({
             type: 'new_post',
             post: post,
-            message: `${req.user.name || 'Someone'} just added ${drinkName} to their night!`
+            message: `${userName} just added ${drinkName} to their night!`
         });
 
         res.json({
