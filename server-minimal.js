@@ -113,10 +113,11 @@ const connectDB = async () => {
         console.log('✅ User model created successfully');
         
         // Create Post model for social feed
-        const postSchema = new mongoose.Schema({
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-            content: { type: String, required: true },
-            type: { type: String, enum: ['regular', 'night_share'], default: 'regular' },
+const postSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    content: { type: String, required: true },
+    type: { type: String, enum: ['regular', 'night_share', 'live_update'], default: 'regular' },
+    isLiveUpdate: { type: Boolean, default: false },
             sessionStats: {
                 totalDrinks: { type: Number, default: 0 },
                 totalCalories: { type: Number, default: 0 },
@@ -137,6 +138,23 @@ const connectDB = async () => {
                     time: Date,
                     _id: String
                 }]
+            },
+            liveUpdateData: {
+                userName: String,
+                drinkAdded: String,
+                totalDrinks: Number,
+                totalStandards: Number,
+                drinksConsumed: [{
+                    name: String,
+                    count: Number,
+                    calories: Number,
+                    standardDrinks: Number,
+                    time: Date,
+                    _id: String
+                }],
+                sessionDuration: Number,
+                sessionStart: Date,
+                timestamp: Date
             },
             likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
             comments: [{
